@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ModuLaser Module Current Draw — Reference Table</title>
+<style>
+  :root{
+    --bg: #14181c; --panel: #1b2127; --panel-2: #20262d; --panel-3: #262e36;
+    --border-soft: rgba(255,255,255,0.08);
+    --text: #e9edf1; --text-dim: #b8c0c8; --text-faint: #7c8791;
+    --accent: #ff9130; --good: #4bb583; --good-soft: rgba(75,181,131,0.12);
+    --sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    background: var(--bg); color: var(--text); font-family: var(--sans);
+    margin:0; padding:32px 24px 64px; line-height:1.5;
+  }
+  .wrap{ max-width: 880px; margin:0 auto; }
+  h1{ font-size:22px; margin:0 0 4px; }
+  .sub{ color: var(--text-faint); font-size:13px; margin:0 0 24px; }
+  .card{
+    background: var(--panel); border:1px solid var(--border-soft); border-radius:8px;
+    padding:20px 22px; margin-bottom:20px;
+  }
+  table{ width:100%; border-collapse:collapse; font-family: var(--mono); font-size:13px; }
+  th{
+    text-align:left; font-family: var(--sans); font-size:10.5px; text-transform:uppercase;
+    letter-spacing:0.5px; color: var(--text-faint); font-weight:600;
+    padding:0 10px 8px; border-bottom:1px solid var(--border-soft);
+  }
+  th.num, td.num{ text-align:right; }
+  td{ padding:7px 10px; border-bottom:1px solid rgba(255,255,255,0.04); color: var(--text-dim); }
+  tr.display-row td{ color: var(--text); }
+  tr.display-row{ background: var(--panel-2); }
+  .model{ color: var(--text-faint); font-size:12px; }
+  .footnote-marker{ color: var(--accent); font-weight:700; cursor:default; }
+  .section-label{
+    font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color: var(--text-faint);
+    font-weight:600; margin: 22px 0 8px; padding-bottom:6px; border-bottom:1px solid var(--border-soft);
+  }
+  .notes{ background: var(--panel-3); border-radius:6px; padding:14px 16px; font-size:12.5px; color: var(--text-dim); }
+  .notes ol{ margin:0; padding-left:18px; }
+  .notes li{ margin-bottom:8px; }
+  .notes li:last-child{ margin-bottom:0; }
+  footer{ color: var(--text-faint); font-size:11px; text-align:center; margin-top:28px; font-family: var(--mono); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>ModuLaser Module Current Draw — Reference Table</h1>
+    <p class="sub">18V figures per the manufacturer's current-draw worksheet · 24V figures as embedded in the ModuLaser Battery Calculator</p>
+
+    <div class="card">
+      <div class="section-label">Display Modules</div>
+      <table>
+        <thead>
+          <tr><th>Module Type</th><th>Model</th><th class="num">18V Current</th><th class="num">24V Current (calculator)</th></tr>
+        </thead>
+        <tbody>
+          <tr class="display-row">
+            <td>Minimum Display <span class="footnote-marker" title="See note 3">¹</span></td>
+            <td class="model">FHSD8300-ULF</td>
+            <td class="num">242 mA</td>
+            <td class="num">210 mA</td>
+          </tr>
+          <tr class="display-row">
+            <td>Standard Display</td>
+            <td class="model">FHSD8310-ULF</td>
+            <td class="num">266 mA</td>
+            <td class="num">232 mA</td>
+          </tr>
+          <tr class="display-row">
+            <td>Command Display <span class="footnote-marker" title="See note 4">²</span></td>
+            <td class="model">FHSD8320-ULF</td>
+            <td class="num">266 mA</td>
+            <td class="num">232 mA</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="section-label">Detectors — by Fan Speed</div>
+      <table>
+        <thead>
+          <tr><th>Module Type</th><th>Model</th><th class="num">18V Current</th><th class="num">24V Current (calculator)</th></tr>
+        </thead>
+        <tbody id="detector-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="notes">
+      <ol>
+        <li>18V figures shown are taken directly from the manufacturer's current-draw worksheet at the 18.0V test point ("New UL Values").</li>
+        <li>24V figures are the values embedded in the ModuLaser Battery Calculator, which do not match either the 18.0V or 20.4V rows in the manufacturer worksheet exactly — they reflect a separate reference point used when the calculator was built.</li>
+        <li>Display rows are collapsed to a single current value each, per the calculator's own model (which does not distinguish TFT or LEDS state) — the TFT-On/LEDS-On (highest-draw) state was used to select the corresponding 18V figure.</li>
+        <li><b>¹ Minimum Display:</b> the manufacturer worksheet publishes only the LEDS-Off state for this display (no TFT) at 18V — no LEDS-On figure is available in the source data, so 242 mA is the highest published value rather than a true TFT-On/LEDS-On worst case.</li>
+        <li><b>² Command Display:</b> no separate current-draw entry exists for this display in the source manufacturer table. This reuses the Standard Display figure, consistent with the calculator's own treatment of both display types as electrically identical (FHSD8310-ULF and FHSD8320-ULF share the same 232 mA rating in the calculator).</li>
+      </ol>
+    </div>
+
+    <footer>ModuLaser Battery Calculator — Current Draw Reference</footer>
+  </div>
+
+<script>
+const fan18v = [250,279,305,330,358,380,430,465,517,566,615,685,733,786,872,1021];
+const fan24v = [218,234,255,279,301,330,363,393,431,471,506,552,602,646,712,762];
+const tbody = document.getElementById('detector-rows');
+tbody.innerHTML = fan18v.map((v18, i) => `
+  <tr>
+    <td>Detector (Fan Speed ${i+1})</td>
+    <td class="model">FHSD8330-ULF</td>
+    <td class="num">${v18} mA</td>
+    <td class="num">${fan24v[i]} mA</td>
+  </tr>
+`).join('');
+</script>
+</body>
+</html>
