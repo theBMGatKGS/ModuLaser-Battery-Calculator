@@ -1,0 +1,27 @@
+directories:
+  output: dist
+  buildResources: build
+electronDownload:
+  mirror: file:///C:/ElectronMirror/
+appId: com.kgs.modulasercalculator
+productName: ModuLaser Battery Calculator
+files:
+  - filter:
+      - main.js
+      - app/**/*
+      - build/icon.png
+win:
+  target:
+    - nsis
+  icon: build/icon.ico
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+mac:
+  target:
+    - dmg
+  icon: build/icon.icns
+  category: public.app-category.utilities
+electronVersion: 31.7.7

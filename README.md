@@ -1,73 +1,92 @@
-# ModuLaser Battery Calculator
+# ModuLaser Battery Calculator — Desktop App (Electron)
 
-A fire alarm standby battery sizing calculator for the ModuLaser aspirating smoke
-detection (ASD) product line on Edwards EST fire alarm platforms — built for
-mission-critical / data center fire and life safety design work.
+Wraps the calculator in a real desktop window for Windows and macOS, with
+its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
-**Current revision:** 01.04.008 — see [CHANGELOG.md](./CHANGELOG.md) for the full history, or open the calculator's own **Help → Revision Log** for the same information in-app.
+## One-time setup
 
----
+1. Install [Node.js](https://nodejs.org) (LTS version) if you don't have it.
+2. Open a terminal in this folder and run:
+   ```
+   npm install
+   ```
 
-## What it does
+## Try it without building anything
 
-Given a network of ModuLaser display and detector modules (addresses, zones, fan
-speeds, cluster assignments), the calculator:
+```
+npm start
+```
+Opens the calculator in an Electron window right away — good for checking
+everything works before you build an installer.
 
-- Computes total system current draw and required standby/alarm battery capacity
-  per the applicable code or standard.
-- Supports **13 Design Basis presets**: NFPA 72 (Standard, Voice, and NFPA 110
-  Generator Backup variants), UFC 3-600-01 (Hydro and FA/MNS), AWS, CAN/ULC-S524:2024
-  (Standard and Voice), four BS 5839-1 categories, and a fully custom basis —
-  each with its own verified code citation and, for BS 5839-1, a genuinely
-  different sizing formula (Annex E, with an automatically-determined battery
-  de-rating factor).
-- Recommends the correct Edwards power supply, enclosure, and battery hardware —
-  or, in third-party mode, hands off raw load figures for use with another
-  manufacturer's own sizing tool.
-- Validates the design as you build it: soft advisory flags (duplicate
-  addresses, missing circuit sources, oversized ribbon segments) and hard
-  invalid-calculation triggers (missing fan speed or address, battery capacity
-  exceeding the largest available unit, AUX circuit overcurrent) that withhold
-  hardware recommendations until resolved.
-- Supports both **Networked** (network-wide unique addressing, 1–127) and
-  **Standalone** (per-cluster addressing, 1–9, for a cluster with no SenseNET
-  pathway to the rest of the network) addressing schemes, per sheet.
-- Produces a print-ready output tuned to fit one power supply's full calculation
-  on a single printed page, with an optional Bill of Materials and an optional
-  granular per-module calculation-detail page.
-- Includes a built-in 4-section Help menu (How to Use the Calculator, Standards
-  and Formulas, FAQs, Revision Log) covering the full workflow and every cited
-  formula/standard in detail.
+## Build an installer
 
-## Deliverables
+```
+npm run build:win     # → dist/ModuLaser Battery Calculator Setup 1.0.0.exe
+npm run build:mac     # → dist/ModuLaser Battery Calculator-1.0.0.dmg
+npm run build:all     # both, if your machine can build both (see note below)
+```
 
-This repository/branch produces three synced deliverables from one source file:
+### Important: macOS builds need to run on a Mac
 
-| Deliverable | What it is | Where |
-|---|---|---|
-| **Standalone HTML** | One self-contained `.html` file — no install, no server, works offline once downloaded | `modulaser_battery_calculator.html` |
-| **PWA** | The same calculator packaged as an installable web app (works offline, "Add to Home Screen" on mobile) | `pwa/` |
-| **Electron desktop app** | A Windows/macOS desktop app scaffold, buildable into an installer | `electron-app/` |
+`electron-builder` can build a **Windows** installer from Windows, macOS, or
+Linux. But it can **only build a macOS app/.dmg while running on macOS** —
+Apple's code-signing tools don't exist anywhere else. So:
 
-See [`electron-app/README.md`](./electron-app/README.md) and
-[`electron-app/Electron_to_EXE_Checklist.md`](./electron-app/Electron_to_EXE_Checklist.md)
-for building the desktop installer, and [`PAGES_SETUP.md`](./PAGES_SETUP.md) for
-publishing the standalone/PWA version live via GitHub Pages.
+- Building on **Windows**: `npm run build:win` works directly.
+  `npm run build:mac` will fail — you'd need a Mac (or a free CI service
+  like GitHub Actions with a `macos-latest` runner) to produce the .dmg.
+- Building on a **Mac**: both `build:win` and `build:mac` work directly.
 
-## Quick start
+If you don't have access to a Mac, the easiest free route is a GitHub
+Actions workflow that checks out this folder and runs `npm run build:mac`
+on a `macos-latest` runner — happy to help set that up if you want it.
 
-Open `modulaser_battery_calculator.html` directly in any modern browser — no
-build step, no dependencies to install. For the full walkthrough, use the
-in-app **Help** button once it's open (12-step Quick Start + a fully worked
-example).
+## About menu
 
-## Versioning
+The app has a Help → About menu item (and on macOS, the standard app menu's
+"About ModuLaser Battery Calculator" too) showing the revision and author —
+currently Revision `01.04.005_260810`, authored by The BMG. These are set
+as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
+update them there whenever you cut a new revision, and keep them matching
+the calculator's own title-bar Revision/Date cells and its "About" section
+in the Help overlay, so all three deliverables stay consistent.
 
-`MM.mm.rrr_YYMMDD` — major and minor version numbers are set deliberately, not
-auto-incremented; the patch number increments once per distinct logical change
-and resets when minor/major changes. Full detail in
-[CHANGELOG.md](./CHANGELOG.md).
+### Revision numbering scheme
 
-## License
+Format: `MM.mm.rrr_YYMMDD`
+- `MM` (major) and `mm` (minor) are set manually — never auto-changed.
+- `rrr` is a 3-digit counter, incremented by 1 for each distinct logical
+  change made in a chat session, reset to `000` only when `mm` is next
+  revised manually.
+- `YYMMDD` is the actual calendar date of that change.
 
-See [LICENSE](./LICENSE).
+The full running changelog lives in the `AMENDMENTS` array inside
+`app/modulaser_battery_calculator.html` (near the top of the `<script>`
+block) — that's the source of truth; the Electron About dialog just shows
+the latest revision and points here for the complete history.
+
+## Updating the calculator itself
+
+Replace `app/modulaser_battery_calculator.html` with the newer version
+whenever you get an updated export, then rebuild.
+
+## iOS
+
+Electron cannot produce an iOS app — it's a desktop-only technology
+(Windows/macOS/Linux). For iOS, use the PWA version of this calculator
+instead: host it (even a free static host like GitHub Pages or Netlify
+works), then on the iPhone open it in Safari and use
+Share → "Add to Home Screen." That gives a real home-screen icon and a
+standalone app-like window, with offline support via the service worker
+already built into the PWA package. A true native iOS app (App Store or
+sideloaded) would require Xcode, a paid $99/year Apple Developer account,
+and a substantially different build — not something this Electron setup
+can produce.
+
+## Folder contents
+
+- `main.js` — Electron entry point, opens the calculator in a window
+- `app/modulaser_battery_calculator.html` — the calculator itself
+- `build/icon.ico` / `icon.icns` / `icon.png` — app icons for Windows/macOS/Linux
+- `package.json` — dependencies + electron-builder configuration
