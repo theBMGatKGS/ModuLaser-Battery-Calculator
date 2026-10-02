@@ -7,9 +7,9 @@ its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
 Web / PWA: https://thebmgatkgs.github.io/ModuLaser-Battery-Calculator/
 
-Calculator revision **01.05.006_261002** (desktop installer **v1.0.2**).
+Calculator revision **01.05.007_261002** (desktop installer **v1.0.3**).
 
-- **Dropdown contrast** (01.05.006) — white text on black for Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other native selects / option lists
+- **Dropdown contrast** (01.05.007) — custom white-on-black listboxes for Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects (native option popups could not be styled reliably in Chromium after 01.05.006)
 - **Import Calc** — replace or merge saved `.html` files (collision prompts + older-revision warning)
 - **Clear** — this sheet or entire file (keep/clear header)
 - **Confirm defaults** — clear blue needs-entry on header + current-sheet factory defaults
@@ -38,8 +38,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser Battery Calculator Setup 1.0.2.exe
-npm run build:mac     # → dist/ModuLaser Battery Calculator-1.0.2.dmg
+npm run build:win     # → dist/ModuLaser Battery Calculator Setup 1.0.3.exe
+npm run build:mac     # → dist/ModuLaser Battery Calculator-1.0.3.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -62,7 +62,7 @@ on a `macos-latest` runner — happy to help set that up if you want it.
 
 The app has a Help → About menu item (and on macOS, the standard app menu's
 "About ModuLaser Battery Calculator" too) showing the revision and author —
-currently Revision `01.05.006_261002`, authored by The BMG. These are set
+currently Revision `01.05.007_261002`, authored by The BMG. These are set
 as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
 update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section

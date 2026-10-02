@@ -10,6 +10,7 @@ regenerate this file from it rather than hand-editing both.
 
 ## 01.05 — 2026-10-02
 
+- **01.05.007** (2026-10-02): Replaced unreliable native <select> option popups (Chromium/Electron still painted light OS menus with light text despite 01.05.006 CSS) with custom white-on-black listboxes for all calculator selects — Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and the rest. Native selects stay in the DOM (visually hidden) so value/change/save-load/needs-entry/validation keep working; open menus use fixed positioning to escape .location overflow clipping. Verified open menus via browser screenshots.
 - **01.05.006** (2026-10-02): Fixed native <select> dropdowns (Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects) that rendered white text on white background in the open option list — forced white text on black background for select and option elements, plus color-scheme:dark for Chromium/Electron/Safari native popups. Needs-entry soft blue chrome, yellow validation, and red invalid styles unchanged.
 - **01.05.005** (2026-10-02): Added searchable How Do I… in the main toolbar and Help overlay: type-ahead filters curated common topics plus other Help/FAQ/Quick Start entries, shows a short inline answer with a jump link into the full Help section.
 - **01.05.004** (2026-10-02): Quick Start updated with steps 13–16 documenting blue needs-entry highlights, Confirm defaults, Clear (sheet vs entire file), and Import Calc (replace/merge, collision choices, older-revision warning), each with qs-figure wireframes.

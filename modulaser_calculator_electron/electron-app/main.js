@@ -6,7 +6,7 @@ const path = require('path');
 // per change — see the AMENDMENTS list in app/modulaser_battery_calculator.html
 // for the full running changelog, also viewable in-app via Help → About).
 const APP_NAME = 'ModuLaser Battery Calculator';
-const APP_REVISION = '01.05.006_261002';
+const APP_REVISION = '01.05.007_261002';
 const APP_AUTHOR = 'The BMG';
 
 const isMac = process.platform === 'darwin';

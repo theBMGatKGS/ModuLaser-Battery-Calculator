@@ -163,9 +163,9 @@
   input[type=number]:focus, input[type=text]:focus, select:focus{
     outline:none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
   }
-  /* Native <select> dropdowns: white text on black for closed field and option
-     list. Without an explicit option background, Chromium/Electron/Safari often
-     paint the OS popup light while inheriting the select's light text → white-on-white. */
+  /* color-scheme on root helps native controls; open <option> popups still often
+     ignore option { background } in Chromium — custom listboxes below are authoritative. */
+  html{ color-scheme: dark; }
   select{
     font-family: var(--sans);
     color: #fff;
@@ -182,6 +182,141 @@
   }
   input[disabled], select[disabled]{ opacity:0.45; cursor:not-allowed; }
   option[disabled]{ color: #999; background-color: #000; }
+
+  /* Custom select (calc-select): white-on-black open menus that Chromium cannot
+     refuse to style. Native <select> stays in DOM (hidden) so .value / onchange /
+     save-load / needs-entry keep working. */
+  .calc-select-wrap{
+    position: relative;
+    display: block;
+    width: 100%;
+    vertical-align: middle;
+  }
+  .calc-select-wrap:has(> select[hidden]),
+  .calc-select-wrap[hidden]{
+    display: none !important;
+  }
+  .calc-select-wrap:has(> select:disabled) .calc-select-btn{
+    opacity: 0.45; cursor: not-allowed;
+  }
+  select.calc-select-native{
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    border: 0 !important;
+    clip: rect(0 0 0 0) !important;
+    overflow: hidden !important;
+  }
+  .calc-select-btn{
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-align: left;
+    background: #000;
+    color: #fff;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 7px 28px 7px 9px;
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.35;
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .calc-select-btn::after{
+    content: "";
+    position: absolute;
+    right: 10px; top: 50%;
+    width: 0; height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid #fff;
+    transform: translateY(-35%);
+    pointer-events: none;
+  }
+  .calc-select-btn:focus{
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .calc-select-wrap:has(> select.field-needs) .calc-select-btn{
+    border-color: #5b9bd5 !important;
+    background: rgba(91, 155, 213, 0.12) !important;
+    box-shadow: 0 0 0 1px rgba(91, 155, 213, 0.35);
+  }
+  .calc-select-list{
+    position: fixed;
+    z-index: 10050;
+    max-height: min(280px, 50vh);
+    overflow: auto;
+    background: #000;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 6px;
+    box-shadow: 0 14px 36px rgba(0,0,0,0.55);
+    padding: 4px 0;
+    min-width: 80px;
+  }
+  .calc-select-list[hidden]{ display: none !important; }
+  .calc-select-optgroup{
+    padding: 6px 10px 2px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #999;
+    font-weight: 600;
+  }
+  .calc-select-option{
+    padding: 7px 12px;
+    cursor: pointer;
+    color: #fff;
+    background: #000;
+    font-family: var(--sans);
+    font-size: 13px;
+    line-height: 1.35;
+  }
+  .calc-select-option:hover,
+  .calc-select-option.active{
+    background: #222;
+    color: #fff;
+  }
+  .calc-select-option[aria-selected="true"]{
+    background: #1a3a55;
+    color: #fff;
+  }
+  .calc-select-option[aria-disabled="true"]{
+    color: #777;
+    cursor: not-allowed;
+  }
+  /* Match compact table selects */
+  .calc-select-wrap:has(> .module-address) .calc-select-btn,
+  .calc-select-wrap:has(> .module-address) .calc-select-option{
+    font-family: var(--mono); font-size: 11.5px; text-align: center; padding-top: 2px; padding-bottom: 2px;
+  }
+  .calc-select-wrap:has(> .module-address) .calc-select-btn{ padding-left: 4px; padding-right: 18px; }
+  .calc-select-wrap:has(> .power-select) .calc-select-btn,
+  .calc-select-wrap:has(> .power-select) .calc-select-option,
+  .calc-select-wrap:has(> .aux-circuit-num) .calc-select-btn,
+  .calc-select-wrap:has(> .aux-circuit-num) .calc-select-option,
+  .calc-select-wrap:has(> .fanspeed-select) .calc-select-btn,
+  .calc-select-wrap:has(> .fanspeed-select) .calc-select-option,
+  .calc-select-wrap:has(> .cluster-select) .calc-select-btn,
+  .calc-select-wrap:has(> .cluster-select) .calc-select-option,
+  .calc-select-wrap:has(> .type-select) .calc-select-btn,
+  .calc-select-wrap:has(> .type-select) .calc-select-option{
+    font-size: 11px; padding-top: 2px; padding-bottom: 2px;
+  }
+  .calc-select-wrap:has(> .margin-select),
+  .calc-select-wrap:has(> .export-margin-select){ width: 90px; }
+  .calc-select-wrap:has(> .margin-select) .calc-select-btn,
+  .calc-select-wrap:has(> .export-margin-select) .calc-select-btn{ width: 90px; }
 
   .section-label{
     font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-faint);
@@ -714,6 +849,7 @@
     .zone-print-text, .cluster-print-text, .fan-print-text, .addr-print-text, .power-print-text{ display:block !important; white-space:nowrap !important; }
     .module-model{ white-space:nowrap !important; }
     .module-address, .power-select, .circuit-source, .aux-circuit-num{ display:none !important; }
+    .calc-select-wrap, .calc-select-list{ display:none !important; }
     .cluster-select, .cluster-label, .fanspeed-select, .fan-na{ display:none !important; }
 
     input, select, .stat, .location, .arr-card, .legend-group, .mode-opt, .const-row, .aux-row, .network-flags{
@@ -1469,6 +1605,7 @@ const AMENDMENTS = [
   { rev: "004", minor: "05", date: "261002", desc: "Quick Start updated with steps 13–16 documenting blue needs-entry highlights, Confirm defaults, Clear (sheet vs entire file), and Import Calc (replace/merge, collision choices, older-revision warning), each with qs-figure wireframes." },
   { rev: "005", minor: "05", date: "261002", desc: "Added searchable How Do I… in the main toolbar and Help overlay: type-ahead filters curated common topics plus other Help/FAQ/Quick Start entries, shows a short inline answer with a jump link into the full Help section." },
   { rev: "006", minor: "05", date: "261002", desc: "Fixed native <select> dropdowns (Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects) that rendered white text on white background in the open option list — forced white text on black background for select and option elements, plus color-scheme:dark for Chromium/Electron/Safari native popups. Needs-entry soft blue chrome, yellow validation, and red invalid styles unchanged." },
+  { rev: "007", minor: "05", date: "261002", desc: "Replaced unreliable native <select> option popups (Chromium/Electron still painted light OS menus with light text despite 01.05.006 CSS) with custom white-on-black listboxes for all calculator selects — Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and the rest. Native selects stay in the DOM (visually hidden) so value/change/save-load/needs-entry/validation keep working; open menus use fixed positioning to escape .location overflow clipping. Verified open menus via browser screenshots." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -6076,6 +6213,212 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW registration failed:', e));
   });
 }
+
+/* ---- Custom calc-select: reliable white-on-black open menus ---- */
+(function initCalcSelects(){
+  const valueDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+  const selectedIndexDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'selectedIndex');
+  Object.defineProperty(HTMLSelectElement.prototype, 'value', {
+    configurable: true, enumerable: true,
+    get(){ return valueDesc.get.call(this); },
+    set(v){ valueDesc.set.call(this, v); if (typeof this._calcSelectSync === 'function') this._calcSelectSync(); }
+  });
+  Object.defineProperty(HTMLSelectElement.prototype, 'selectedIndex', {
+    configurable: true, enumerable: true,
+    get(){ return selectedIndexDesc.get.call(this); },
+    set(v){ selectedIndexDesc.set.call(this, v); if (typeof this._calcSelectSync === 'function') this._calcSelectSync(); }
+  });
+
+  let openWrap = null;
+  let openList = null;
+
+  function closeOpen(){
+    if (openList){
+      openList.hidden = true;
+      if (openList.parentElement !== openWrap && openList._calcHome){
+        openList._calcHome.appendChild(openList);
+      }
+    }
+    if (openWrap){
+      const btn = openWrap.querySelector('.calc-select-btn');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    }
+    openWrap = null;
+    openList = null;
+  }
+
+  function syncFromSelect(select){
+    const wrap = select.closest('.calc-select-wrap');
+    if (!wrap) return;
+    const btn = wrap.querySelector('.calc-select-btn');
+    if (!btn) return;
+    const opt = select.selectedOptions && select.selectedOptions[0];
+    btn.textContent = opt ? opt.textContent : '';
+    btn.disabled = !!select.disabled;
+    if (select.hasAttribute('hidden')) wrap.setAttribute('hidden', '');
+    else wrap.removeAttribute('hidden');
+  }
+
+  function makeOptionEl(select, opt){
+    const el = document.createElement('div');
+    el.className = 'calc-select-option';
+    el.setAttribute('role', 'option');
+    el.dataset.value = opt.value;
+    el.textContent = opt.textContent;
+    if (opt.disabled) el.setAttribute('aria-disabled', 'true');
+    if (opt.selected) el.setAttribute('aria-selected', 'true');
+    el.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (opt.disabled) return;
+      select.value = opt.value;
+      select.dispatchEvent(new Event('input', { bubbles: true }));
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      syncFromSelect(select);
+      closeOpen();
+    });
+    return el;
+  }
+
+  function rebuildList(select, list){
+    list.innerHTML = '';
+    Array.from(select.children).forEach((child) => {
+      if (child.tagName === 'OPTGROUP'){
+        const lab = document.createElement('div');
+        lab.className = 'calc-select-optgroup';
+        lab.textContent = child.label || '';
+        list.appendChild(lab);
+        Array.from(child.children).forEach((opt) => {
+          if (opt.tagName === 'OPTION') list.appendChild(makeOptionEl(select, opt));
+        });
+      } else if (child.tagName === 'OPTION'){
+        list.appendChild(makeOptionEl(select, child));
+      }
+    });
+  }
+
+  function positionList(btn, list){
+    const r = btn.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const width = Math.max(r.width, 120);
+    list.style.minWidth = width + 'px';
+    list.style.width = Math.min(Math.max(width, r.width), Math.max(180, vw - 16)) + 'px';
+    list.hidden = false;
+    const lh = list.offsetHeight || 200;
+    let top = r.bottom + 2;
+    if (top + lh > vh - 8 && r.top > lh + 8) top = r.top - lh - 2;
+    let left = r.left;
+    if (left + width > vw - 8) left = Math.max(8, vw - width - 8);
+    if (left < 8) left = 8;
+    list.style.top = top + 'px';
+    list.style.left = left + 'px';
+  }
+
+  function enhance(select){
+    if (!select || select.dataset.calcSelect === '1') return;
+    if (select.closest('.calc-select-wrap')) return;
+    select.dataset.calcSelect = '1';
+    select.classList.add('calc-select-native');
+
+    const wrap = document.createElement('div');
+    wrap.className = 'calc-select-wrap';
+    select.parentNode.insertBefore(wrap, select);
+    wrap.appendChild(select);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'calc-select-btn';
+    btn.setAttribute('aria-haspopup', 'listbox');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.tabIndex = 0;
+
+    const list = document.createElement('div');
+    list.className = 'calc-select-list';
+    list.setAttribute('role', 'listbox');
+    list.hidden = true;
+    list._calcHome = wrap;
+
+    wrap.appendChild(btn);
+    wrap.appendChild(list);
+
+    select._calcSelectSync = () => {
+      syncFromSelect(select);
+      if (openWrap === wrap && openList && !openList.hidden){
+        rebuildList(select, openList);
+        positionList(btn, openList);
+      }
+    };
+
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (select.disabled) return;
+      const willOpen = openWrap !== wrap;
+      closeOpen();
+      if (!willOpen) return;
+      rebuildList(select, list);
+      document.body.appendChild(list);
+      positionList(btn, list);
+      btn.setAttribute('aria-expanded', 'true');
+      openWrap = wrap;
+      openList = list;
+      const sel = list.querySelector('[aria-selected="true"]');
+      if (sel) sel.scrollIntoView({ block: 'nearest' });
+    });
+
+    btn.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        btn.click();
+      } else if (e.key === 'Escape'){
+        closeOpen();
+      }
+    });
+
+    const mo = new MutationObserver(() => select._calcSelectSync());
+    mo.observe(select, {
+      childList: true, subtree: true,
+      attributes: true, attributeFilter: ['disabled', 'hidden', 'class', 'style']
+    });
+    select._calcSelectSync();
+  }
+
+  function enhanceAll(root){
+    (root || document).querySelectorAll('select').forEach(enhance);
+  }
+
+  document.addEventListener('mousedown', (e) => {
+    if (!openWrap) return;
+    if (openWrap.contains(e.target)) return;
+    if (openList && openList.contains(e.target)) return;
+    closeOpen();
+  }, true);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeOpen();
+  });
+  window.addEventListener('resize', closeOpen);
+  window.addEventListener('scroll', closeOpen, true);
+
+  const bodyMo = new MutationObserver((muts) => {
+    for (const m of muts){
+      m.addedNodes.forEach((n) => {
+        if (n.nodeType !== 1) return;
+        if (n.tagName === 'SELECT') enhance(n);
+        else if (n.querySelectorAll) n.querySelectorAll('select').forEach(enhance);
+      });
+    }
+  });
+
+  function start(){
+    enhanceAll(document);
+    bodyMo.observe(document.documentElement, { childList: true, subtree: true });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
+
+
 renderRevisionInfo();
 syncPrintHeaders();
 updateSaveIndicator();
