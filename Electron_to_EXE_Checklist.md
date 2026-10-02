@@ -36,7 +36,7 @@ Verified against the actual `electron-app` scaffold (package.json, main.js) as o
 6. [ ] Wait for it to finish (typically 1–3 minutes). You'll see electron-builder log its packaging steps; a successful run ends without an error and leaves a new `dist/` folder.
 7. [ ] Find your installer at:
    ```
-   dist/ModuLaser Battery Calculator Setup 1.0.0.exe
+   dist/ModuLaser.Battery.Calculator.Setup.01.05.007.exe
    ```
    This is a real **NSIS installer** — not a portable single-file exe. Running it lets the user pick an install location, and it creates a Start Menu shortcut and (optionally) a desktop shortcut, per the `nsis` settings already configured in `package.json`.
 
