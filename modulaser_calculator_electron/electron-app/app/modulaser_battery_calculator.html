@@ -163,9 +163,25 @@
   input[type=number]:focus, input[type=text]:focus, select:focus{
     outline:none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft);
   }
-  select{ font-family: var(--sans); }
+  /* Native <select> dropdowns: white text on black for closed field and option
+     list. Without an explicit option background, Chromium/Electron/Safari often
+     paint the OS popup light while inheriting the select's light text → white-on-white. */
+  select{
+    font-family: var(--sans);
+    color: #fff;
+    background-color: #000;
+    color-scheme: dark;
+  }
+  select option, select optgroup{
+    color: #fff;
+    background-color: #000;
+  }
+  select:focus{
+    color: #fff;
+    background-color: #000;
+  }
   input[disabled], select[disabled]{ opacity:0.45; cursor:not-allowed; }
-  option[disabled]{ color: #666; }
+  option[disabled]{ color: #999; background-color: #000; }
 
   .section-label{
     font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-faint);
@@ -1452,6 +1468,7 @@ const AMENDMENTS = [
   { rev: "003", minor: "05", date: "261002", desc: "Date field excluded from needs-entry (blue) highlighting; new/cleared documents still initialize Date to today, and the field remains normally editable afterward." },
   { rev: "004", minor: "05", date: "261002", desc: "Quick Start updated with steps 13–16 documenting blue needs-entry highlights, Confirm defaults, Clear (sheet vs entire file), and Import Calc (replace/merge, collision choices, older-revision warning), each with qs-figure wireframes." },
   { rev: "005", minor: "05", date: "261002", desc: "Added searchable How Do I… in the main toolbar and Help overlay: type-ahead filters curated common topics plus other Help/FAQ/Quick Start entries, shows a short inline answer with a jump link into the full Help section." },
+  { rev: "006", minor: "05", date: "261002", desc: "Fixed native <select> dropdowns (Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects) that rendered white text on white background in the open option list — forced white text on black background for select and option elements, plus color-scheme:dark for Chromium/Electron/Safari native popups. Needs-entry soft blue chrome, yellow validation, and red invalid styles unchanged." },
 ];
 
 function formatDateYYMMDD(yymmdd){
