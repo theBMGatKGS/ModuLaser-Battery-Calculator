@@ -22,8 +22,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.007.exe
-npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.007.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.009.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.009.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 

@@ -7,10 +7,12 @@ its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
 Web / PWA: https://thebmgatkgs.github.io/ModuLaser-Battery-Calculator/
 
-Calculator revision **01.05.007_261002** — GitHub release **[v01.05.007](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/tag/v01.05.007)** (same number; date suffix `_261002` is in-app only).
+Calculator revision **01.05.009_261002** — GitHub release **[v01.05.009](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/tag/v01.05.009)** (same number; date suffix `_261002` is in-app only).
 
 Going forward, desktop release tags match the calculator revision exactly: `vMM.mm.rrr` ↔ `MM.mm.rrr` (older `v1.0.x` tags remain as history).
 
+- **Dropdown scroll + keyboard** (01.05.009) — tall calc-select menus (Fan Speed, Addresses, …) keep open while scrollbar-dragging or wheel-scrolling; Arrow/Page/Home/End navigate, Enter commits
+- **Sheet header layout** (01.05.008) — Power Supply Name/Location on a full row above Design Basis + Ambient Temp; Design Basis wide enough for the longest preset label without truncation
 - **Dropdown contrast** (01.05.007) — custom white-on-black listboxes for Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects (native option popups could not be styled reliably in Chromium after 01.05.006)
 - **Import Calc** — replace or merge saved `.html` files (collision prompts + older-revision warning)
 - **Clear** — this sheet or entire file (keep/clear header)
@@ -40,8 +42,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.007.exe
-npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.007.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.009.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.009.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -64,17 +66,17 @@ on a `macos-latest` runner — happy to help set that up if you want it.
 
 The app has a Help → About menu item (and on macOS, the standard app menu's
 "About ModuLaser Battery Calculator" too) showing the revision and author —
-currently Revision `01.05.007_261002`, authored by The BMG. These are set
+currently Revision `01.05.009_261002`, authored by The BMG. These are set
 as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
 update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section
 in the Help overlay, so all three deliverables stay consistent.
 
 GitHub releases use the same number as the calculator revision: tag/title
-`v01.05.007` for calculator `01.05.007` (the `_YYMMDD` date stays in-app /
+`v01.05.009` for calculator `01.05.009` (the `_YYMMDD` date stays in-app /
 `package.json` `revision` only). The npm/`electron-builder` `version` field
 stays plain semver without leading zeros (e.g. `1.5.7`) so NSIS accepts it;
-installer filenames are forced to `…Setup.01.05.007.exe` via `artifactName`.
+installer filenames are forced to `…Setup.01.05.009.exe` via `artifactName`.
 
 ### Revision numbering scheme
 
