@@ -7,7 +7,9 @@ its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
 Web / PWA: https://thebmgatkgs.github.io/ModuLaser-Battery-Calculator/
 
-Calculator revision **01.05.007_261002** (desktop installer **v1.0.3**).
+Calculator revision **01.05.007_261002** — GitHub release **[v01.05.007](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/tag/v01.05.007)** (same number; date suffix `_261002` is in-app only).
+
+Going forward, desktop release tags match the calculator revision exactly: `vMM.mm.rrr` ↔ `MM.mm.rrr` (older `v1.0.x` tags remain as history).
 
 - **Dropdown contrast** (01.05.007) — custom white-on-black listboxes for Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects (native option popups could not be styled reliably in Chromium after 01.05.006)
 - **Import Calc** — replace or merge saved `.html` files (collision prompts + older-revision warning)
@@ -38,8 +40,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser Battery Calculator Setup 1.0.3.exe
-npm run build:mac     # → dist/ModuLaser Battery Calculator-1.0.3.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.007.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.01.05.007.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -68,6 +70,12 @@ update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section
 in the Help overlay, so all three deliverables stay consistent.
 
+GitHub releases use the same number as the calculator revision: tag/title
+`v01.05.007` for calculator `01.05.007` (the `_YYMMDD` date stays in-app /
+`package.json` `revision` only). The npm/`electron-builder` `version` field
+stays plain semver without leading zeros (e.g. `1.5.7`) so NSIS accepts it;
+installer filenames are forced to `…Setup.01.05.007.exe` via `artifactName`.
+
 ### Revision numbering scheme
 
 Format: `MM.mm.rrr_YYMMDD`
@@ -76,6 +84,8 @@ Format: `MM.mm.rrr_YYMMDD`
   change made in a chat session, reset to `000` only when `mm` is next
   revised manually.
 - `YYMMDD` is the actual calendar date of that change.
+- GitHub release tag: `vMM.mm.rrr` (matches the calculator revision;
+  supersedes the older separate `v1.0.x` desktop numbering).
 
 The full running changelog lives in the `AMENDMENTS` array inside
 `app/modulaser_battery_calculator.html` (near the top of the `<script>`
