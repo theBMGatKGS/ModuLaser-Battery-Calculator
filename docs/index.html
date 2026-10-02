@@ -107,25 +107,30 @@
     margin-bottom: 22px; overflow: hidden;
   }
   .location-head{
-    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    display:flex; flex-direction:column; align-items:stretch; gap:12px;
     padding: 16px 20px; border-bottom:1px solid var(--border-soft);
     background: linear-gradient(180deg, rgba(255,145,48,0.05), transparent);
-    flex-wrap:wrap;
   }
-  .location-title-wrap{ display:flex; align-items:center; gap:12px; flex:1; min-width:240px;}
+  /* Row 1: sheet badge + power supply name/location — full width above basis controls */
+  .location-head-ps-row{
+    display:flex; align-items:center; gap:12px; width:100%; min-width:0;
+  }
+  .location-title-wrap{ display:flex; align-items:center; gap:12px; flex:1; min-width:0;} /* legacy alias */
   .location-index{
     font-family: var(--mono); font-size:11px; color: var(--accent); border:1px solid var(--accent-dim);
     background: var(--accent-soft); padding: 3px 8px; border-radius: 20px; letter-spacing:0.5px; white-space:nowrap;
   }
-  .ps-title-group{ display:flex; flex-direction:column; gap:2px; flex:1; min-width:220px; }
+  .ps-title-group{ display:flex; flex-direction:column; gap:2px; flex:1; min-width:0; width:100%; }
   .ps-title-group .ps-name-primary{
     background: transparent; border:none; color: var(--text); font-size:18px; font-weight:700;
     font-family: var(--mono); padding: 2px 2px; border-bottom: 1px dashed transparent; letter-spacing:0.5px;
+    width:100%; box-sizing:border-box;
   }
   .ps-title-group .ps-name-primary:hover, .ps-title-group .ps-name-primary:focus{ border-bottom-color: var(--border); outline:none; }
   .ps-title-group .ps-location-primary{
     background: transparent; border:none; color: var(--text-dim); font-size:12.5px; font-weight:500;
     font-family: var(--sans); padding: 2px 2px; border-bottom: 1px dashed transparent;
+    width:100%; box-sizing:border-box;
   }
   .ps-title-group .ps-location-primary:hover, .ps-title-group .ps-location-primary:focus{ border-bottom-color: var(--border); outline:none; }
   .clusters-supported-strip{
@@ -148,10 +153,39 @@
   .location-name:hover, .location-name:focus{ border-bottom-color: var(--border); outline:none; }
   .location-name-print-text{ display:none; }
   .ps-name-print-text, .ps-location-print-text{ display:none; }
-  .head-fields{ display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap; }
+  /* Row 2: Design Basis (wide) + Standby/Alarm + Ambient Temp + Remove */
+  .head-fields{ display:flex; gap:14px; align-items:flex-end; flex-wrap:nowrap; width:100%; }
+  .head-fields > .btn{ flex: 0 0 auto; }
+  @media (max-width: 900px){
+    .head-fields{ flex-wrap: wrap; }
+  }
   .field-mini{ display:flex; flex-direction:column; gap:4px; }
   .field-mini label{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.6px; color: var(--text-faint); font-weight:600;}
   .field-mini input{ width:74px; }
+  .field-mini.design-basis-field{
+    /* Grow into leftover space after Standby/Alarm/Ambient/Remove; basis 0 so
+       siblings keep their natural widths and don't wrap under a greedy basis. */
+    flex: 1 1 0%;
+    min-width: min(100%, 380px);
+    max-width: 100%;
+  }
+  .field-mini.ambient-temp-field{
+    flex: 0 1 260px;
+    min-width: 220px;
+  }
+  /* Closed Design Basis control must show the full selected label (longest presets ~310px text) */
+  .calc-select-wrap:has(> .design-basis-select){
+    width: 100%;
+    min-width: 0;
+  }
+  .calc-select-wrap:has(> .design-basis-select) .calc-select-btn{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip; /* no ellipsis truncation of critical basis text when field is sized */
+  }
+  .calc-select-wrap:has(> .temperature-select){
+    min-width: 220px;
+  }
 
   .location-body{ padding: 20px; display:flex; flex-direction:column; gap: 20px; }
 
@@ -256,6 +290,7 @@
     z-index: 10050;
     max-height: min(280px, 50vh);
     overflow: auto;
+    scrollbar-gutter: stable;
     background: #000;
     color: #fff;
     border: 1px solid #555;
@@ -1606,6 +1641,8 @@ const AMENDMENTS = [
   { rev: "005", minor: "05", date: "261002", desc: "Added searchable How Do I… in the main toolbar and Help overlay: type-ahead filters curated common topics plus other Help/FAQ/Quick Start entries, shows a short inline answer with a jump link into the full Help section." },
   { rev: "006", minor: "05", date: "261002", desc: "Fixed native <select> dropdowns (Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects) that rendered white text on white background in the open option list — forced white text on black background for select and option elements, plus color-scheme:dark for Chromium/Electron/Safari native popups. Needs-entry soft blue chrome, yellow validation, and red invalid styles unchanged." },
   { rev: "007", minor: "05", date: "261002", desc: "Replaced unreliable native <select> option popups (Chromium/Electron still painted light OS menus with light text despite 01.05.006 CSS) with custom white-on-black listboxes for all calculator selects — Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and the rest. Native selects stay in the DOM (visually hidden) so value/change/save-load/needs-entry/validation keep working; open menus use fixed positioning to escape .location overflow clipping. Verified open menus via browser screenshots." },
+  { rev: "008", minor: "05", date: "261002", desc: "Sheet header layout: Power Supply Name and Location now occupy a full row above Design Basis / Standby / Alarm / Ambient Temperature (previously side-by-side with those controls, so long PS titles encroached on the Design Basis dropdown). Design Basis control widened (flex min ~400px) so the full selected label shows for every preset — including NFPA 72 + NFPA 110 Generator Backup (Non-Voice/Voice) — without truncating into adjacent fields. Custom calc-selects, needs-entry, save/load, and print unchanged." },
+  { rev: "009", minor: "05", date: "261002", desc: "Fixed tall custom calc-select menus (Fan Speed, Addresses, and any other long list) that could not scroll: a capture-phase window scroll listener was closing the menu on the list's own scrollbar drag and mouse-wheel scroll. Listener now ignores scrolls that originate from the open list; outside-click dismiss also treats pointer-down inside the open list's bounding box as inside; option commit moved from mousedown to click and lists use scrollbar-gutter:stable so scrollbar/gutter drags are not stolen by option hit-targets (overlay scrollbars). Also added keyboard navigation while a menu is open — Arrow Up/Down, Page Up/Down, Home/End move the highlight (with scroll-into-view), Enter/Space commit, Escape closes — and stopped ArrowDown on the closed-state button from toggling an already-open menu shut." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -2343,7 +2380,7 @@ function locationTemplate(loc){
       </div>
     </div>
     <div class="location-head">
-      <div class="location-title-wrap">
+      <div class="location-head-ps-row">
         <span class="location-index location-index-badge">Sheet ${idx}</span>
         <div class="ps-title-group">
           <input class="ps-name ps-name-primary" placeholder="Power Supply Name (e.g. PS-1)" oninput="scheduleSave()" onchange="recalcLocation('${loc}')">
@@ -2355,7 +2392,7 @@ function locationTemplate(loc){
         <span class="location-name-print-text"></span>
       </div>
       <div class="head-fields">
-        <div class="field-mini" style="min-width:168px;">
+        <div class="field-mini design-basis-field">
           <label>Design Basis</label>
           <select class="design-basis-select" onchange="applyDesignBasis('${loc}')">
             <option value="NFPA 72 Standard">NFPA 72 Standard</option>
@@ -2382,7 +2419,7 @@ function locationTemplate(loc){
           <label>Alarm (min)</label>
           <input type="number" class="alarm-minutes" value="15" min="0" step="1" onchange="recalcLocation('${loc}')">
         </div>
-        <div class="field-mini" style="min-width:150px;">
+        <div class="field-mini ambient-temp-field">
           <label>Ambient Temp.</label>
           <select class="temperature-select" onchange="recalcLocation('${loc}')">
             <option value="77" selected>77°F / 25°C (no de-rating)</option>
@@ -6267,7 +6304,10 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     el.textContent = opt.textContent;
     if (opt.disabled) el.setAttribute('aria-disabled', 'true');
     if (opt.selected) el.setAttribute('aria-selected', 'true');
-    el.addEventListener('mousedown', (e) => {
+    // Use click (not mousedown) so grabbing the scrollbar / gutter does not
+    // commit a value and dismiss the menu — overlay scrollbars otherwise hit
+    // the option underneath on mousedown.
+    el.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
       if (opt.disabled) return;
@@ -6276,6 +6316,11 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
       select.dispatchEvent(new Event('change', { bubbles: true }));
       syncFromSelect(select);
       closeOpen();
+    });
+    el.addEventListener('mousedown', (e) => {
+      // Keep focus from jumping; do not select-on-mousedown.
+      e.preventDefault();
+      e.stopPropagation();
     });
     return el;
   }
@@ -6363,11 +6408,21 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
       btn.setAttribute('aria-expanded', 'true');
       openWrap = wrap;
       openList = list;
-      const sel = list.querySelector('[aria-selected="true"]');
-      if (sel) sel.scrollIntoView({ block: 'nearest' });
+      list.querySelectorAll('.calc-select-option.active').forEach((el) => el.classList.remove('active'));
+      const sel = list.querySelector('[aria-selected="true"]') || list.querySelector('.calc-select-option:not([aria-disabled="true"])');
+      if (sel){
+        sel.classList.add('active');
+        sel.scrollIntoView({ block: 'nearest' });
+      }
     });
 
     btn.addEventListener('keydown', (e) => {
+      // When this list is already open, arrow/enter/space are handled by the
+      // document keydown navigator — do not toggle the menu closed.
+      if (openWrap === wrap && openList && !openList.hidden){
+        if (e.key === 'Escape'){ e.preventDefault(); closeOpen(); }
+        return;
+      }
       if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){
         e.preventDefault();
         btn.click();
@@ -6392,13 +6447,89 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
     if (!openWrap) return;
     if (openWrap.contains(e.target)) return;
     if (openList && openList.contains(e.target)) return;
+    // Native scrollbar clicks often have a target outside the scrollable
+    // element; still treat pointer-down inside the list's box as "inside"
+    // so scrollbar drag does not dismiss the menu.
+    if (openList && !openList.hidden){
+      const r = openList.getBoundingClientRect();
+      if (e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom) return;
+    }
     closeOpen();
   }, true);
+
+  function calcSelectEnabledOptions(list){
+    return [...list.querySelectorAll('.calc-select-option:not([aria-disabled="true"])')];
+  }
+  function calcSelectMoveActive(list, nextIdx){
+    const options = calcSelectEnabledOptions(list);
+    if (!options.length) return;
+    const i = Math.max(0, Math.min(options.length - 1, nextIdx));
+    options.forEach((o) => o.classList.remove('active'));
+    const el = options[i];
+    el.classList.add('active');
+    el.scrollIntoView({ block: 'nearest' });
+    return el;
+  }
+  function calcSelectActiveIndex(list){
+    const options = calcSelectEnabledOptions(list);
+    const active = list.querySelector('.calc-select-option.active');
+    if (active){
+      const i = options.indexOf(active);
+      if (i >= 0) return i;
+    }
+    const selected = list.querySelector('[aria-selected="true"]');
+    if (selected){
+      const i = options.indexOf(selected);
+      if (i >= 0) return i;
+    }
+    return -1;
+  }
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeOpen();
+    if (!openList || openList.hidden){
+      if (e.key === 'Escape') closeOpen();
+      return;
+    }
+    const options = calcSelectEnabledOptions(openList);
+    if (!options.length){
+      if (e.key === 'Escape'){ e.preventDefault(); closeOpen(); }
+      return;
+    }
+    const idx = calcSelectActiveIndex(openList);
+    if (e.key === 'Escape'){
+      e.preventDefault();
+      closeOpen();
+    } else if (e.key === 'ArrowDown'){
+      e.preventDefault();
+      calcSelectMoveActive(openList, idx < 0 ? 0 : idx + 1);
+    } else if (e.key === 'ArrowUp'){
+      e.preventDefault();
+      calcSelectMoveActive(openList, idx < 0 ? 0 : idx - 1);
+    } else if (e.key === 'Home'){
+      e.preventDefault();
+      calcSelectMoveActive(openList, 0);
+    } else if (e.key === 'End'){
+      e.preventDefault();
+      calcSelectMoveActive(openList, options.length - 1);
+    } else if (e.key === 'PageDown'){
+      e.preventDefault();
+      calcSelectMoveActive(openList, idx < 0 ? 0 : idx + 8);
+    } else if (e.key === 'PageUp'){
+      e.preventDefault();
+      calcSelectMoveActive(openList, idx < 0 ? 0 : idx - 8);
+    } else if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      const pick = openList.querySelector('.calc-select-option.active') || options[Math.max(0, idx)];
+      if (pick) pick.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    }
   });
   window.addEventListener('resize', closeOpen);
-  window.addEventListener('scroll', closeOpen, true);
+  // Close on page/container scroll, but NOT when the open list itself scrolls
+  // (scrollbar drag + mouse wheel on a tall Fan Speed / Addresses menu).
+  window.addEventListener('scroll', (e) => {
+    if (openList && (e.target === openList || (e.target && openList.contains(e.target)))) return;
+    closeOpen();
+  }, true);
 
   const bodyMo = new MutationObserver((muts) => {
     for (const m of muts){
