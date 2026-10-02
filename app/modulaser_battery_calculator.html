@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ModuLaser Battery Calculator</title>
+<meta name="theme-color" content="#101418">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -326,6 +330,16 @@
     font-family: var(--mono); font-size:13.5px; color: var(--accent); background: var(--panel-3);
     border:1px solid var(--border-soft); border-radius:6px; padding:10px 14px; text-align:center;
   }
+  .help-currentdraw-table{ width:100%; border-collapse:collapse; font-family: var(--mono); font-size:12.5px; }
+  .help-currentdraw-table th{
+    text-align:left; font-family: var(--sans); font-size:10.5px; text-transform:uppercase;
+    letter-spacing:0.5px; color: var(--text-faint); font-weight:600;
+    padding:0 10px 8px; border-bottom:1px solid var(--border-soft);
+  }
+  .help-currentdraw-table th:nth-child(3), .help-currentdraw-table th:nth-child(4),
+  .help-currentdraw-table td:nth-child(3), .help-currentdraw-table td:nth-child(4){ text-align:right; }
+  .help-currentdraw-table td{ padding:6px 10px; border-bottom:1px solid rgba(255,255,255,0.04); color: var(--text-dim); }
+  .help-currentdraw-table td:first-child{ color: var(--text); }
   .cd-row{ display:grid; grid-template-columns: 1fr 2fr auto; gap:10px; align-items:baseline; padding:4px 0; font-size:12px; }
   .cd-permodule-row{ font-size:11px; padding:2px 0; }
   .cd-permodule-row .cd-label, .cd-permodule-row .cd-value{ color: var(--text-faint); }
@@ -410,7 +424,7 @@
   body.help-print .location, body.help-print .topbar, body.help-print .project-info-bar, body.help-print main, body.help-print .print-header{ display:none !important; }
   body.help-print .help-overlay{ position:static; background:none; padding:0; display:block !important; }
   body.help-print .help-overlay.open{ display:block !important; }
-  body.help-print .help-close, body.help-print .help-nav, body.help-print #help-print-btn{ display:none !important; }
+  body.help-print .help-close, body.help-print .help-nav, body.help-print #help-print-btn, body.help-print .howdoi-panel{ display:none !important; }
   body.help-print .help-card{ box-shadow:none; border:none; padding:0; max-width:none; background:#fff; }
   .help-section{ margin-bottom: 30px; }
   .help-subsection{ margin: 22px 0 30px; padding-top:18px; border-top:1px solid var(--border-soft); }
@@ -516,6 +530,59 @@
   .saveas-filename-row input{ flex:1; }
   .saveas-filename-row span{ color: var(--text-faint); font-family: var(--mono); font-size:12.5px; }
   .saveas-actions{ display:flex; justify-content:flex-end; gap:8px; }
+  .saveas-actions{ flex-wrap:wrap; }
+  .prompt-extra{ margin:0 0 14px; }
+  /* Soft blue needs-entry highlight — distinct from yellow Validation Errors and red Invalid Calculation */
+  .field-needs{
+    border-color: #5b9bd5 !important;
+    background: rgba(91, 155, 213, 0.12) !important;
+    box-shadow: 0 0 0 1px rgba(91, 155, 213, 0.35);
+  }
+  .field-needs-wrap{
+    outline: 1px solid rgba(91, 155, 213, 0.55);
+    background: rgba(91, 155, 213, 0.08);
+    border-radius: 8px;
+    padding: 4px 6px;
+  }
+  .location-current{
+    box-shadow: 0 0 0 2px rgba(100, 120, 140, 0.55);
+    border-radius: 10px;
+  }
+  .howdoi-panel{
+    margin: 0 0 18px; padding: 12px 14px; border:1px solid var(--border-soft);
+    border-radius: 10px; background: var(--panel-3);
+  }
+  .howdoi-panel > label{
+    display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px;
+    color: var(--text-faint); font-weight:600; margin-bottom:6px;
+  }
+  .howdoi-combobox{ position:relative; }
+  .howdoi-combobox input{
+    width:100%; box-sizing:border-box; font-size:13px; padding:8px 10px;
+  }
+  .howdoi-dropdown{
+    position:absolute; left:0; right:0; top:100%; z-index:5;
+    max-height:240px; overflow:auto; margin-top:4px;
+    background: var(--panel); border:1px solid var(--border); border-radius:8px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+  }
+  .howdoi-dropdown[hidden]{ display:none !important; }
+  .howdoi-option{
+    display:block; width:100%; text-align:left; border:0; background:transparent;
+    padding:8px 12px; cursor:pointer; color: var(--text); font-size:12.5px;
+  }
+  .howdoi-option:hover, .howdoi-option.active{ background: var(--accent-soft); color: var(--accent); }
+  .howdoi-option .howdoi-opt-meta{ display:block; font-size:10.5px; color: var(--text-faint); margin-top:2px; }
+  .howdoi-answer{
+    margin-top:10px; padding:10px 12px; border-left:3px solid var(--accent);
+    background: var(--panel); border-radius:0 8px 8px 0;
+  }
+  .howdoi-answer[hidden]{ display:none !important; }
+  .howdoi-answer-title{ font-size:13.5px; font-weight:600; color: var(--text); margin:0 0 6px; }
+  .howdoi-answer-body{ font-size:12.5px; color: var(--text-dim); line-height:1.55; margin:0 0 8px; }
+  .howdoi-answer-link{ font-size:12.5px; color: var(--accent); font-weight:600; text-decoration:none; }
+  .howdoi-answer-link:hover{ text-decoration:underline; }
+
   .project-info-bar label{ font-size:10px; text-transform:uppercase; letter-spacing:0.5px; color: var(--text-faint); font-weight:600; }
   .project-info-bar input{ width:180px; }
   .project-info-bar input[type=date]{ width:150px; }
@@ -540,6 +607,8 @@
     .topbar, .top-actions, .btn, .add-zone-row, .rm-cell, .help-overlay, .ribbon-assign-toggle, .auto-battery-toggle,
     .project-info-bar, .note, .swatch,
     .arr-card .donut-chart { display:none !important; }
+    .field-needs, .field-needs-wrap{ border-color: inherit !important; background: transparent !important; box-shadow:none !important; outline:none !important; }
+    .location-current{ box-shadow:none !important; }
 
     .donut-row{ gap:8px; align-items:center; }
     .main-donut svg{ width:44px !important; height:44px !important; }
@@ -743,8 +812,13 @@
     </div>
     <div class="top-actions">
       <button class="btn" id="help-btn">Help</button>
+      <button class="btn" id="howdoi-toolbar-btn" title="Search How Do I… topics and open Help">How Do I…</button>
       <button class="btn" id="save-as-copy-btn">Save As…</button>
+      <button class="btn" id="import-calc-btn" title="Import a saved calculator .html">Import Calc</button>
+      <button class="btn" id="clear-calc-btn" title="Clear this sheet or the entire file">Clear</button>
+      <button class="btn" id="confirm-defaults-btn" title="Mark factory-default fields on the project header and current sheet as confirmed (clears blue needs-entry on defaults)">Confirm defaults</button>
       <button class="btn" id="export-xlsx-btn">Export to Excel</button>
+      <input type="file" id="import-calc-file" accept=".html,.htm,text/html" hidden>
       <button class="btn" id="cluster-report-btn">Cluster Report</button>
       <label class="bom-print-toggle" title="When off, the Bill of Materials is left out of the printed output for every sheet in this document">
         <input type="checkbox" id="print-bom-toggle" checked onchange="togglePrintBom()">
@@ -829,6 +903,15 @@
     </div>
   </div>
 
+  <div class="saveas-overlay" id="prompt-overlay">
+    <div class="saveas-card" style="max-width:520px;">
+      <h2 id="prompt-title">Prompt</h2>
+      <p id="prompt-desc"></p>
+      <div class="prompt-extra" id="prompt-extra"></div>
+      <div class="saveas-actions" id="prompt-actions"></div>
+    </div>
+  </div>
+
   <main>
     <p class="intro">Enter each display/detector module, fan speed, and auxiliary circuit count for a cluster below. The calculator derives total current draw, standby/alarm capacity, and required battery size — then recommends the power supply and enclosure combination, or lets you hand off ModuLaser load figures to a third-party supply's own calculator.</p>
 
@@ -845,6 +928,19 @@
       </div>
       <h2>Using the ModuLaser Battery Calculator</h2>
       <p class="help-sub">How to use the calculator · standards and formulas · FAQs · revision log</p>
+
+      <div class="howdoi-panel" id="howdoi-panel">
+        <label for="howdoi-input">How Do I…</label>
+        <div class="howdoi-combobox">
+          <input type="search" id="howdoi-input" placeholder="Type to filter topics (Import, Clear, battery sizing…)" autocomplete="off" spellcheck="false">
+          <div class="howdoi-dropdown" id="howdoi-dropdown" hidden role="listbox"></div>
+        </div>
+        <div class="howdoi-answer" id="howdoi-answer" hidden>
+          <div class="howdoi-answer-title" id="howdoi-answer-title"></div>
+          <div class="howdoi-answer-body" id="howdoi-answer-body"></div>
+          <a class="howdoi-answer-link" id="howdoi-answer-link" href="#">Open full Help section →</a>
+        </div>
+      </div>
 
       <div class="help-nav">
         <a href="#help-howtouse">How to Use the Calculator</a>
@@ -884,7 +980,7 @@
         <div class="qs-step">
           <div class="qs-step-num">3</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Pick a design basis</div>
+            <div class="qs-step-title" id="qs-step-design-basis">Pick a design basis</div>
             <p>NFPA 72 Standard/Voice, NFPA 72 + NFPA 110 Generator Backup (Non-Voice/Voice), UFC 3-600-01 Hydro or FA/MNS, AWS, CAN/ULC-S524:2024 Standard/Voice, four BS 5839-1 categories (M/L, M/L + Generator, P Staffed, P Unstaffed), or Custom — sets Standby and Alarm duration. The generator-backup presets reflect a 4-hour standby basis where a code-compliant NFPA 110 generator serves as secondary power in place of the full 24-hour battery standby — confirm with your AHJ that a generator qualifies for your specific installation before relying on this basis. BS 5839-1 presets use that standard's own formula rather than the NFPA-72-style formula used everywhere else — its De-Rating factor is determined automatically (1 or 1.75, per Annex E's own rule) based on the selected battery, and the Safety Margin control locks to 25% automatically since that matches BS 5839-1's fixed aging factor. Category P (Unstaffed) is the one preset where Standby stays editable, capped at 72 hours. A new <b>Ambient Temperature</b> selector next to Alarm applies a de-rating multiplier when batteries won't sit at the standard 77°F/25°C — set per sheet, since different power supplies may be in different environments. When a design basis has a known code citation and the sheet's calculation is clean, a compliance statement citing the exact section/paragraph appears at the bottom of the sheet automatically.</p>
             <figure class="qs-figure"><img data-qs-slot="3-design-basis" alt="Design basis dropdown"><figcaption>Screenshot: Design Basis dropdown expanded, with Ambient Temperature selector</figcaption></figure>
           </div>
@@ -893,8 +989,8 @@
         <div class="qs-step">
           <div class="qs-step-num">4</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Build each cluster</div>
-            <p>A Standard or Minimum Display starts a new cluster (numbered 01–63) and can host up to 8 Detectors. A <b>Command Display</b> works differently — it's network-wide rather than cluster-scoped (up to 2 per network), used for command/supervisory functions, and never hosts Detectors directly. Add Detectors and assign each to a cluster hosted by a Standard or Minimum Display. Detectors on a display-less sheet can reference clusters hosted on other sheets.</p>
+            <div class="qs-step-title" id="qs-step-clusters">Build each cluster</div>
+            <p>A Standard or Minimum Display starts a new cluster (numbered 01–63) and can host up to 8 Detectors. A <b>Command Display</b> works differently — it's network-wide rather than cluster-scoped (up to 2 per network), used for command/supervisory functions, and never hosts Detectors directly. Add Detectors and assign each to a cluster hosted by a Standard or Minimum Display. Detectors on a display-less sheet can reference clusters hosted on other sheets — and detectors on that same sheet sharing that same remote reference can still ribbon-connect to each other locally, forming their own portion of the cluster's ribbon topology (up to the usual 2-segment limit for that sheet's contribution), while linking back to the rest of the cluster over SNET+ rather than ribbon.</p>
             <figure class="qs-figure"><img data-qs-slot="4-cluster-build" alt="Cluster building"><figcaption>Screenshot: module table with a display + detectors, cluster dropdown open</figcaption></figure>
           </div>
         </div>
@@ -911,7 +1007,7 @@
         <div class="qs-step">
           <div class="qs-step-num">6</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Choose Networked or Standalone addressing</div>
+            <div class="qs-step-title" id="qs-step-addressing">Choose Networked or Standalone addressing</div>
             <p>Just below "Clusters supported" is a per-sheet <b>Networked / Standalone</b> toggle. <b>Networked</b> is the default (unchanged for every existing project) — Address stays the 1–127 dropdown from Step 5, unique across the whole document. <b>Standalone</b> is for a cluster with no SenseNET pathway connecting it to anything else: Address becomes a 1–9 dropdown, and uniqueness is scoped to that one cluster rather than the whole document — a completely unrelated cluster elsewhere can freely reuse the same addresses, even if it happens to share the same cluster number, since there's no physical network tying them together. A sheet with multiple clusters still gets an independent 1–9 pool per cluster even in Standalone mode, and Cluster identification is still fully required either way — Standalone only changes the addressing pool, nothing else. Cross-sheet cluster referencing (Step 4) keeps working normally no matter which scheme either sheet uses. Switching a sheet to Standalone clears any of its own addresses already set above 9, since they're no longer valid options.</p>
           </div>
         </div>
@@ -928,7 +1024,7 @@
         <div class="qs-step">
           <div class="qs-step-num">8</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">AUX + battery size</div>
+            <div class="qs-step-title" id="qs-step-battery">AUX + battery size</div>
             <p><b>Auto Battery Sizing</b> (the toggle above Required Battery Capacity, default Auto) picks battery size, Power supply capacity, and Battery cabinet together from your total load — the smallest catalog size that reaches 1 supply when possible, switching to 10 A only if AUX draw needs it. Switch it to Off to set all three manually instead. Edwards AUX outputs are rated 3.0 A per circuit, 6.0 A total on a 6 A supply (APS6A/BPS6A) or 8.0 A total on a 10 A supply (APS10A/BPS10A). For 50 Ah and 65 Ah batteries, a <b>Battery cabinet</b> choice appears — Edwards 3-RCC7R (with 3-BATS shelf at 65 Ah) or Space Age SSU00507.</p>
             <figure class="qs-figure"><img data-qs-slot="7-aux-battery" alt="AUX and battery"><figcaption>Screenshot: Auto Battery Sizing toggle + AUX + battery size + battery cabinet choice</figcaption></figure>
           </div>
@@ -937,7 +1033,7 @@
         <div class="qs-step">
           <div class="qs-step-num">9</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Review Validation Error flags</div>
+            <div class="qs-step-title" id="qs-step-validation">Review Validation Error flags</div>
             <p>Yellow-highlighted <b>Validation Error</b> flags call out detector/display mismatches, ribbon-segment size limits, duplicate addresses, missing circuit sources, and AUX coverage. They don't block editing, but <b>the power supply/battery recommendation section, the multi-supply recommendation, the Recommended Power Supply Arrangement, and the Bill of Materials are all withheld until every flag clears</b> — including a missing fan speed selection. Resolve everything shown here before expecting a hardware recommendation at the bottom of the sheet.</p>
             <figure class="qs-figure"><img data-qs-slot="8-validation" alt="Validation Error flags"><figcaption>Screenshot: yellow Validation Error panel with flags</figcaption></figure>
           </div>
@@ -946,7 +1042,7 @@
         <div class="qs-step">
           <div class="qs-step-num">10</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Resolve any INVALID CALCULATION banner</div>
+            <div class="qs-step-title" id="qs-step-invalid">Resolve any INVALID CALCULATION banner</div>
             <p>Separate from — and more severe than — a Validation Error flag, a bold red <b>"INVALID CALCULATION"</b> banner at the top of a sheet means the numbers themselves can't be trusted. It fires on any of four conditions, each with a specific fix:</p>
             <ul class="help-steps" style="margin:0 0 10px;">
               <li><b>Required battery capacity exceeds 65 Ah</b> (the largest available battery) — increase the battery size where possible, or split the location's clusters across additional power supply sheets using the Recommended Power Supply Arrangement below.</li>
@@ -970,8 +1066,44 @@
         <div class="qs-step">
           <div class="qs-step-num">12</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Save your work and export results</div>
+            <div class="qs-step-title" id="qs-step-save-export">Save your work and export results</div>
             <p><b>Save As…</b> in the toolbar downloads the whole document — every sheet, every field — as a single self-contained .html file you can keep, email, or reopen later in any browser; opening it restores the document exactly as saved. The <b>Autosave</b> toggle (next to it) is a convenience on top of that: once turned on, it saves your current work automatically to this browser's local storage as you go, so a reload doesn't lose it — but it's tied to this specific browser and device, not portable like a saved file, so it's not a substitute for an occasional Save As when you want a real, shareable copy. <b>Export to Excel</b> in the toolbar produces a multi-sheet .xlsx workbook, one worksheet per power supply, mirroring each sheet's module table and results — useful for handing data to someone who wants it outside this tool.</p>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-num">13</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-needs-entry">Blue needs-entry highlights</div>
+            <p>Empty editable fields — and fields still sitting on their factory defaults — show a soft <b>blue</b> border and light blue tint so unfinished entry is easy to spot. This is intentionally different from the <b>yellow</b> Validation Error panel and the <b>red</b> INVALID CALCULATION banner. Blue clears when you fill an empty field, or when you change a factory-default value away from its starter setting. <b>Date</b> is excluded: new and cleared documents still initialize Date to today, and you can edit it normally afterward, but it is never blue-highlighted. Project-header fields (Project Name, Prepared By, Network #, Building, CDM locations) use the same empty/default rules as sheet fields.</p>
+            <figure class="qs-figure"><img data-qs-slot="10-needs-entry" alt="Blue needs-entry highlights"><figcaption>Screenshot: blue-highlighted empty/default fields on the project header and current sheet</figcaption></figure>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-num">14</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-confirm-defaults">Confirm defaults</div>
+            <p>When factory defaults are intentional (you reviewed them and want to keep them), click <b>Confirm defaults</b> in the toolbar. That clears blue highlighting on factory-default fields for the <b>project header</b> and the <b>current sheet</b> (the sheet you last clicked or focused — shown with a subtle outline). Empty fields stay blue until you fill them. Confirming does not change any values — it only marks those defaults as reviewed.</p>
+            <figure class="qs-figure"><img data-qs-slot="11-confirm-defaults" alt="Confirm defaults button"><figcaption>Screenshot: Confirm defaults toolbar button clearing blue on reviewed factory defaults</figcaption></figure>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-num">15</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-clear">Clear a sheet or the entire file</div>
+            <p><b>Clear</b> in the toolbar asks what to wipe. <b>This sheet only</b> resets the current power-supply sheet to a blank factory starter (modules + defaults) and leaves project header fields alone — you confirm before it runs. <b>Entire file</b> removes every sheet, then asks whether to <b>keep</b> or <b>clear</b> the project/header fields, and asks for a final confirm before wiping. Either path starts you with a fresh blank sheet afterward. (The separate "Clear saved data" control in the project bar is only for wiping browser Autosave storage — different from toolbar Clear.)</p>
+            <figure class="qs-figure"><img data-qs-slot="12-clear" alt="Clear dialog"><figcaption>Screenshot: Clear prompt choosing this sheet vs entire file</figcaption></figure>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-num">16</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-import">Import Calc from a saved .html</div>
+            <p><b>Import Calc</b> opens a file picker for a calculator <span class="mono-inline">.html</span> that was produced with Save As… (those files embed the document data needed for import). If the file's revision is older than this app, you get a warning and can cancel or continue. Then choose <b>Replace document</b> (swap your current header + sheets for the imported file) or <b>Merge sheets</b> (add the imported power-supply sheets into the current file). On merge, if an imported sheet name collides with one you already have, you pick per collision: <b>Skip</b>, <b>Keep both (auto-rename)</b>, or <b>Overwrite existing</b>.</p>
+            <figure class="qs-figure"><img data-qs-slot="13-import-calc" alt="Import Calc dialog"><figcaption>Screenshot: Import Calc replace/merge prompt and sheet-name collision choices</figcaption></figure>
           </div>
         </div>
 
@@ -1045,6 +1177,25 @@
           <div class="help-formula-box">C<sub>min</sub> = 1.25 × (I<sub>1</sub> × T<sub>1</sub> + D × I<sub>2</sub> × T<sub>2</sub>)</div>
           <p style="font-size:11.5px; color:var(--text-faint); margin:6px 0 0;">I<sub>1</sub>×T<sub>1</sub> = standby term · I<sub>2</sub>×T<sub>2</sub> = alarm term · D = 1 or 1.75, determined automatically by comparing the selected battery's 20-hour rate to the alarm current (see the De-Rating factor field and the Battery and Charger Sizing entry below for the full determination rule) · 1.25 = fixed aging factor (shown via this calculator's Safety Margin, locked to 25% while a BS 5839-1 preset is active). Standby/alarm durations by category: M (Manual) or L (Life Safety) = 24 h / 30 min · M/L with generator = 6 h / 30 min · P (staffed/ARC-monitored) = 24 h / 30 min · P (unstaffed) = 24 h + unoccupied period, up to 72 h total / 30 min.</p>
         </div>
+
+        <div class="section-label" style="margin-top:26px;">Module Current Draw Reference</div>
+        <p style="font-size:12px; color:var(--text-dim); margin:0 0 12px;">Every module's current draw used by this calculator, alongside the manufacturer's 18V figures for cross-reference. 24V is the value this calculator actually applies — it does not match either the 18.0V or 20.4V rows in the manufacturer's worksheet exactly; it reflects a separate reference point used when the calculator was built.</p>
+        <table class="help-currentdraw-table">
+          <thead><tr><th>Module Type</th><th>Model</th><th>18V Current</th><th>24V Current (calculator)</th></tr></thead>
+          <tbody>
+            <tr><td>Minimum Display<sup>1</sup></td><td class="mono-inline">FHSD8300-ULF</td><td>242 mA</td><td>210 mA</td></tr>
+            <tr><td>Standard Display</td><td class="mono-inline">FHSD8310-ULF</td><td>266 mA</td><td>232 mA</td></tr>
+            <tr><td>Command Display<sup>2</sup></td><td class="mono-inline">FHSD8320-ULF</td><td>266 mA</td><td>232 mA</td></tr>
+            <tr class="cd-permodule-rows-help"><td colspan="4" style="padding-top:10px; font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.5px; border-bottom:1px solid var(--border-soft); padding-bottom:6px;">Detectors — by Fan Speed</td></tr>
+          </tbody>
+          <tbody id="help-fanspeed-currentdraw-rows"></tbody>
+        </table>
+        <p style="font-size:11px; color:var(--text-faint); margin:10px 0 0; line-height:1.6;">
+          Display rows are collapsed to a single current value each, per the calculator's own model (which does not distinguish TFT or LEDS state) — the TFT-On/LEDS-On (highest-draw) state was used to select the corresponding 18V figure.<br>
+          <sup>1</sup> Minimum Display: the manufacturer worksheet publishes only the LEDS-Off state for this display (no TFT) at 18V — no LEDS-On figure is available in the source data, so 242 mA is the highest published value rather than a true TFT-On/LEDS-On worst case.<br>
+          <sup>2</sup> Command Display: no separate current-draw entry exists for this display in the source manufacturer table. This reuses the Standard Display figure, consistent with the calculator's own treatment of both display types as electrically identical.<br>
+          A standalone version of this table (Excel + HTML) is available as a separate reference file alongside this calculator.
+        </p>
 
         <div class="section-label" style="margin-top:26px;">Other Code Requirements</div>
 
@@ -1237,7 +1388,7 @@
 //         change made in chat, until the minor version above is next revised
 //   YYMMDD = the actual calendar date the revision was made
 const APP_MAJOR = "01";
-const APP_MINOR = "04";
+const APP_MINOR = "05";
 const APP_AUTHOR = "The BMG";
 
 // Running amendment log. Each entry is one distinct logical change.
@@ -1293,6 +1444,14 @@ const AMENDMENTS = [
   { rev: "003", minor: "04", date: "260810", desc: "Found and fixed a real bug while building the Standalone addressing scope: cluster numbers turned out to only be unique within their own sheet (confirmed by reading the actual auto-assignment code), not document-wide as initially assumed — meaning two completely unrelated clusters on different sheets can share the same bare number. Grouping Standalone addresses by that bare number alone would have wrongly treated them as one cluster. Fixed by keying on the cluster's true (host sheet, cluster number) identity instead, resolved the same way cross-sheet references already resolve it — verified via test that two unrelated same-numbered clusters no longer conflict, while genuinely cross-referenced clusters correctly do." },
   { rev: "004", minor: "04", date: "260810", desc: "Added FAQ documentation for the new Standalone / Networked toggle, and updated the granular calculation detail FAQ entry to mention the new per-module current listing." },
   { rev: "005", minor: "04", date: "260810", desc: "Reviewed and expanded Quick Start end to end, per Brent. Added a new step 6 (Choose Networked or Standalone addressing), positioned right after the Address step per Brent's explicit placement instruction, renumbering the remaining steps 7-11. Also closed three gaps found during the review that predated features now in the calculator: expanded the cluster-building step to cover Command Displays (a real module type that was never mentioned anywhere in Quick Start), and added a new final step 12 covering Save As, Autosave, and Export to Excel — none of which were documented, despite all three being real toolbar features. Verified autosave's actual mechanism (browser localStorage, not portable) and Excel export's actual output (one worksheet per power supply) directly in the code before describing them, rather than assuming. Fixed a stale internal step-number cross-reference this renumbering would otherwise have broken." },
+  { rev: "006", minor: "04", date: "260818", desc: "Fixed three real bugs Brent hit in actual use, all reproduced directly before fixing. (1) Circuit source: selecting an AUX Circuit # never filled in the separate Circuit Source text field the validation actually checks, so a properly-assigned entry point could still show \"missing circuit source\" — now auto-populated from the PS name + assigned circuit number, tracked the same way as other auto-vs-manual fields so a deliberate custom entry is still respected. (2) Detectors that both reference the same remote cluster (cross-sheet, display-less) could never ribbon-connect to each other — the code explicitly treated any remote reference as own-circuit-only; fixed so ribbon, being a physical/per-sheet concept, works locally between same-sheet detectors sharing a remote cluster reference, independent of whichever sheet hosts that cluster's display. (3) The ribbon segment-count validation and the auto-reorder-on-sheet logic both only scanned locally-hosted clusters, so a display-less sheet's ribbon segments were silently never validated or grouped — both fixed to scan every cluster the sheet actually touches." },
+  { rev: "007", minor: "04", date: "260818", desc: "Fixed a real startup/restore bug: opening a saved file could show a false \"address not assigned\" INVALID CALCULATION banner even though every address was correctly saved and restored. Root cause: the invalid-calculation check ran before the address dropdowns' deferred restore values had been resolved into real selections, and nothing re-checked afterward. Fixed with a second pass after restore, once addresses are fully resolved. Also updated Quick Start's cluster-building step to describe the new same-sheet ribbon capability for remotely-referenced detectors." },
+  { rev: "008", minor: "04", date: "260903", desc: "Added a Module Current Draw Reference table to Standards and Formulas, per Brent: every module's current draw as used by this calculator (24V) alongside the manufacturer's 18V figures for cross-reference, sourced from Brent's uploaded worksheet image. Display rows use the TFT-On/LEDS-On (highest-draw) state per Brent's explicit choice; two real data gaps in the source (no LEDS-On figure for Minimum Display, no separate Command Display entry at all) are documented inline via numbered footnotes rather than silently guessed at. Detector rows reuse the calculator's own FAN_SPEED_MA constant for the 24V column (a new companion FAN_SPEED_MA_18V constant holds the reference-only 18V figures) so the embedded table can never drift from the actual calculation logic. Also shipped as two standalone reference files (Excel + HTML, styled to match the calculator) alongside the three calculator deliverables." },
+  { rev: "001", minor: "05", date: "261002", desc: "Minor version bumped to 01.05 per Brent; revision counter restarted at 001. Feature pack: Import Calc (replace or merge saved .html sheets, with sheet-name collision prompts and older-revision warning), Clear (this sheet or entire file, with keep/clear header option), Confirm defaults (clears amber on factory-default fields for the current sheet), and soft amber highlighting for empty editable fields and unconfirmed factory defaults." },
+  { rev: "002", minor: "05", date: "261002", desc: "Needs-entry highlight switched from amber to soft blue (distinct from yellow Validation Errors and red Invalid Calculation); project-header fields now use the same empty + factory-default rules; Confirm defaults always clears blue on header defaults and the current sheet's defaults." },
+  { rev: "003", minor: "05", date: "261002", desc: "Date field excluded from needs-entry (blue) highlighting; new/cleared documents still initialize Date to today, and the field remains normally editable afterward." },
+  { rev: "004", minor: "05", date: "261002", desc: "Quick Start updated with steps 13–16 documenting blue needs-entry highlights, Confirm defaults, Clear (sheet vs entire file), and Import Calc (replace/merge, collision choices, older-revision warning), each with qs-figure wireframes." },
+  { rev: "005", minor: "05", date: "261002", desc: "Added searchable How Do I… in the main toolbar and Help overlay: type-ahead filters curated common topics plus other Help/FAQ/Quick Start entries, shows a short inline answer with a jump link into the full Help section." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -1348,6 +1507,11 @@ const MODULE_TYPES = {
   "Detector":         { model: "FHSD8330-ULF", kind: "detector", ma: null }
 };
 const FAN_SPEED_MA = {1:218,2:234,3:255,4:279,5:301,6:330,7:363,8:393,9:431,10:471,11:506,12:552,13:602,14:646,15:712,16:762};
+// 18V reference figures from the manufacturer's current-draw worksheet, for the Help menu's
+// reference table only — not used in any calculation (the calculator's own math always uses
+// FAN_SPEED_MA above). Does not match either the 18.0V or 20.4V rows exactly in every case;
+// see the Help menu's Module Current Draw Reference for the documented sourcing.
+const FAN_SPEED_MA_18V = {1:250,2:279,3:305,4:330,5:358,6:380,7:430,8:465,9:517,10:566,11:615,12:685,13:733,14:786,15:872,16:1021};
 
 const QUIESCENT_MA = 70;
 const AUX_MA_PER_CIRCUIT = 35;
@@ -1790,6 +1954,28 @@ function applyLoadedState(state){
   }
   const locs = state.locations.map(restoreLocation);
   locs.forEach(loc => recalcLocation(loc));
+  // The pass above computes each location's invalid-calculation state before
+  // updateNetworkAddressAvailability() (which runs at the end of that same cascade) has
+  // resolved deferred addresses restored via dataset.desiredValue — so a freshly-opened file
+  // can show a false "missing address" banner even though every address is actually set.
+  // Re-run the inner calculation now that addresses are correctly resolved.
+  locs.forEach(loc => recalcLocationInner(loc));
+  document.querySelectorAll('[data-role="module"]').forEach(row => {
+    if (typeof stampFactoryTypeOnRow === 'function') stampFactoryTypeOnRow(row);
+  });
+  const firstLoc = document.querySelector('.location');
+  if (firstLoc && typeof setCurrentLocation === 'function') setCurrentLocation(firstLoc);
+  // Restored header values are intentional document data — mark non-empty headers confirmed;
+  // stamp date factory only when it was blank and we just assigned today elsewhere.
+  if (typeof HEADER_NEEDS_IDS !== 'undefined'){
+    HEADER_NEEDS_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (String(el.value ?? '').trim() !== '') el.dataset.confirmed = '1';
+    });
+  }
+  if (typeof stampHeaderFactoryDefaults === 'function') stampHeaderFactoryDefaults();
+  if (typeof refreshAllAmber === 'function') refreshAllAmber();
   syncPrintHeaders();
 }
 
@@ -1960,7 +2146,7 @@ function buildModuleRow(loc, uid, defaultType, defaultZone, defaultFan){
     </td>
     <td class="power-cell">
       <select class="power-select" onchange="recalcLocation('${loc}')"><option value="own">Own circuit (entry point)</option></select>
-      <input class="circuit-source" placeholder="e.g. PS-1 AUX-2" oninput="scheduleSave()" onchange="recalcLocation('${loc}')" hidden>
+      <input class="circuit-source" placeholder="e.g. PS-1 AUX-2" oninput="this.dataset.userEdited='1'; scheduleSave()" onchange="this.dataset.userEdited='1'; recalcLocation('${loc}')" hidden>
       <select class="aux-circuit-num" onchange="recalcLocation('${loc}')" hidden></select>
       <span class="power-print-text"></span>
     </td>
@@ -2434,8 +2620,14 @@ function addLocation(){
   const container = document.getElementById("locations-container");
   const wrap = document.createElement("div");
   wrap.innerHTML = locationTemplate(loc);
-  container.appendChild(wrap.firstElementChild);
+  const locEl = wrap.firstElementChild;
+  container.appendChild(locEl);
+  locEl.querySelectorAll('[data-role="module"]').forEach(row => {
+    if (typeof stampFactoryTypeOnRow === 'function') stampFactoryTypeOnRow(row);
+  });
   applyDesignBasis(loc);
+  if (typeof setCurrentLocation === 'function') setCurrentLocation(locEl);
+  if (typeof refreshAmberForLocation === 'function') refreshAmberForLocation(locEl);
   if (typeof syncPrintHeaders === "function") syncPrintHeaders();
 }
 
@@ -2455,8 +2647,11 @@ function addModuleRow(loc, type){
   const tbody = locEl.querySelector(".devices-body");
   const wrap = document.createElement("tbody");
   wrap.innerHTML = buildModuleRow(loc, uid, type, "", "");
-  tbody.appendChild(wrap.firstElementChild);
+  const row = wrap.firstElementChild;
+  tbody.appendChild(row);
+  if (typeof stampFactoryTypeOnRow === 'function') stampFactoryTypeOnRow(row);
   recalcLocation(loc);
+  if (typeof refreshAmberForLocation === 'function') refreshAmberForLocation(locEl);
 }
 
 function removeModuleRow(loc, rowId){
@@ -3495,6 +3690,11 @@ function recalcLocationInner(loc){
       sel.innerHTML = opts;
       sel.value = String(n);
       usedAuxCircuits.add(n);
+      const circuitSourceEl = row.querySelector('.circuit-source');
+      if (circuitSourceEl && circuitSourceEl.dataset.userEdited !== '1'){
+        const psNameVal = locEl.querySelector('.ps-name').value.trim() || `Sheet ${loc}`;
+        circuitSourceEl.value = `${psNameVal} AUX-${n}`;
+      }
     }
     sel.hidden = false;
   }
@@ -3533,21 +3733,33 @@ function recalcLocationInner(loc){
     const row = d.row;
     const pSel = row.querySelector('.power-select');
     const src = row.querySelector('.circuit-source');
-    // Which cluster? For local-mode this is a plain number; for remote-mode this is r:loc:num
+    // Which cluster? Both local (plain number) and remote (r:loc:num) references resolve to a
+    // cluster number here — ribbon is a physical, per-sheet concept: two detectors that both
+    // reference the same remote cluster can still ribbon-connect to each other locally on this
+    // sheet, even though the cluster's display lives elsewhere and the two portions link up via
+    // SNET+ rather than ribbon. The segment pool for a remote cluster number is created lazily
+    // (this sheet's own local contribution to that cluster), separate from whatever segment pool
+    // that same cluster number has on the sheet that actually hosts it.
     let myClusterNum = null;
     const clusterVal = row.querySelector('.cluster-select').value;
-    if (clusterVal && clusterVal.indexOf('r:') !== 0){
-      const n = parseInt(clusterVal);
-      if (!Number.isNaN(n)) myClusterNum = n;
+    if (clusterVal){
+      if (clusterVal.indexOf('r:') === 0){
+        const parts = clusterVal.split(':');
+        const n = parseInt(parts[2]);
+        if (!Number.isNaN(n)) myClusterNum = n;
+      } else {
+        const n = parseInt(clusterVal);
+        if (!Number.isNaN(n)) myClusterNum = n;
+      }
     }
-    // No local cluster -> can only be its own entry point (remote detectors are treated as own-circuit here)
-    if (myClusterNum === null || !ribbonSegmentsByCluster[myClusterNum]){
+    if (myClusterNum === null){
       pSel.innerHTML = '<option value="own">Own circuit (entry point)</option>';
       pSel.value = 'own';
       src.hidden = false;
       setupAuxCircuitSelect(row);
       return;
     }
+    if (!ribbonSegmentsByCluster[myClusterNum]) ribbonSegmentsByCluster[myClusterNum] = [];
     // Build options: own + one per existing entry point in this cluster (excluding self, which isn't an entry yet)
     const prevVal = pSel.dataset.desiredValue || pSel.value || 'own';
     delete pSel.dataset.desiredValue;
@@ -3635,8 +3847,8 @@ function recalcLocationInner(loc){
   if (ribbonAutoMode){
     const trackedIds = new Set();
     const orderedRows = [];
-    clusterInfo.forEach(c => {
-      (ribbonSegmentsByCluster[c.num] || []).forEach(seg => {
+    Object.keys(ribbonSegmentsByCluster).forEach(cnKey => {
+      (ribbonSegmentsByCluster[cnKey] || []).forEach(seg => {
         if (!trackedIds.has(seg.entryRow.id)){ orderedRows.push(seg.entryRow); trackedIds.add(seg.entryRow.id); }
         seg.followerRows.forEach(f => {
           if (!trackedIds.has(f.id)){ orderedRows.push(f); trackedIds.add(f.id); }
@@ -3703,15 +3915,16 @@ function recalcLocationInner(loc){
   // Ribbon segment validation
   const oversizedSegments = [];
   const overcountClusters = [];
-  clusterInfo.forEach(c => {
-    const segs = ribbonSegmentsByCluster[c.num] || [];
+  Object.keys(ribbonSegmentsByCluster).forEach(cnKey => {
+    const cn = parseInt(cnKey);
+    const segs = ribbonSegmentsByCluster[cnKey] || [];
     segs.forEach(seg => {
       if (seg.followerRows.length > 4){
-        oversizedSegments.push(`Cluster ${pad2(c.num)} (${seg.followerRows.length} ribbon-connected detectors on one segment)`);
+        oversizedSegments.push(`Cluster ${pad2(cn)} (${seg.followerRows.length} ribbon-connected detectors on one segment)`);
       }
     });
     if (segs.length > 2){
-      overcountClusters.push(`Cluster ${pad2(c.num)} (${segs.length} distributed segments)`);
+      overcountClusters.push(`Cluster ${pad2(cn)} (${segs.length} distributed segments)`);
     }
   });
   if (oversizedSegments.length){
@@ -4691,6 +4904,52 @@ function qsWireframe(slot){
       `<text x="210" y="76" font-size="8" fill="#666">18.7 Ah — 1 supply</text>` +
       `<rect x="10" y="120" width="230" height="22" rx="3" fill="#ff9130" stroke="#c56610"/><text x="125" y="135" text-anchor="middle" font-size="9" fill="#fff" font-weight="600">Export additional arrangements</text>` +
       `<text x="250" y="135" font-size="8" fill="#666">→ each Arrangement becomes its own sheet</text>`);
+
+    case '10-needs-entry': return shell(defs +
+      `<text x="10" y="16" font-size="8" fill="#666" text-transform="uppercase" font-weight="600">Needs-entry (soft blue) — not yellow / not red</text>` +
+      `<rect x="10" y="24" width="120" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="18" y="36" font-size="7" fill="#666">Project Name</text><text x="18" y="46" font-size="8" fill="#5b9bd5" font-style="italic">(empty)</text>` +
+      `<rect x="140" y="24" width="90" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="148" y="36" font-size="7" fill="#666">Prepared By</text><text x="148" y="46" font-size="8" fill="#5b9bd5" font-style="italic">(empty)</text>` +
+      `<rect x="240" y="24" width="70" height="28" rx="3" fill="#fff" stroke="#333"/><text x="248" y="36" font-size="7" fill="#666">Date</text><text x="248" y="46" font-size="8" fill="#111" font-family="Consolas, monospace">2026-10-02</text>` +
+      `<text x="318" y="42" font-size="7.5" fill="#666">← never blue</text>` +
+      `<rect x="10" y="66" width="180" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="18" y="78" font-size="7" fill="#666">Design Basis (factory default)</text><text x="18" y="88" font-size="8" fill="#111">NFPA 72 Voice</text>` +
+      `<rect x="200" y="66" width="90" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="208" y="78" font-size="7" fill="#666">Address</text><text x="208" y="88" font-size="8" fill="#5b9bd5" font-style="italic">— Select —</text>` +
+      `<rect x="10" y="108" width="175" height="18" rx="3" fill="#fdf8e3" stroke="#d4b106"/><text x="18" y="120" font-size="7.5" fill="#8f7704">⚠ yellow = Validation Error</text>` +
+      `<rect x="200" y="108" width="175" height="18" rx="3" fill="#fdeaea" stroke="#c81e2c"/><text x="208" y="120" font-size="7.5" fill="#c81e2c">red = INVALID CALCULATION</text>` +
+      `<text x="10" y="142" font-size="7.5" fill="#666">Blue clears when filled, changed off factory default, or via Confirm defaults</text>`);
+
+    case '11-confirm-defaults': return shell(defs +
+      `<rect x="8" y="10" width="384" height="36" rx="4" fill="#fff" stroke="#666"/>` +
+      `<rect x="14" y="18" width="58" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="43" y="32" text-anchor="middle" font-size="8" fill="#333">Save As…</text>` +
+      `<rect x="78" y="18" width="70" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="113" y="32" text-anchor="middle" font-size="8" fill="#333">Import Calc</text>` +
+      `<rect x="154" y="18" width="48" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="178" y="32" text-anchor="middle" font-size="8" fill="#333">Clear</text>` +
+      `<rect x="208" y="18" width="110" height="20" rx="3" fill="#e8f1fa" stroke="#5b9bd5"/><text x="263" y="32" text-anchor="middle" font-size="8" fill="#2a6aa5" font-weight="600">Confirm defaults</text>` +
+      `<rect x="324" y="18" width="60" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="354" y="32" text-anchor="middle" font-size="8" fill="#333">Export</text>` +
+      `<text x="14" y="68" font-size="9" fill="#111" font-weight="600">Clears blue on:</text>` +
+      `<text x="14" y="86" font-size="9" fill="#333">• Project-header factory defaults</text>` +
+      `<text x="14" y="102" font-size="9" fill="#333">• Current sheet factory defaults (last focused sheet)</text>` +
+      `<text x="14" y="118" font-size="9" fill="#666">Empty fields stay blue until filled — Confirm does not invent values</text>` +
+      `<text x="14" y="138" font-size="8" fill="#5b9bd5">Reviewed defaults keep their values; only the highlight clears</text>`);
+
+    case '12-clear': return shell(defs +
+      `<rect x="60" y="12" width="280" height="126" rx="6" fill="#fff" stroke="#666"/>` +
+      `<text x="200" y="34" text-anchor="middle" font-size="12" fill="#111" font-weight="700">Clear</text>` +
+      `<text x="200" y="52" text-anchor="middle" font-size="8.5" fill="#666">What would you like to clear?</text>` +
+      `<rect x="80" y="64" width="70" height="22" rx="3" fill="#f0f0ec" stroke="#999"/><text x="115" y="79" text-anchor="middle" font-size="8" fill="#333">Cancel</text>` +
+      `<rect x="158" y="64" width="100" height="22" rx="3" fill="#fff" stroke="#5b9bd5"/><text x="208" y="79" text-anchor="middle" font-size="8" fill="#2a6aa5">This sheet only</text>` +
+      `<rect x="266" y="64" width="58" height="22" rx="3" fill="#2a6aa5" stroke="#2a6aa5"/><text x="295" y="79" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Entire file</text>` +
+      `<text x="80" y="106" font-size="7.5" fill="#666">Entire file → keep or clear header fields, then confirm</text>` +
+      `<text x="80" y="120" font-size="7.5" fill="#666">This sheet only → confirm, then reset to factory starter</text>`);
+
+    case '13-import-calc': return shell(defs +
+      `<rect x="40" y="8" width="320" height="134" rx="6" fill="#fff" stroke="#666"/>` +
+      `<text x="200" y="28" text-anchor="middle" font-size="12" fill="#111" font-weight="700">Import Calc</text>` +
+      `<text x="200" y="44" text-anchor="middle" font-size="8" fill="#666">Replace document  ·  or  ·  Merge sheets</text>` +
+      `<rect x="55" y="54" width="90" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="100" y="68" text-anchor="middle" font-size="8" fill="#333">Cancel</text>` +
+      `<rect x="155" y="54" width="90" height="20" rx="3" fill="#fff" stroke="#5b9bd5"/><text x="200" y="68" text-anchor="middle" font-size="8" fill="#2a6aa5">Merge sheets</text>` +
+      `<rect x="255" y="54" width="90" height="20" rx="3" fill="#2a6aa5" stroke="#2a6aa5"/><text x="300" y="68" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Replace</text>` +
+      `<text x="55" y="92" font-size="8" fill="#666" font-weight="600">On sheet-name collision:</text>` +
+      `<text x="55" y="106" font-size="8" fill="#333">Skip  ·  Keep both (rename)  ·  Overwrite existing</text>` +
+      `<text x="55" y="124" font-size="7.5" fill="#8f7704">Older file revision → warning, then continue if you confirm</text>`);
   }
   return null;
 }
@@ -4711,7 +4970,990 @@ document.querySelectorAll('.qs-figure img[data-qs-slot]').forEach(img => {
   }
   img.replaceWith(holder);
 });
+/* ===== Feature pack 01.05.005 — How Do I + Import / Clear / Confirm / Needs-entry ===== */
+let currentLocId = null;
+let promptResolver = null;
+
+const FACTORY_FIELD_DEFAULTS = [
+  { sel: '.design-basis-select', value: 'NFPA 72 Voice' },
+  { sel: '.standby-hours', value: '24' },
+  { sel: '.alarm-minutes', value: '15' },
+  { sel: '.temperature-select', value: '77' },
+  { sel: '.nfpa72-edition-select', value: '2022plus' },
+  { sel: '.margin-select', value: '0.25' },
+  { sel: '.ps-capacity-select', value: '6' },
+  { sel: '.battery-size-select', value: '40' },
+  { sel: '.battery-size-custom', value: '40' },
+  { sel: '.custom-quiescent', value: '70' },
+  { sel: '.custom-aux-ma', value: '35' },
+  { sel: '.aux-circuits-custom', value: '1' },
+  { sel: '.tp-battery-ah', value: '40' },
+  { sel: '.tp-battery-voltage', value: '12' },
+  { sel: '.export-margin-select', value: '0.25' },
+  { sel: '.export-charger-ah', value: '65' },
+  { sel: '.derating-input', value: '1.75' },
+  { sel: '.ribbon-assign-mode', value: 'auto' },
+  { sel: '.auto-battery-mode', value: 'auto' },
+  { sel: '.tp-auto-battery-mode', value: 'off' },
+];
+
+function runningRevisionFull(){
+  const latest = AMENDMENTS[AMENDMENTS.length - 1];
+  return `${APP_MAJOR}.${latest.minor || APP_MINOR}.${latest.rev}_${latest.date}`;
+}
+function runningRevisionTuple(){
+  const latest = AMENDMENTS[AMENDMENTS.length - 1];
+  return [parseInt(APP_MAJOR, 10), parseInt(latest.minor || APP_MINOR, 10), parseInt(latest.rev, 10)];
+}
+function parseRevisionTuple(str){
+  if (!str) return null;
+  const m = String(str).match(/(\d+)\.(\d+)\.(\d+)/);
+  if (!m) return null;
+  return [parseInt(m[1], 10), parseInt(m[2], 10), parseInt(m[3], 10)];
+}
+function compareRevisionTuples(a, b){
+  if (!a || !b) return 0;
+  for (let i = 0; i < 3; i++){
+    if (a[i] !== b[i]) return a[i] < b[i] ? -1 : 1;
+  }
+  return 0;
+}
+function extractRevisionFromHtml(htmlText){
+  const about = htmlText.match(/id=["']about-revision-value["'][^>]*>([^<]+)</i);
+  if (about && about[1].trim() && about[1].trim() !== '—') return about[1].trim();
+  const majorM = htmlText.match(/const\s+APP_MAJOR\s*=\s*["'](\d+)["']/);
+  const minorM = htmlText.match(/const\s+APP_MINOR\s*=\s*["'](\d+)["']/);
+  const amendMatches = [...htmlText.matchAll(/\{\s*rev:\s*["'](\d+)["']\s*,\s*(?:minor:\s*["'](\d+)["']\s*,\s*)?date:\s*["'](\d+)["']/g)];
+  if (majorM && amendMatches.length){
+    const last = amendMatches[amendMatches.length - 1];
+    const minor = last[2] || (minorM ? minorM[1] : '00');
+    return `${majorM[1]}.${minor}.${last[1]}_${last[3]}`;
+  }
+  if (majorM && minorM) return `${majorM[1]}.${minorM[1]}.000`;
+  return null;
+}
+function parseImportedCalculatorHtml(htmlText){
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlText, 'text/html');
+  let state = null;
+  const tag = doc.getElementById('embedded-state');
+  if (tag && tag.textContent.trim()){
+    try { state = JSON.parse(tag.textContent); } catch (e){ state = null; }
+  }
+  if (!state || !Array.isArray(state.locations)){
+    // Some older saves may only have localStorage-shaped JSON elsewhere — reject cleanly
+    return { ok: false, error: 'No calculator document data found in that file. Save As… from this calculator embeds the data needed for Import.' };
+  }
+  if (state.locations.length === 0){
+    return { ok: false, error: 'That file has no power-supply sheets to import.' };
+  }
+  return {
+    ok: true,
+    state,
+    revision: extractRevisionFromHtml(htmlText),
+  };
+}
+
+function sheetDisplayName(locEl, indexHint){
+  if (!locEl) return `Sheet ${indexHint || '?'}`;
+  const ps = (locEl.querySelector('.ps-name')?.value || '').trim();
+  const label = (locEl.querySelector('.location-name')?.value || '').trim();
+  if (ps) return ps;
+  if (label) return label;
+  const idx = locEl.dataset.loc || indexHint || '?';
+  return `Sheet ${String(idx).padStart(2, '0')}`;
+}
+function sheetNameFromSaved(saved, indexHint){
+  const ps = (saved.psName || '').trim();
+  const label = (saved.name || '').trim();
+  if (ps) return ps;
+  if (label) return label;
+  return `Sheet ${String(indexHint).padStart(2, '0')}`;
+}
+function uniqueImportedSheetName(base, existingNames){
+  const set = new Set(existingNames.map(n => n.toLowerCase()));
+  if (!set.has(base.toLowerCase())) return base;
+  let n = 2;
+  while (set.has(`${base} (${n})`.toLowerCase())) n++;
+  return `${base} (${n})`;
+}
+
+function setCurrentLocation(locEl){
+  if (!locEl || !locEl.classList.contains('location')) return;
+  currentLocId = locEl.dataset.loc;
+  document.querySelectorAll('.location').forEach(el => {
+    el.classList.toggle('location-current', el === locEl);
+  });
+}
+function getCurrentLocationEl(){
+  if (currentLocId){
+    const el = document.getElementById(`location-${currentLocId}`);
+    if (el) return el;
+  }
+  const first = document.querySelector('.location');
+  if (first) setCurrentLocation(first);
+  return first;
+}
+
+function closePromptModal(){
+  const overlay = document.getElementById('prompt-overlay');
+  if (overlay) overlay.classList.remove('open');
+  const actions = document.getElementById('prompt-actions');
+  if (actions) actions.innerHTML = '';
+  const extra = document.getElementById('prompt-extra');
+  if (extra) extra.innerHTML = '';
+}
+function showPromptModal({ title, desc, buttons, extraHtml }){
+  return new Promise(resolve => {
+    const overlay = document.getElementById('prompt-overlay');
+    document.getElementById('prompt-title').textContent = title || '';
+    document.getElementById('prompt-desc').innerHTML = desc || '';
+    const extra = document.getElementById('prompt-extra');
+    extra.innerHTML = extraHtml || '';
+    const actions = document.getElementById('prompt-actions');
+    actions.innerHTML = '';
+    (buttons || []).forEach(b => {
+      const btn = document.createElement('button');
+      btn.className = b.primary ? 'btn btn-primary btn-sm' : (b.danger ? 'btn btn-danger-ghost btn-sm' : 'btn btn-ghost btn-sm');
+      if (b.className) btn.className = b.className;
+      btn.textContent = b.label;
+      btn.addEventListener('click', () => {
+        closePromptModal();
+        promptResolver = null;
+        resolve(b.value);
+      });
+      actions.appendChild(btn);
+    });
+    promptResolver = resolve;
+    overlay.classList.add('open');
+  });
+}
+
+function isEditableControl(el){
+  if (!el || el.disabled || el.readOnly) return false;
+  if (el.tabIndex < 0 && el.tagName === 'INPUT' && el.type === 'hidden') return false;
+  if (el.closest('[hidden]')) return false;
+  // Skip controls inside a hidden ancestor block (display:none via hidden attr on parent)
+  let p = el.parentElement;
+  while (p && p !== document.body){
+    if (p.hidden) return false;
+    p = p.parentElement;
+  }
+  return true;
+}
+function controlIsEmpty(el){
+  if (!el) return false;
+  if (el.tagName === 'SELECT') return el.value === '';
+  if (el.type === 'checkbox' || el.type === 'radio') return false;
+  return String(el.value ?? '').trim() === '';
+}
+function markFieldAmber(el, on){
+  if (!el) return;
+  el.classList.toggle('field-needs', !!on);
+}
+function refreshAmberForLocation(locEl){
+  if (!locEl) return;
+  locEl.querySelectorAll('input.field-needs, select.field-needs').forEach(el => el.classList.remove('field-needs'));
+  const editable = locEl.querySelectorAll('input:not([type=hidden]):not([type=radio]):not([type=checkbox]), select');
+  editable.forEach(el => {
+    if (!isEditableControl(el)) { markFieldAmber(el, false); return; }
+    if (el.classList.contains('aux-circuits')) { markFieldAmber(el, false); return; } // readonly auto-count
+    if (controlIsEmpty(el)){
+      markFieldAmber(el, true);
+      return;
+    }
+    // Factory default?
+    const conf = el.dataset.confirmed === '1';
+    if (conf){ markFieldAmber(el, false); return; }
+    const factory = FACTORY_FIELD_DEFAULTS.find(f => el.matches(f.sel));
+    if (factory && String(el.value) === String(factory.value)){
+      markFieldAmber(el, true);
+      return;
+    }
+    // Module starter types count as factory until confirmed/changed
+    if (el.classList.contains('type-select')){
+      const factoryTypes = ['Standard Display', 'Detector', 'Minimum Display', 'Command Display'];
+      // Only amber type if it was never touched — use data-factory-type stamped at creation
+      if (el.dataset.factoryType && el.value === el.dataset.factoryType && el.dataset.confirmed !== '1'){
+        markFieldAmber(el, true);
+        return;
+      }
+    }
+    if (el.classList.contains('power-select') && el.value === 'own' && el.dataset.confirmed !== '1' && el.dataset.userTouched !== '1'){
+      // own-circuit is the factory power mode for new rows
+      markFieldAmber(el, true);
+      return;
+    }
+    markFieldAmber(el, false);
+  });
+  // Addressing radios: networked is factory
+  const addrNet = locEl.querySelector('.addr-scheme-radio[value="networked"]');
+  const addrStand = locEl.querySelector('.addr-scheme-radio[value="standalone"]');
+  if (addrNet && addrStand){
+    const wrap = locEl.querySelector('.addr-scheme-row');
+    if (wrap){
+      const stillFactory = addrNet.checked && wrap.dataset.confirmed !== '1';
+      wrap.classList.toggle('field-needs-wrap', stillFactory);
+    }
+  }
+  // Mode radios: builtin is factory
+  const modeBuiltin = locEl.querySelector('.mode-radio[value="builtin"]');
+  if (modeBuiltin){
+    const wrap = locEl.querySelector('.mode-toggle');
+    if (wrap){
+      const stillFactory = modeBuiltin.checked && wrap.dataset.confirmed !== '1';
+      wrap.classList.toggle('field-needs-wrap', stillFactory);
+    }
+  }
+}
+const HEADER_NEEDS_IDS = [
+  'project-name-input',
+  'prepared-by-input',
+  // project-date-input intentionally omitted — Date is never needs-entry highlighted
+  'network-number-input',
+  'building-input',
+  'primary-cdm-location-input',
+  'backup-cdm-location-input',
+];
+
+function stampHeaderFactoryDefaults(){
+  // Date is never needs-entry highlighted. Ensure a blank Date is filled with today
+  // for new/cleared documents; once set, it stays a normal editable date field.
+  const dateEl = document.getElementById('project-date-input');
+  if (dateEl && !String(dateEl.value || '').trim()){
+    dateEl.value = new Date().toISOString().slice(0, 10);
+  }
+  if (dateEl){
+    dateEl.classList.remove('field-needs');
+    delete dateEl.dataset.factoryValue;
+    delete dateEl.dataset.confirmed;
+  }
+}
+
+function refreshNeedsForHeader(){
+  const dateEl = document.getElementById('project-date-input');
+  if (dateEl) dateEl.classList.remove('field-needs');
+  HEADER_NEEDS_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('field-needs');
+    const empty = String(el.value ?? '').trim() === '';
+    if (empty){
+      el.classList.add('field-needs');
+      return;
+    }
+    if (el.dataset.confirmed === '1') return;
+    if (el.dataset.factoryValue != null && String(el.value) === String(el.dataset.factoryValue)){
+      el.classList.add('field-needs');
+    }
+  });
+}
+
+function confirmHeaderDefaults(){
+  HEADER_NEEDS_IDS.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    // Confirm factory-default headers (e.g. initial Date). Empty fields stay needs-entry until filled.
+    if (el.dataset.factoryValue != null && String(el.value) === String(el.dataset.factoryValue)){
+      el.dataset.confirmed = '1';
+    }
+    // Text headers have no non-empty factory value — nothing to confirm unless we treat
+    // a filled-but-never-touched field; empties intentionally remain highlighted.
+  });
+  refreshNeedsForHeader();
+}
+
+function refreshAllAmber(){
+  refreshNeedsForHeader();
+  document.querySelectorAll('.location').forEach(refreshAmberForLocation);
+}
+function confirmDefaultsForCurrentSheet(){
+  // Always clear blue on header factory defaults AND current-sheet defaults.
+  confirmHeaderDefaults();
+  const locEl = getCurrentLocationEl();
+  if (!locEl){
+    scheduleSave();
+    return;
+  }
+  setCurrentLocation(locEl);
+  FACTORY_FIELD_DEFAULTS.forEach(f => {
+    locEl.querySelectorAll(f.sel).forEach(el => {
+      if (String(el.value) === String(f.value)) el.dataset.confirmed = '1';
+    });
+  });
+  locEl.querySelectorAll('.type-select').forEach(el => {
+    if (el.dataset.factoryType && el.value === el.dataset.factoryType) el.dataset.confirmed = '1';
+  });
+  locEl.querySelectorAll('.power-select').forEach(el => {
+    if (el.value === 'own') { el.dataset.confirmed = '1'; el.dataset.userTouched = '1'; }
+  });
+  const addrWrap = locEl.querySelector('.addr-scheme-row');
+  if (addrWrap) addrWrap.dataset.confirmed = '1';
+  const modeWrap = locEl.querySelector('.mode-toggle');
+  if (modeWrap) modeWrap.dataset.confirmed = '1';
+  refreshAmberForLocation(locEl);
+  refreshNeedsForHeader();
+  scheduleSave();
+}
+
+function stampFactoryTypeOnRow(row){
+  const typeSel = row.querySelector('.type-select');
+  if (typeSel && !typeSel.dataset.factoryType) typeSel.dataset.factoryType = typeSel.value;
+}
+
+function clearOneSheet(locEl){
+  const loc = locEl.dataset.loc;
+  const container = document.getElementById('locations-container');
+  const wrap = document.createElement('div');
+  wrap.innerHTML = locationTemplate(loc);
+  const fresh = wrap.firstElementChild;
+  locEl.replaceWith(fresh);
+  fresh.querySelectorAll('[data-role="module"]').forEach(stampFactoryTypeOnRow);
+  applyDesignBasis(loc);
+  setCurrentLocation(fresh);
+  refreshAmberForLocation(fresh);
+  syncPrintHeaders();
+  scheduleSave();
+}
+function clearEntireDocument({ clearHeaders }){
+  try {
+    localStorage.removeItem(SAVE_KEY);
+    // Keep autosave activation flags — user asked to clear calc content, not necessarily autosave plumbing
+  } catch (e){}
+  const embeddedTag = document.getElementById('embedded-state');
+  if (embeddedTag) embeddedTag.remove();
+  document.getElementById('locations-container').innerHTML = '';
+  locationCounter = 0;
+  if (clearHeaders){
+    document.getElementById('project-name-input').value = '';
+    document.getElementById('prepared-by-input').value = '';
+    const dateEl = document.getElementById('project-date-input');
+    dateEl.value = new Date().toISOString().slice(0,10);
+    dateEl.classList.remove('field-needs');
+    delete dateEl.dataset.factoryValue;
+    delete dateEl.dataset.confirmed;
+    HEADER_NEEDS_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) delete el.dataset.confirmed;
+    });
+    document.getElementById('network-number-input').value = '';
+    document.getElementById('building-input').value = '';
+    document.getElementById('primary-cdm-location-input').value = '';
+    document.getElementById('backup-cdm-location-input').value = '';
+  }
+  addLocation();
+  const locEl = document.querySelector('.location');
+  if (locEl){
+    locEl.querySelectorAll('[data-role="module"]').forEach(stampFactoryTypeOnRow);
+    setCurrentLocation(locEl);
+  }
+  syncPrintHeaders();
+  refreshAllAmber();
+  updateSaveIndicator();
+  scheduleSave();
+}
+
+async function handleClearClick(){
+  const choice = await showPromptModal({
+    title: 'Clear',
+    desc: 'What would you like to clear? This cannot be undone.',
+    buttons: [
+      { label: 'Cancel', value: 'cancel' },
+      { label: 'This sheet only', value: 'sheet' },
+      { label: 'Entire file', value: 'file', primary: true },
+    ],
+  });
+  if (choice === 'cancel' || choice == null) return;
+  if (choice === 'sheet'){
+    const locEl = getCurrentLocationEl();
+    if (!locEl){ alert('No sheet is available.'); return; }
+    const name = sheetDisplayName(locEl);
+    const ok = await showPromptModal({
+      title: 'Clear this sheet?',
+      desc: `Reset <b>${escapeAttr(name)}</b> to a blank factory sheet (starter modules + default settings). Project header fields are left alone.`,
+      buttons: [
+        { label: 'Cancel', value: false },
+        { label: 'Clear sheet', value: true, primary: true },
+      ],
+    });
+    if (!ok) return;
+    clearOneSheet(locEl);
+    return;
+  }
+  // Entire file
+  const headerChoice = await showPromptModal({
+    title: 'Clear entire file',
+    desc: 'Also clear the project / header fields (Project Name, Prepared By, Date, Network, Building, CDM locations)?',
+    buttons: [
+      { label: 'Cancel', value: 'cancel' },
+      { label: 'Keep header fields', value: 'keep' },
+      { label: 'Clear headers too', value: 'clear', primary: true },
+    ],
+  });
+  if (headerChoice === 'cancel' || headerChoice == null) return;
+  const confirmed = await showPromptModal({
+    title: 'Confirm clear entire file',
+    desc: headerChoice === 'clear'
+      ? 'This removes every sheet and all project header fields, then starts a fresh blank sheet. Continue?'
+      : 'This removes every sheet (project header fields are kept), then starts a fresh blank sheet. Continue?',
+    buttons: [
+      { label: 'Cancel', value: false },
+      { label: 'Clear entire file', value: true, primary: true },
+    ],
+  });
+  if (!confirmed) return;
+  clearEntireDocument({ clearHeaders: headerChoice === 'clear' });
+}
+
+async function handleImportFile(file){
+  if (!file) return;
+  let htmlText;
+  try { htmlText = await file.text(); } catch (e){
+    alert('Could not read that file.');
+    return;
+  }
+  if (!/\.html?$/i.test(file.name) && !/^\s*</.test(htmlText)){
+    alert('Please choose a saved calculator .html file.');
+    return;
+  }
+  const parsed = parseImportedCalculatorHtml(htmlText);
+  if (!parsed.ok){ alert(parsed.error); return; }
+
+  const importedRev = parsed.revision;
+  const importedTuple = parseRevisionTuple(importedRev);
+  const runningTuple = runningRevisionTuple();
+  if (importedTuple && compareRevisionTuples(importedTuple, runningTuple) < 0){
+    const proceed = await showPromptModal({
+      title: 'Older revision',
+      desc: `That file was saved from an older calculator revision (<b>${escapeAttr(importedRev || 'unknown')}</b>) than this app (<b>${escapeAttr(runningRevisionFull())}</b>). You can still import it, but some newer fields may be missing or reset to defaults.`,
+      buttons: [
+        { label: 'Cancel', value: false },
+        { label: 'Import anyway', value: true, primary: true },
+      ],
+    });
+    if (!proceed) return;
+  }
+
+  const mode = await showPromptModal({
+    title: 'Import Calc',
+    desc: `Import <b>${escapeAttr(file.name)}</b> (${parsed.state.locations.length} sheet${parsed.state.locations.length === 1 ? '' : 's'}). Replace the whole document, or merge those sheets into the current file?`,
+    buttons: [
+      { label: 'Cancel', value: 'cancel' },
+      { label: 'Merge sheets', value: 'merge' },
+      { label: 'Replace document', value: 'replace', primary: true },
+    ],
+  });
+  if (mode === 'cancel' || mode == null) return;
+
+  if (mode === 'replace'){
+    const ok = await showPromptModal({
+      title: 'Replace entire document?',
+      desc: 'Your current sheets and project header fields will be replaced by the imported file. Continue?',
+      buttons: [
+        { label: 'Cancel', value: false },
+        { label: 'Replace', value: true, primary: true },
+      ],
+    });
+    if (!ok) return;
+    applyLoadedState(parsed.state);
+    document.querySelectorAll('[data-role="module"]').forEach(stampFactoryTypeOnRow);
+    // Imported values are intentional — treat non-empty restored fields as confirmed for amber purposes
+    document.querySelectorAll('.location').forEach(locEl => {
+      FACTORY_FIELD_DEFAULTS.forEach(f => {
+        locEl.querySelectorAll(f.sel).forEach(el => {
+          if (String(el.value) !== String(f.value)) el.dataset.confirmed = '1';
+        });
+      });
+    });
+    const first = document.querySelector('.location');
+    if (first) setCurrentLocation(first);
+    refreshAllAmber();
+    scheduleSave();
+    return;
+  }
+
+  // Merge
+  const existing = Array.from(document.querySelectorAll('.location'));
+  const existingNames = existing.map((el, i) => sheetDisplayName(el, i + 1));
+  const toAdd = [];
+  for (let i = 0; i < parsed.state.locations.length; i++){
+    const saved = parsed.state.locations[i];
+    const incomingName = sheetNameFromSaved(saved, i + 1);
+    const conflictIdx = existingNames.findIndex(n => n.toLowerCase() === incomingName.toLowerCase());
+    if (conflictIdx === -1){
+      toAdd.push({ saved, renameTo: null });
+      existingNames.push(incomingName);
+      continue;
+    }
+    const decision = await showPromptModal({
+      title: 'Sheet name collision',
+      desc: `A sheet named <b>${escapeAttr(incomingName)}</b> already exists. How should the imported sheet be handled?`,
+      buttons: [
+        { label: 'Skip', value: 'skip' },
+        { label: 'Keep both (rename)', value: 'rename' },
+        { label: 'Overwrite existing', value: 'overwrite', primary: true },
+      ],
+    });
+    if (decision === 'skip' || decision == null) continue;
+    if (decision === 'rename'){
+      const newName = uniqueImportedSheetName(incomingName, existingNames);
+      toAdd.push({ saved, renameTo: newName });
+      existingNames.push(newName);
+      continue;
+    }
+    if (decision === 'overwrite'){
+      // Replace the conflicting location in-place via remove + restore later
+      const victim = existing[conflictIdx];
+      if (victim){
+        // Mark for replacement: remove now, add imported version
+        if (document.querySelectorAll('.location').length <= 1 && parsed.state.locations.length === 1){
+          // Will clear & restore single sheet path below via toAdd after emptying
+        }
+        victim.remove();
+        existing.splice(conflictIdx, 1);
+        existingNames.splice(conflictIdx, 1);
+      }
+      toAdd.push({ saved, renameTo: null });
+      existingNames.push(incomingName);
+    }
+  }
+  if (!toAdd.length){
+    alert('Nothing was imported.');
+    return;
+  }
+  // Ensure at least one location remains before restores if we wiped all via overwrite
+  if (!document.querySelector('.location') && toAdd.length){
+    // restoreLocation creates fresh sheets
+  } else if (!document.querySelector('.location')){
+    addLocation();
+  }
+  const newLocIds = [];
+  toAdd.forEach(({ saved, renameTo }) => {
+    const clone = JSON.parse(JSON.stringify(saved));
+    if (renameTo){
+      if ((clone.psName || '').trim()) clone.psName = renameTo;
+      else clone.name = renameTo;
+    }
+    const locId = restoreLocation(clone);
+    newLocIds.push(locId);
+  });
+  newLocIds.forEach(loc => {
+    recalcLocation(loc);
+    recalcLocationInner(loc);
+  });
+  document.querySelectorAll('[data-role="module"]').forEach(stampFactoryTypeOnRow);
+  syncPrintHeaders();
+  refreshAllAmber();
+  scheduleSave();
+}
+
+function wireFeaturePack(){
+  const importBtn = document.getElementById('import-calc-btn');
+  const clearBtn = document.getElementById('clear-calc-btn');
+  const confirmBtn = document.getElementById('confirm-defaults-btn');
+  const fileInput = document.getElementById('import-calc-file');
+  if (importBtn && fileInput){
+    importBtn.addEventListener('click', () => {
+      fileInput.value = '';
+      fileInput.click();
+    });
+    fileInput.addEventListener('change', () => {
+      const f = fileInput.files && fileInput.files[0];
+      if (f) handleImportFile(f);
+    });
+  }
+  if (clearBtn) clearBtn.addEventListener('click', () => { handleClearClick(); });
+  if (confirmBtn) confirmBtn.addEventListener('click', () => { confirmDefaultsForCurrentSheet(); });
+
+  document.addEventListener('focusin', (e) => {
+    const loc = e.target.closest('.location');
+    if (loc) setCurrentLocation(loc);
+  });
+  document.addEventListener('click', (e) => {
+    const loc = e.target.closest('.location');
+    if (loc) setCurrentLocation(loc);
+  });
+  document.addEventListener('input', (e) => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.matches('input, select')){
+      const factory = FACTORY_FIELD_DEFAULTS.find(f => t.matches(f.sel));
+      if (factory && String(t.value) !== String(factory.value)) t.dataset.confirmed = '1';
+      if (t.classList.contains('type-select') && t.dataset.factoryType && t.value !== t.dataset.factoryType) t.dataset.confirmed = '1';
+      if (t.classList.contains('power-select')) t.dataset.userTouched = '1';
+      if (t.id && HEADER_NEEDS_IDS.includes(t.id)){
+        if (t.dataset.factoryValue != null && String(t.value) !== String(t.dataset.factoryValue)) t.dataset.confirmed = '1';
+        if (String(t.value ?? '').trim() !== '' && t.dataset.factoryValue == null) t.dataset.confirmed = '1';
+        refreshNeedsForHeader();
+      }
+      const loc = t.closest('.location');
+      if (loc) refreshAmberForLocation(loc);
+    }
+  }, true);
+  document.addEventListener('change', (e) => {
+    const t = e.target;
+    if (!t || !t.closest) return;
+    if (t.matches('input, select')){
+      const factory = FACTORY_FIELD_DEFAULTS.find(f => t.matches(f.sel));
+      if (factory && String(t.value) !== String(factory.value)) t.dataset.confirmed = '1';
+      if (t.classList.contains('addr-scheme-radio')){
+        const wrap = t.closest('.addr-scheme-row');
+        if (wrap && t.value !== 'networked') wrap.dataset.confirmed = '1';
+      }
+      if (t.classList.contains('mode-radio')){
+        const wrap = t.closest('.mode-toggle');
+        if (wrap && t.value !== 'builtin') wrap.dataset.confirmed = '1';
+      }
+      if (t.id && HEADER_NEEDS_IDS.includes(t.id)){
+        if (t.dataset.factoryValue != null && String(t.value) !== String(t.dataset.factoryValue)) t.dataset.confirmed = '1';
+        if (String(t.value ?? '').trim() !== '' && t.dataset.factoryValue == null) t.dataset.confirmed = '1';
+        refreshNeedsForHeader();
+      }
+      const loc = t.closest('.location');
+      if (loc) refreshAmberForLocation(loc);
+    }
+  }, true);
+
+  const promptOverlay = document.getElementById('prompt-overlay');
+  if (promptOverlay){
+    promptOverlay.addEventListener('click', (e) => {
+      if (e.target === promptOverlay){
+        closePromptModal();
+        if (promptResolver){ const r = promptResolver; promptResolver = null; r(null); }
+      }
+    });
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape'){
+      const overlay = document.getElementById('prompt-overlay');
+      if (overlay && overlay.classList.contains('open')){
+        closePromptModal();
+        if (promptResolver){ const r = promptResolver; promptResolver = null; r(null); }
+      }
+    }
+  });
+
+  // Stamp factory types on initial modules after first paint
+  document.querySelectorAll('[data-role="module"]').forEach(stampFactoryTypeOnRow);
+  stampHeaderFactoryDefaults();
+  const first = document.querySelector('.location');
+  if (first) setCurrentLocation(first);
+  refreshAllAmber();
+}
+
+
+
+/* ===== How Do I… searchable help ===== */
+const HOWDOI_COMMON = [
+  {
+    id: 'import-calc',
+    title: 'Import Calc',
+    keywords: 'import merge replace collision older revision html',
+    blurb: 'Use Import Calc in the toolbar to load a Save As… .html file. Choose Replace document or Merge sheets. On name collisions pick Skip, Keep both (rename), or Overwrite. Older calculator revisions show a warning first.',
+    target: 'qs-step-import',
+    common: true,
+  },
+  {
+    id: 'clear',
+    title: 'Clear a sheet or the entire file',
+    keywords: 'clear wipe reset blank header',
+    blurb: 'Toolbar Clear asks This sheet only (reset current power-supply sheet) or Entire file (then keep or clear project header fields). Both paths confirm before destructive action.',
+    target: 'qs-step-clear',
+    common: true,
+  },
+  {
+    id: 'confirm-defaults',
+    title: 'Confirm defaults',
+    keywords: 'confirm defaults blue needs-entry factory header',
+    blurb: 'Confirm defaults clears blue needs-entry highlighting on factory-default fields for the project header and the current sheet. Empty fields stay blue until filled; values themselves are unchanged.',
+    target: 'qs-step-confirm-defaults',
+    common: true,
+  },
+  {
+    id: 'needs-entry',
+    title: 'Blue needs-entry highlights',
+    keywords: 'blue highlight empty factory default date',
+    blurb: 'Soft blue marks empty editable fields and unconfirmed factory defaults (not yellow Validation Errors or red Invalid Calculation). Date is never blue-highlighted but still initializes to today on new/cleared documents.',
+    target: 'qs-step-needs-entry',
+    common: true,
+  },
+  {
+    id: 'save-as',
+    title: 'Save As…',
+    keywords: 'save as download html portable file',
+    blurb: 'Save As… downloads a self-contained .html with every sheet and field embedded so you can reopen or share it. Prefer this over Autosave when you need a portable copy.',
+    target: 'qs-step-save-export',
+    common: true,
+  },
+  {
+    id: 'autosave',
+    title: 'Autosave',
+    keywords: 'autosave auto-save localstorage browser',
+    blurb: 'Autosave stores work in this browser’s local storage only — convenient for reloads on the same device, but not portable. Use Save As… for a shareable file.',
+    target: 'qs-step-save-export',
+    common: true,
+  },
+  {
+    id: 'export-excel',
+    title: 'Export to Excel',
+    keywords: 'export excel xlsx spreadsheet workbook',
+    blurb: 'Export to Excel builds a multi-sheet .xlsx workbook — one worksheet per power supply — mirroring module tables and results for handoff outside the calculator.',
+    target: 'qs-step-save-export',
+    common: true,
+  },
+  {
+    id: 'validation-errors',
+    title: 'Validation Errors',
+    keywords: 'validation error yellow flags fan speed ribbon',
+    blurb: 'Yellow Validation Error flags are advisory but withhold power-supply/battery recommendations and the Bill of Materials until every flag clears.',
+    target: 'qs-step-validation',
+    common: true,
+  },
+  {
+    id: 'invalid-calculation',
+    title: 'Invalid Calculation',
+    keywords: 'invalid calculation red banner capacity address fan aux',
+    blurb: 'The red INVALID CALCULATION banner means the numbers cannot be trusted (capacity over 65 Ah, missing fan speed, missing address, or AUX over hardware limits). Fix the listed conditions to clear it.',
+    target: 'qs-step-invalid',
+    common: true,
+  },
+  {
+    id: 'design-basis',
+    title: 'Design basis / standby & alarm',
+    keywords: 'design basis standby alarm nfpa ufc bs5839 temperature',
+    blurb: 'Design Basis presets lock standby and alarm durations (and related formula rules). Ambient Temperature applies a de-rating multiplier when batteries will not sit at 77°F/25°C.',
+    target: 'qs-step-design-basis',
+    common: true,
+  },
+  {
+    id: 'battery-sizing',
+    title: 'Battery sizing',
+    keywords: 'battery sizing auto ah capacity cabinet supply',
+    blurb: 'Auto Battery Sizing picks battery size, supply capacity, and cabinet from total load when left on Auto. Switch Off to choose manually. Catalog sizes round up to the next available model.',
+    target: 'qs-step-battery',
+    common: true,
+  },
+  {
+    id: 'addressing',
+    title: 'Standalone vs Networked addressing',
+    keywords: 'standalone networked address senseNET 1-127 1-9',
+    blurb: 'Networked (default) uses addresses 1–127 unique network-wide. Standalone is for clusters with no SenseNET pathway: addresses 1–9 unique per cluster only.',
+    target: 'qs-step-addressing',
+    common: true,
+  },
+  {
+    id: 'clusters',
+    title: 'Clusters',
+    keywords: 'cluster display detector command ribbon cross-sheet',
+    blurb: 'A Standard or Minimum Display starts a cluster (up to 8 detectors). Cluster numbers tie modules together across sheets when a cluster spans multiple power supplies.',
+    target: 'qs-step-clusters',
+    common: true,
+  },
+];
+
+let howdoiIndex = [];
+let howdoiActiveIdx = -1;
+
+function buildHowDoIIndex(){
+  const items = HOWDOI_COMMON.map(c => ({...c, source: 'Common'}));
+  const seen = new Set(items.map(i => i.title.toLowerCase()));
+  document.querySelectorAll('.qs-step-title').forEach(el => {
+    const title = el.textContent.trim();
+    if (!title || seen.has(title.toLowerCase())) return;
+    const body = el.parentElement?.querySelector('p');
+    const blurb = (body?.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 220);
+    items.push({
+      id: 'qs-' + (el.id || title),
+      title,
+      keywords: title,
+      blurb: blurb || title,
+      target: el.id || null,
+      source: 'Quick Start',
+      common: false,
+    });
+    seen.add(title.toLowerCase());
+  });
+  document.querySelectorAll('.help-faq-item').forEach((item, idx) => {
+    const q = item.querySelector('.q');
+    const a = item.querySelector('.a');
+    if (!q) return;
+    const title = q.textContent.trim();
+    if (!title || seen.has(title.toLowerCase())) return;
+    if (!item.id) item.id = 'help-faq-item-' + idx;
+    items.push({
+      id: 'faq-' + idx,
+      title,
+      keywords: title + ' ' + (a?.textContent || ''),
+      blurb: ((a?.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 220)) || title,
+      target: item.id,
+      source: 'FAQ',
+      common: false,
+    });
+    seen.add(title.toLowerCase());
+  });
+  // Standards section headings
+  document.querySelectorAll('#help-standards h3, #help-standards h4, #help-standards .help-formula-box > b, #help-standards .q').forEach((el, idx) => {
+    const title = el.textContent.trim();
+    if (!title || title.length > 80 || seen.has(title.toLowerCase())) return;
+    if (!el.id) el.id = 'help-std-topic-' + idx;
+    items.push({
+      id: 'std-' + idx,
+      title,
+      keywords: title,
+      blurb: 'See Standards and Formulas in Help for the full citation and formula detail.',
+      target: el.id,
+      source: 'Standards',
+      common: false,
+    });
+    seen.add(title.toLowerCase());
+  });
+  howdoiIndex = items;
+}
+
+function filterHowDoI(query){
+  const q = (query || '').trim().toLowerCase();
+  if (!q){
+    return howdoiIndex.filter(i => i.common).slice(0, 12);
+  }
+  const scored = [];
+  howdoiIndex.forEach(item => {
+    const hay = (item.title + ' ' + (item.keywords || '') + ' ' + (item.blurb || '')).toLowerCase();
+    if (!hay.includes(q) && !q.split(/\s+/).every(tok => hay.includes(tok))) return;
+    let score = 0;
+    if (item.title.toLowerCase().startsWith(q)) score += 50;
+    if (item.title.toLowerCase().includes(q)) score += 30;
+    if (item.common) score += 10;
+    if ((item.keywords || '').toLowerCase().includes(q)) score += 5;
+    scored.push({ item, score });
+  });
+  scored.sort((a, b) => b.score - a.score || a.item.title.localeCompare(b.item.title));
+  return scored.map(s => s.item).slice(0, 14);
+}
+
+function renderHowDoIDropdown(items){
+  const dd = document.getElementById('howdoi-dropdown');
+  if (!dd) return;
+  howdoiActiveIdx = -1;
+  if (!items.length){
+    dd.innerHTML = '<div class="howdoi-option" style="cursor:default;color:var(--text-faint)">No matching topics</div>';
+    dd.hidden = false;
+    return;
+  }
+  dd.innerHTML = items.map((it, i) =>
+    `<button type="button" class="howdoi-option" role="option" data-idx="${i}" data-id="${escapeAttr(it.id)}">` +
+    `${escapeAttr(it.title)}<span class="howdoi-opt-meta">${escapeAttr(it.source || '')}</span></button>`
+  ).join('');
+  dd.hidden = false;
+  dd.querySelectorAll('.howdoi-option[data-id]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      const item = howdoiIndex.find(x => x.id === id) || items.find(x => x.id === id);
+      if (item) selectHowDoIItem(item);
+    });
+  });
+}
+
+function showHowDoIAnswer(item){
+  const box = document.getElementById('howdoi-answer');
+  const title = document.getElementById('howdoi-answer-title');
+  const body = document.getElementById('howdoi-answer-body');
+  const link = document.getElementById('howdoi-answer-link');
+  if (!box || !title || !body || !link) return;
+  title.textContent = item.title;
+  body.textContent = item.blurb;
+  if (item.target){
+    link.hidden = false;
+    link.href = '#' + item.target;
+    link.onclick = (e) => {
+      e.preventDefault();
+      jumpHowDoITarget(item.target);
+    };
+  } else {
+    link.hidden = true;
+    link.onclick = null;
+  }
+  box.hidden = false;
+}
+
+function jumpHowDoITarget(targetId){
+  const el = document.getElementById(targetId);
+  if (!el) return;
+  const overlay = document.getElementById('help-overlay');
+  if (overlay) overlay.classList.add('open');
+  // Expand scroll within help card
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.classList.add('field-needs-wrap');
+    setTimeout(() => el.classList.remove('field-needs-wrap'), 1800);
+  }, 50);
+}
+
+function selectHowDoIItem(item){
+  const input = document.getElementById('howdoi-input');
+  const dd = document.getElementById('howdoi-dropdown');
+  if (input) input.value = item.title;
+  if (dd) dd.hidden = true;
+  showHowDoIAnswer(item);
+}
+
+function openHowDoIFromToolbar(){
+  const overlay = document.getElementById('help-overlay');
+  if (overlay) overlay.classList.add('open');
+  buildHowDoIIndex();
+  const input = document.getElementById('howdoi-input');
+  const items = filterHowDoI(input?.value || '');
+  renderHowDoIDropdown(items);
+  setTimeout(() => {
+    if (input){ input.focus(); input.select(); }
+  }, 30);
+}
+
+function wireHowDoI(){
+  buildHowDoIIndex();
+  const input = document.getElementById('howdoi-input');
+  const dd = document.getElementById('howdoi-dropdown');
+  const toolbarBtn = document.getElementById('howdoi-toolbar-btn');
+  if (toolbarBtn) toolbarBtn.addEventListener('click', openHowDoIFromToolbar);
+  if (!input || !dd) return;
+
+  input.addEventListener('focus', () => {
+    buildHowDoIIndex();
+    renderHowDoIDropdown(filterHowDoI(input.value));
+  });
+  input.addEventListener('input', () => {
+    renderHowDoIDropdown(filterHowDoI(input.value));
+  });
+  input.addEventListener('keydown', (e) => {
+    const opts = [...dd.querySelectorAll('.howdoi-option[data-id]')];
+    if (e.key === 'ArrowDown'){
+      e.preventDefault();
+      if (!opts.length) return;
+      howdoiActiveIdx = Math.min(opts.length - 1, howdoiActiveIdx + 1);
+      opts.forEach((o, i) => o.classList.toggle('active', i === howdoiActiveIdx));
+      opts[howdoiActiveIdx]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp'){
+      e.preventDefault();
+      if (!opts.length) return;
+      howdoiActiveIdx = Math.max(0, howdoiActiveIdx - 1);
+      opts.forEach((o, i) => o.classList.toggle('active', i === howdoiActiveIdx));
+      opts[howdoiActiveIdx]?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter'){
+      e.preventDefault();
+      const pick = opts[howdoiActiveIdx] || opts[0];
+      if (pick) pick.click();
+    } else if (e.key === 'Escape'){
+      dd.hidden = true;
+    }
+  });
+  document.addEventListener('click', (e) => {
+    const panel = document.getElementById('howdoi-panel');
+    if (panel && !panel.contains(e.target)) dd.hidden = true;
+  });
+}
+
 document.getElementById("save-as-copy-btn").addEventListener("click", () => openSaveAsModal('copy'));
+wireFeaturePack();
+
 
 const reportOverlay = document.getElementById("report-overlay");
 document.getElementById("report-close-btn").addEventListener("click", closeReportModal);
@@ -4722,10 +5964,11 @@ const helpOverlay = document.getElementById("help-overlay");
 const helpBtn = document.getElementById("help-btn");
 const helpCloseBtn = document.getElementById("help-close-btn");
 const helpPrintBtn = document.getElementById("help-print-btn");
-helpBtn.addEventListener("click", () => { helpOverlay.classList.add("open"); });
+helpBtn.addEventListener("click", () => { helpOverlay.classList.add("open"); buildHowDoIIndex(); });
 helpCloseBtn.addEventListener("click", () => { helpOverlay.classList.remove("open"); });
 helpPrintBtn.addEventListener("click", printHelpOnly);
 helpOverlay.addEventListener("click", (e) => { if (e.target === helpOverlay) helpOverlay.classList.remove("open"); });
+wireHowDoI();
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape"){
     helpOverlay.classList.remove("open");
@@ -4800,7 +6043,22 @@ if (!tryLoadEmbeddedState() && !loadState()){
   projectDateInput.value = new Date().toISOString().slice(0, 10);
   addLocation();
 }
+if (typeof stampHeaderFactoryDefaults === 'function') stampHeaderFactoryDefaults();
+if (typeof refreshAllAmber === 'function') refreshAllAmber();
 autosaveToggleInput.checked = isAutosaveActivated() && isAutosaveEnabled();
+function renderHelpCurrentDrawTable(){
+  const tbody = document.getElementById('help-fanspeed-currentdraw-rows');
+  if (!tbody) return;
+  tbody.innerHTML = Object.keys(FAN_SPEED_MA).map(speed => `
+    <tr><td>Detector (Fan Speed ${speed})</td><td class="mono-inline">FHSD8330-ULF</td><td>${FAN_SPEED_MA_18V[speed]} mA</td><td>${FAN_SPEED_MA[speed]} mA</td></tr>
+  `).join('');
+}
+renderHelpCurrentDrawTable();
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch((e) => console.warn('SW registration failed:', e));
+  });
+}
 renderRevisionInfo();
 syncPrintHeaders();
 updateSaveIndicator();

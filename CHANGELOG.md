@@ -8,6 +8,14 @@ and reset when minor/major changes. This file is generated from the calculator's
 own in-app Amendment Log (Help → Revision Log) — that log is the source of truth;
 regenerate this file from it rather than hand-editing both.
 
+## 01.05 — 2026-10-02
+
+- **01.05.005** (2026-10-02): Added searchable How Do I… in the main toolbar and Help overlay: type-ahead filters curated common topics plus other Help/FAQ/Quick Start entries, shows a short inline answer with a jump link into the full Help section.
+- **01.05.004** (2026-10-02): Quick Start updated with steps 13–16 documenting blue needs-entry highlights, Confirm defaults, Clear (sheet vs entire file), and Import Calc (replace/merge, collision choices, older-revision warning), each with qs-figure wireframes.
+- **01.05.003** (2026-10-02): Date field excluded from needs-entry (blue) highlighting; new/cleared documents still initialize Date to today, and the field remains normally editable afterward.
+- **01.05.002** (2026-10-02): Needs-entry highlight switched from amber to soft blue (distinct from yellow Validation Errors and red Invalid Calculation); project-header fields now use the same empty + factory-default rules; Confirm defaults always clears blue on header defaults and the current sheet's defaults.
+- **01.05.001** (2026-10-02): Minor version bumped to 01.05 per Brent; revision counter restarted at 001. Feature pack: Import Calc (replace or merge saved .html sheets, with sheet-name collision prompts and older-revision warning), Clear (this sheet or entire file, with keep/clear header option), Confirm defaults (clears amber on factory-default fields for the current sheet), and soft amber highlighting for empty editable fields and unconfirmed factory defaults.
+
 ## 01.04 — 2026-08-10 to 2026-09-03
 
 - **01.04.008** (2026-09-03): Added a Module Current Draw Reference table to Standards and Formulas, per Brent: every module's current draw as used by this calculator (24V) alongside the manufacturer's 18V figures for cross-reference, sourced from Brent's uploaded worksheet image. Display rows use the TFT-On/LEDS-On (highest-draw) state per Brent's explicit choice; two real data gaps in the source (no LEDS-On figure for Minimum Display, no separate Command Display entry at all) are documented inline via numbered footnotes rather than silently guessed at. Detector rows reuse the calculator's own FAN_SPEED_MA constant for the 24V column (a new companion FAN_SPEED_MA_18V constant holds the reference-only 18V figures) so the embedded table can never drift from the actual calculation logic. Also shipped as two standalone reference files (Excel + HTML, styled to match the calculator) alongside the three calculator deliverables.

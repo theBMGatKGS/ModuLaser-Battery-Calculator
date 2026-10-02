@@ -1,9 +1,9 @@
 {
   "name": "modulaser-battery-calculator",
-  "version": "1.0.0",
-  "revision": "01.04.005_260810",
+  "version": "1.0.1",
+  "revision": "01.05.005_261002",
   "author": "The BMG",
-  "description": "ModuLaser Battery Calculator — desktop app",
+  "description": "ModuLaser Battery Calculator \u2014 desktop app",
   "main": "main.js",
   "private": true,
   "scripts": {
