@@ -1,7 +1,7 @@
 {
   "name": "modulaser-battery-calculator",
-  "version": "1.6.0",
-  "revision": "01.06.000_261013",
+  "version": "2.0.0",
+  "revision": "02.00.000_261013",
   "author": "The BMG",
   "description": "ModuLaser Battery Calculator \u2014 desktop app",
   "main": "main.js",
@@ -24,6 +24,7 @@
     },
     "files": [
       "main.js",
+      "preload.js",
       "app/**/*",
       "build/icon.png"
     ],
@@ -38,7 +39,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "artifactName": "ModuLaser.Battery.Calculator.Setup.01.06.000.${ext}"
+      "artifactName": "ModuLaser.Battery.Calculator.Setup.02.00.000.${ext}"
     },
     "mac": {
       "target": [
@@ -47,7 +48,7 @@
       "icon": "build/icon.icns",
       "category": "public.app-category.utilities"
     },
-    "artifactName": "ModuLaser.Battery.Calculator.Setup.01.06.000.${ext}"
+    "artifactName": "ModuLaser.Battery.Calculator.Setup.02.00.000.${ext}"
   },
   "allowScripts": {
     "electron@31.7.7": true

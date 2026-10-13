@@ -3,26 +3,18 @@
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
-## Recent improvements (01.05)
+## What's new in 02.00.000
 
 Web / PWA: https://thebmgatkgs.github.io/ModuLaser-Battery-Calculator/
 
-Calculator revision **01.06.000_261013** — GitHub release **[v01.06.000](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/tag/v01.06.000)** (same number; date suffix `_261013` is in-app only).
+Calculator revision **02.00.000_261013** (desktop installer `ModuLaser.Battery.Calculator.Setup.02.00.000.exe`; release tag `v02.00.000` when published). 02.00.000 folds in the unreleased 01.06.000 work. **Calculation math is unchanged** from 01.05.009.
 
-Going forward, desktop release tags match the calculator revision exactly: `vMM.mm.rrr` ↔ `MM.mm.rrr` (older `v1.0.x` tags remain as history).
-
-- **Import PipeCAD .pl** (01.06.000) — File → Import .pl… wizard: battery settings first, pick several .pl files and tick Areas/Groups (metric converted to ft), rename table with 16-character counter, power-supply assignment enforcing ≥1 supply per Area/Group, no supply across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah; one sheet per supply
-- **Linked .pl files** (01.06.000) — each import stays linked (SHA-256 + per-detector fingerprints); Check link shows a change banner and diff, re-import updates fan speeds/names without touching addresses or hand edits unless confirmed
-- **Menu bar** (01.06.000) — File / Edit / View / Help menus replace the crowded toolbar, plus a quick row (Import .pl, + Add Location, Save As…, Print, Auto-Save indicator)
-- **Dropdown scroll + keyboard** (01.05.009) — tall calc-select menus (Fan Speed, Addresses, …) keep open while scrollbar-dragging or wheel-scrolling; Arrow/Page/Home/End navigate, Enter commits
-- **Sheet header layout** (01.05.008) — Power Supply Name/Location on a full row above Design Basis + Ambient Temp; Design Basis wide enough for the longest preset label without truncation
-- **Dropdown contrast** (01.05.007) — custom white-on-black listboxes for Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and other selects (native option popups could not be styled reliably in Chromium after 01.05.006)
-- **Import Calc** — replace or merge saved `.html` files (collision prompts + older-revision warning)
-- **Clear** — this sheet or entire file (keep/clear header)
-- **Confirm defaults** — clear blue needs-entry on header + current-sheet factory defaults
-- **Blue needs-entry** highlighting (Date excluded)
-- **How Do I…** searchable help in toolbar and Help overlay
-- Quick Start steps 13–16 documenting the above
+- **New layout** — PipeCAD dark theme; menu bar (File / Edit / View / Help) + quick row (☰ sidebar, Import .pl, + Add Location, Save As…, Print, Auto-Save, ◧ results); collapsible **Project Settings** bar with a one-line summary and per-sheet override badges; **sheet sidebar** grouped by Area/Group with status dots (complete / needs entry / error / overridden) and + Add power supply; compact module table with n/16 zone counters; pinned **live results** panel (required Ah vs battery vs 65 Ah, PASS / FAIL / INCOMPLETE, load breakdown, clusters, validation messages). Panels collapse on narrow screens.
+- **Print / Export** (File → Print / Export…, Print, Ctrl+P) — live 8.5 × 11 preview; **PDF**, **Word (.docx)**, **HTML** and **Excel** built offline (no CDN); detail levels **Summary / Standard / Full** (Full adds calculation appendix pages: formula, values substituted, result, reference). Project summary page + one letter page per PSU with capacity gauge, PASS/FAIL stamp, cluster diagram, module table, settings and BOM. In the desktop app PDF is saved directly via `printToPDF`.
+- **Excel** — **CAD Schedule** sheet (compact per-PSU tables, thin borders, fixed widths, no merged cells/fills, for pasting into AutoCAD) + **Detail** sheet that follows the detail level with outline row groups.
+- **Import PipeCAD .pl** wizard (from 01.06.000) — battery settings first, multi-file pick with Area/Group selection, 16-character rename table, power-supply assignment (≥1 per Area/Group, none across, max 4 detectors + 1 display, ≤ 65 Ah) with an Unassigned tray, Pack into fewest, and blocked Create sheets until assigned.
+- **Linked .pl files** (from 01.06.000) — SHA-256 + per-device fingerprints, Check link, change banner, diff and safe re-import.
+- **Help** rewritten: Quick Start, How Do I…, FAQ and revision log cover the new layout, Print / Export, detail levels and the CAD paste tip.
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) and Help → Revision Log in the app.
 
@@ -45,8 +37,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.01.06.000.exe
-npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.01.06.000.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.000.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.000.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -69,17 +61,17 @@ on a `macos-latest` runner — happy to help set that up if you want it.
 
 The app has a Help → About menu item (and on macOS, the standard app menu's
 "About ModuLaser Battery Calculator" too) showing the revision and author —
-currently Revision `01.06.000_261013`, authored by The BMG. These are set
+currently Revision `02.00.000_261013`, authored by The BMG. These are set
 as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
 update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section
 in the Help overlay, so all three deliverables stay consistent.
 
 GitHub releases use the same number as the calculator revision: tag/title
-`v01.06.000` for calculator `01.06.000` (the `_YYMMDD` date stays in-app /
+`v02.00.000` for calculator `02.00.000` (the `_YYMMDD` date stays in-app /
 `package.json` `revision` only). The npm/`electron-builder` `version` field
 stays plain semver without leading zeros (e.g. `1.5.7`) so NSIS accepts it;
-installer filenames are forced to `…Setup.01.06.000.exe` via `artifactName`.
+installer filenames are forced to `…Setup.02.00.000.exe` via `artifactName`.
 
 ### Revision numbering scheme
 
