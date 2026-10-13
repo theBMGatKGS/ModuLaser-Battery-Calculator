@@ -1,5 +1,5 @@
 /* ModuLaser Battery Calculator — service worker */
-const CACHE_VERSION = 'modulaser-calc-v46';
+const CACHE_VERSION = 'modulaser-calc-v47';
 const APP_SHELL = [
   './',
   './index.html',
@@ -26,7 +26,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Runtime-cache cross-origin assets (SheetJS CDN, Google Fonts) so
+  // Runtime-cache cross-origin assets (Google Fonts; 02.00 has no CDN libraries) so
   // Excel export and typography keep working offline after first load.
   if (url.origin !== self.location.origin) {
     event.respondWith(

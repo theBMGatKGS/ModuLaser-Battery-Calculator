@@ -10,7 +10,6 @@
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --bg: #14181c;
@@ -1051,29 +1050,173 @@
   .plw-prompt{ border:1px solid #ffb74d; background:rgba(255,183,77,0.12); color:var(--text); border-radius:8px; padding:10px 12px; margin:0 0 10px; font-size:13px; line-height:1.45; }
   .plw-viol{ color:#ff8a80; font-size:11.5px; margin-top:4px; }
   .plw-diff-added{ color:#a5d6a7; } .plw-diff-removed{ color:#ff8a80; } .plw-diff-changed{ color:#ffe08a; }
+/* ===================== 02.00.000 — PipeCAD "underground" dark theme + app shell ===================== */
+:root{
+  --bg:#0b0e12; --surface:#12171e; --surface2:#1a212b; --line:#2a3441; --line2:#222b36; --ink:#e6edf3; --muted:#8b98a8; --faint:#6b7889;
+  --accent2:#3a9ad6; --navy:#102645; --kred:#ac242a;
+  --pass:#3fb950; --passbg:#0f2a17; --fail:#f85149; --failbg:#3a1210; --inc:#d29922; --incbg:#33260a;
+  --panel:var(--surface); --panel-2:var(--surface2); --panel-3:#222b36; --border:var(--line); --border-soft:var(--line2);
+  --text:var(--ink); --text-dim:var(--muted); --text-faint:var(--faint);
+  --accent:#0c77bc; --accent-dim:#0a5e94; --accent-soft:rgba(12,119,188,.16);
+  --good:var(--pass); --good-soft:rgba(63,185,80,.14); --danger:var(--fail); --danger-soft:rgba(248,81,73,.14);
+  --info:#3a9ad6; --info-dim:#0c77bc; --info-soft:rgba(58,154,214,.14); --warn:var(--inc); --warn-dim:#8a6512; --warn-soft:rgba(210,153,34,.16);
+  --sans:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif; --mono:Consolas,"SFMono-Regular",Menlo,monospace;
+  --v2-sb:248px; --v2-rp:318px; --v2-top:92px;
+}
+html{ color-scheme:dark; }
+body.v2{ background:var(--bg); font:13.5px/1.45 var(--sans); }
+body.v2 .btn-primary{ background:var(--accent); border-color:var(--accent); color:#fff; }
+body.v2 .location-head{ background:linear-gradient(180deg, rgba(12,119,188,.07), transparent); }
+/* top: menu strip + quick row */
+body.v2 .topbar.v2-top{ display:block; padding:0; background:var(--surface); border-bottom:1px solid var(--line); }
+.v2-menustrip{ display:flex; align-items:center; gap:14px; padding:4px 14px; background:#000; border-bottom:1px solid var(--line); min-height:34px; }
+.v2-menustrip .brand-mini{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:13px; color:#fff; white-space:nowrap; }
+.v2-menustrip .brand-mini .brand-mark{ width:22px; height:22px; font-size:10px; border-radius:5px; }
+.v2-menustrip .menubar{ flex:1; }
+.v2-menustrip .menubar-menu{ left:0; right:auto; }
+.v2-menustrip .revision-cells{ margin-left:auto; gap:6px; }
+.v2-menustrip .revision-cell{ padding:2px 8px; }
+body.v2 .quick-row{ display:flex; align-items:center; gap:8px; padding:7px 14px; flex-wrap:wrap; background:linear-gradient(180deg,#132d52,var(--navy)); border-bottom:1px solid #1d3a63; }
+body.v2 .quick-row .btn{ border-color:rgba(255,255,255,.3); background:rgba(255,255,255,.07); color:#fff; }
+body.v2 .quick-row .btn:hover{ background:rgba(255,255,255,.16); }
+body.v2 .quick-row .btn-primary{ background:var(--accent); border-color:#3a9ad6; }
+body.v2 .quick-row .qr-sep{ width:1px; height:22px; background:rgba(255,255,255,.2); margin:0 2px; }
+body.v2 .quick-row .save-indicator{ margin-left:auto; }
+.qr-icon{ min-width:34px; }
+/* project settings bar */
+.ps-bar{ background:var(--surface); border-bottom:1px solid var(--line); }
+.ps-bar-head{ display:flex; align-items:center; gap:10px; padding:6px 14px; }
+.ps-bar-head button.ps-toggle{ background:none; border:0; color:var(--ink); font:700 11px/1 var(--sans); letter-spacing:.08em; text-transform:uppercase; cursor:pointer; display:flex; align-items:center; gap:6px; padding:4px 0; }
+.ps-bar-head .chev{ transition:transform .15s; display:inline-block; }
+.ps-bar.collapsed .chev{ transform:rotate(-90deg); }
+#proj-settings-summary{ color:var(--muted); font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; flex:1; }
+.ps-bar:not(.collapsed) #proj-settings-summary{ visibility:hidden; }
+.pss-basis{ color:var(--ink); margin-left:6px; }
+.v2-or-chip{ display:inline-block; font:600 10.5px/1.6 var(--mono); padding:0 6px; border-radius:4px; background:rgba(58,154,214,.15); color:#3a9ad6; border:1px solid #1d4f75; }
+.ps-bar.collapsed .ps-bar-body{ display:none; }
+.ps-bar-body .project-info-bar{ border:0; padding:4px 14px 8px; background:transparent; }
+#proj-basis-line{ padding:0 14px 9px; font-size:12px; color:var(--muted); }
+.linkish{ background:none; border:0; color:#3a9ad6; text-decoration:underline; cursor:pointer; padding:0; font:inherit; }
+/* 3-column shell */
+#app-shell{ display:grid; grid-template-columns:var(--v2-sb) minmax(0,1fr) var(--v2-rp); align-items:start; min-height:calc(100vh - 140px); }
+body.sidebar-closed #app-shell{ grid-template-columns:0 minmax(0,1fr) var(--v2-rp); }
+body.results-closed #app-shell{ grid-template-columns:var(--v2-sb) minmax(0,1fr) 0; }
+body.sidebar-closed.results-closed #app-shell{ grid-template-columns:0 minmax(0,1fr) 0; }
+body.sidebar-closed #sheet-sidebar, body.results-closed #results-panel{ display:none; }
+#sheet-sidebar, #results-panel{ position:sticky; top:0; max-height:100vh; overflow:auto; background:var(--surface); }
+#sheet-sidebar{ border-right:1px solid var(--line); display:flex; flex-direction:column; min-height:calc(100vh - 140px); }
+#results-panel{ border-left:1px solid var(--line); padding:12px; }
+body.v2 main#v2-center{ max-width:none; margin:0; padding:14px 18px 60px; min-width:0; }
+body.v2 main#v2-center > .intro{ display:none; }
+body.v2 .location:not(.location-current){ display:none; }
+body.v2 .location{ border-radius:8px; margin-bottom:14px; }
+.sb-top{ display:flex; align-items:center; justify-content:space-between; padding:10px 12px 6px; font:700 11px/1 var(--sans); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+#sb-count{ font:600 10.5px var(--mono); color:var(--faint); text-transform:none; letter-spacing:0; }
+#sb-list{ flex:1; overflow:auto; padding:0 6px 8px; }
+.sb-gh{ font:700 10.5px/1.2 var(--sans); letter-spacing:.07em; text-transform:uppercase; color:var(--faint); padding:10px 8px 4px; }
+.sb-item{ display:flex; align-items:center; gap:7px; width:100%; text-align:left; background:none; border:1px solid transparent; border-radius:6px; padding:6px 8px; color:var(--ink); cursor:pointer; font:600 12.5px var(--mono); }
+.sb-item:hover{ background:var(--surface2); border-color:var(--line); }
+.sb-item.current{ background:#16243a; border-color:#1d4f75; }
+.sb-name{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.sb-ah{ font:600 10.5px var(--mono); color:var(--muted); background:var(--surface2); border:1px solid var(--line); border-radius:4px; padding:0 5px; }
+.sb-cnt{ font:700 10px/1.6 var(--mono); background:var(--failbg); color:var(--fail); border-radius:4px; padding:0 5px; }
+.dot{ width:8px; height:8px; border-radius:50%; flex:none; display:inline-block; }
+.dot.st-complete{ background:var(--pass); } .dot.st-needs{ background:var(--inc); } .dot.st-error{ background:var(--fail); } .dot.st-overridden{ background:#3a9ad6; }
+.sb-empty{ color:var(--muted); font-size:12px; padding:8px; }
+.sb-foot{ border-top:1px solid var(--line); padding:10px 10px 12px; }
+#sb-add-btn{ width:100%; border:1px dashed var(--line); background:none; color:var(--ink); border-radius:6px; padding:8px; cursor:pointer; font-weight:600; }
+#sb-add-btn:hover{ border-color:var(--accent2); background:var(--surface2); }
+.sb-legend{ display:grid; grid-template-columns:1fr 1fr; gap:4px 8px; margin-top:10px; font-size:10.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; }
+.sb-legend span{ display:flex; align-items:center; gap:6px; }
+/* results panel */
+.rp-head{ display:flex; align-items:center; justify-content:space-between; font:700 11px/1 var(--sans); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+#rp-close-btn{ background:none; border:0; color:var(--muted); cursor:pointer; font-size:14px; }
+.rp-card{ background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:10px; }
+.rp-k{ font:700 10.5px/1.3 var(--sans); letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
+.rp-cap{ text-align:center; }
+.rp-big{ font:700 40px/1.05 var(--mono); color:#fff; margin:4px 0 6px; } .rp-big small{ font-size:18px; color:var(--muted); }
+.rp-legend{ display:flex; gap:10px; justify-content:center; font-size:10.5px; color:var(--muted); margin:2px 0 6px; }
+.rp-legend i{ display:inline-block; width:10px; height:8px; margin-right:4px; vertical-align:0; }
+.lg-solid{ background:var(--pass); } .lg-soft{ background:rgba(63,185,80,.45); }
+.rp-status{ border-radius:6px; padding:6px 8px; font-weight:700; font-size:12.5px; }
+.rp-status.st-pass{ background:var(--passbg); color:var(--pass); border:1px solid #1f5f2c; }
+.rp-status.st-fail{ background:var(--failbg); color:var(--fail); border:1px solid #6e1f1b; }
+.rp-status.st-incomplete{ background:var(--incbg); color:var(--inc); border:1px solid #5e4512; }
+.rp-row{ display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:2px 0; } .rp-row span{ color:var(--muted); } .rp-row b{ font-family:var(--mono); font-weight:600; text-align:right; }
+.rp-row.tot{ border-top:1px solid var(--line); margin-top:3px; padding-top:5px; } .rp-row.tot span{ color:var(--ink); font-weight:600; }
+.rp-msg{ border-radius:6px; padding:7px 9px; font-size:12px; margin-bottom:6px; border:1px solid; }
+.rp-msg.bad{ background:var(--failbg); color:#ffb4ae; border-color:#6e1f1b; } .rp-msg.warn{ background:var(--incbg); color:#f0c867; border-color:#5e4512; }
+.rp-msg.info{ background:rgba(58,154,214,.12); color:#9fd0f0; border-color:#1d4f75; } .rp-msg.ok{ background:var(--passbg); color:var(--pass); border-color:#1f5f2c; }
+.rp-empty{ color:var(--muted); font-size:12.5px; }
+/* sheet: override badge, compact table, 16-char counters */
+.v2-or-badge{ margin-left:auto; font:600 11px/1.6 var(--mono); color:#3a9ad6; background:rgba(58,154,214,.12); border:1px solid #1d4f75; border-radius:4px; padding:1px 8px; white-space:nowrap; }
+body.v2 .devtable th{ font-size:10px; padding:6px 6px; }
+body.v2 .devtable td{ padding:4px 6px; }
+body.v2 .name-cell{ position:relative; white-space:nowrap; }
+.v2-cc{ display:inline-block; margin-left:5px; font:600 10px var(--mono); color:var(--faint); vertical-align:middle; }
+.v2-cc.full{ color:var(--inc); } .v2-cc.over{ color:var(--fail); font-weight:700; }
+input.v2-over16{ border-color:var(--fail) !important; }
+.v2-16-note{ font-size:11.5px; color:var(--muted); margin:6px 0 0; }
+/* print/export dialog */
+.v2-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:6000; padding:18px; }
+.v2-overlay.open{ display:flex; }
+.pe-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; width:min(1180px,100%); height:min(860px,100%); display:grid; grid-template-rows:auto 1fr; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.6); }
+.pe-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-bottom:1px solid var(--line); background:linear-gradient(180deg,#132d52,var(--navy)); color:#fff; }
+.pe-head h2{ margin:0; font-size:15px; }
+.pe-body{ display:grid; grid-template-columns:270px 1fr; min-height:0; }
+.pe-side{ padding:12px 14px; border-right:1px solid var(--line); overflow:auto; display:flex; flex-direction:column; gap:12px; }
+.pe-side h3{ margin:0 0 6px; font:700 10.5px/1 var(--sans); letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+.pe-side label{ display:flex; gap:8px; align-items:flex-start; font-size:12.5px; margin:4px 0; cursor:pointer; }
+.pe-side label small{ display:block; color:var(--muted); font-size:11px; }
+.pe-side select{ width:100%; background:#000; color:#fff; border:1px solid var(--line); border-radius:5px; padding:5px; }
+.pe-btns{ display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.pe-btns .btn{ justify-content:center; }
+#pe-status, #pe-pages{ font-size:11.5px; color:var(--muted); }
+#pe-preview{ width:100%; height:100%; border:0; background:#5b6573; }
+@media (max-width:820px){ .pe-body{ grid-template-columns:1fr; grid-template-rows:auto 1fr; } .pe-side{ border-right:0; border-bottom:1px solid var(--line); } }
+/* wizard step 4 restyle (behaviour unchanged) */
+body.v2 .plw-card{ background:var(--surface); border-color:var(--line); }
+body.v2 .plw-head{ background:linear-gradient(180deg,#132d52,var(--navy)); }
+body.v2 .plw-psu{ background:var(--bg); border:1px solid var(--line); border-radius:8px; }
+body.v2 .plw-psu-h{ background:var(--surface2); border-bottom:1px solid var(--line); border-radius:8px 8px 0 0; }
+body.v2 .plw-psu.bad{ border-color:#6e1f1b; box-shadow:0 0 0 1px #6e1f1b inset; }
+body.v2 .plw-tray{ background:rgba(210,153,34,.07); border:1px dashed #5e4512; border-radius:8px; }
+body.v2 .plw-prompt{ background:var(--incbg); border:1px solid #5e4512; color:#f0c867; border-radius:8px; }
+body.v2 .plw-dev{ background:var(--surface2); border:1px solid var(--line); border-radius:5px; }
+body.v2 .plw-area{ border-color:var(--line); }
+/* responsive */
+@media (max-width:1180px){ :root{ --v2-rp:280px; --v2-sb:220px; } }
+@media (max-width:980px){
+  #app-shell, body.sidebar-closed #app-shell{ grid-template-columns:var(--v2-sb) minmax(0,1fr); }
+  body.sidebar-closed #app-shell{ grid-template-columns:minmax(0,1fr); }
+  #results-panel{ grid-column:1 / -1; position:static; max-height:none; border-left:0; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:10px; }
+  #results-panel .rp-head{ grid-column:1/-1; } #rp-body{ display:contents; }
+}
+@media (max-width:820px){
+  #app-shell, body.sidebar-closed #app-shell, body.results-closed #app-shell{ grid-template-columns:minmax(0,1fr); }
+  #sheet-sidebar{ position:fixed; left:0; top:0; bottom:0; width:min(290px,86vw); z-index:5500; box-shadow:8px 0 30px rgba(0,0,0,.6); min-height:0; }
+  .v2-menustrip .revision-cells{ display:none; }
+}
+@media print{
+  body.v2 .location:not(.location-current){ display:block; }
+  #sheet-sidebar, #results-panel, .ps-bar-head, #proj-basis-line, .v2-overlay, .v2-cc, .v2-16-note, .v2-or-badge, .v2-menustrip{ display:none !important; }
+  #app-shell{ display:block; } body.v2{ background:#fff; }
+}
+body.v2 .topbar.v2-top{ position:sticky; top:0; z-index:60; }
+#sheet-sidebar, #results-panel{ top:var(--v2-top); max-height:calc(100vh - var(--v2-top)); }
+#sheet-sidebar{ min-height:0; height:calc(100vh - var(--v2-top)); }
+.v2-menustrip .menubar{ border:0 !important; background:none !important; box-shadow:none !important; padding:0 !important; }
+body.v2 .name-cell .zone-name{ width:calc(100% - 40px) !important; min-width:96px; }
+body.v2 .model-cell{ font-size:10.5px; }
+@media (max-width:980px){ #results-panel{ max-height:none; } }
+@media (max-width:820px){ #sheet-sidebar{ top:0; height:100vh; max-height:100vh; } }
 </style>
 </head>
 <body>
 
-  <div class="topbar">
-    <div class="brand">
-      <div class="brand-mark">ML</div>
-      <div class="brand-text">
-        <h1>ModuLaser Battery Calculator</h1>
-        <p>Current draw &amp; standby battery sizing — BPS6A / APS6A power supplies</p>
-      </div>
-    </div>
-    <div class="revision-cells">
-      <div class="revision-cell">
-        <span class="revision-k">Revision</span>
-        <span class="revision-v" id="app-revision-cell">—</span>
-      </div>
-      <div class="revision-cell">
-        <span class="revision-k">Date</span>
-        <span class="revision-v" id="app-revision-date-cell">—</span>
-      </div>
-    </div>
-    <div class="top-actions menu-actions">
+  <div class="topbar v2-top">
+    <div class="v2-menustrip">
+      <div class="brand brand-mini"><div class="brand-mark">ML</div><div class="brand-text"><h1>ModuLaser Battery Calculator</h1></div></div>
       <nav class="menubar" role="menubar" aria-label="Main menu">
         <div class="menubar-item">
           <button class="menubar-top" role="menuitem" aria-haspopup="true" aria-expanded="false" id="menu-file-btn">File</button>
@@ -1084,9 +1227,9 @@
             <button role="menuitem" id="linked-pl-btn" title="See and check the PipeCAD .pl files linked to this calc">Linked .pl files…</button>
             <hr>
             <button role="menuitem" id="save-as-menu-btn">Save As…</button>
-            <button role="menuitem" id="export-xlsx-btn">Export to Excel</button>
+            <button role="menuitem" id="export-xlsx-btn" title="Excel workbook: CAD Schedule + Detail sheets">Export to Excel</button>
             <hr>
-            <button role="menuitem" id="print-menu-btn">Print…<span class="mi-kbd">Ctrl+P</span></button>
+            <button role="menuitem" id="print-menu-btn" title="Preview and export the printout as PDF, Word (.docx), HTML or Excel">Print / Export…<span class="mi-kbd">Ctrl+P</span></button>
             <label class="bom-print-toggle" role="menuitemcheckbox" tabindex="-1" title="When off, the Bill of Materials is left out of the printed output for every sheet in this document">
               <input type="checkbox" id="print-bom-toggle" checked onchange="togglePrintBom()">
               <span>Print BOM</span>
@@ -1096,7 +1239,7 @@
         <div class="menubar-item">
           <button class="menubar-top" role="menuitem" aria-haspopup="true" aria-expanded="false" id="menu-edit-btn">Edit</button>
           <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-edit-btn">
-            <button role="menuitem" id="add-location-menu-btn">+ Add Location</button>
+            <button role="menuitem" id="add-location-menu-btn" title="Add another power supply sheet">+ Add Location</button>
             <hr>
             <button role="menuitem" id="clear-calc-btn" title="Clear this sheet or the entire file">Clear…</button>
             <button role="menuitem" id="confirm-defaults-btn" title="Mark factory-default fields on the project header and current sheet as confirmed (clears blue needs-entry on defaults)">Confirm defaults</button>
@@ -1108,6 +1251,10 @@
           <button class="menubar-top" role="menuitem" aria-haspopup="true" aria-expanded="false" id="menu-view-btn">View</button>
           <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-view-btn">
             <button role="menuitem" id="cluster-report-btn">Cluster Report</button>
+            <hr>
+            <button role="menuitem" id="view-settings-btn" title="Expand or collapse the Project Settings bar">Project Settings bar</button>
+            <button role="menuitem" id="view-sidebar-btn" title="Show or hide the power supply sheet list">Sheet sidebar</button>
+            <button role="menuitem" id="view-results-btn" title="Show or hide the live results panel">Results panel</button>
           </div>
         </div>
         <div class="menubar-item">
@@ -1119,17 +1266,33 @@
           </div>
         </div>
       </nav>
-      <div class="quick-row">
-        <input type="file" id="import-calc-file" accept=".html,.htm,text/html" hidden>
-        <button class="btn" id="import-pl-btn" title="Import one or more PipeCAD .pl files">Import .pl</button>
-        <button class="btn btn-primary" id="add-location-btn">+ Add Location</button>
-        <button class="btn" id="save-as-copy-btn">Save As…</button>
-        <button class="btn" id="print-btn" onclick="window.print()">Print</button>
-        <span id="save-indicator" class="save-indicator">Auto-Save off</span>
+    <div class="revision-cells">
+      <div class="revision-cell">
+        <span class="revision-k">Revision</span>
+        <span class="revision-v" id="app-revision-cell">—</span>
       </div>
+      <div class="revision-cell">
+        <span class="revision-k">Date</span>
+        <span class="revision-v" id="app-revision-date-cell">—</span>
+      </div>
+    </div>
+    </div>
+    <div class="quick-row">
+      <input type="file" id="import-calc-file" accept=".html,.htm,text/html" hidden>
+      <button class="btn qr-icon" id="sb-toggle-btn" title="Show or hide the sheet sidebar" aria-label="Sheet sidebar">☰</button>
+      <button class="btn btn-primary" id="import-pl-btn" title="Import one or more PipeCAD .pl files">Import .pl</button>
+      <button class="btn" id="add-location-btn" title="Add another power supply sheet">+ Add Location</button>
+      <span class="qr-sep"></span>
+      <button class="btn" id="save-as-copy-btn" title="Download this calculator as a self-contained .html file">Save As…</button>
+      <button class="btn" id="print-btn" title="Print / Export: PDF, Word, HTML or Excel with a live preview">Print</button>
+      <span id="save-indicator" class="save-indicator">Auto-Save off</span>
+      <button class="btn qr-icon" id="rp-toggle-btn" title="Show or hide the results panel" aria-label="Results panel">◧</button>
     </div>
   </div>
 
+  <section class="ps-bar" id="proj-settings">
+    <div class="ps-bar-head"><button type="button" class="ps-toggle" id="proj-settings-toggle" aria-expanded="true" aria-controls="proj-settings-body"><span class="chev">▾</span> Project Settings</button><span id="proj-settings-summary"></span></div>
+    <div class="ps-bar-body" id="proj-settings-body">
   <div class="project-info-bar">
     <div class="pf">
       <label>Project Name</label>
@@ -1167,6 +1330,9 @@
       </label>
     </div>
   </div>
+    <div id="proj-basis-line"></div>
+    </div>
+  </section>
 
   <div class="report-overlay" id="report-overlay">
     <div class="report-card">
@@ -1209,12 +1375,57 @@
     </div>
   </div>
 
-  <main>
+  <div id="app-shell">
+  <aside id="sheet-sidebar" aria-label="Power supply sheets">
+    <div class="sb-top"><span>Power supplies</span><span id="sb-count"></span></div>
+    <div id="sb-list"></div>
+    <div class="sb-foot">
+      <button type="button" id="sb-add-btn" title="Add another power supply sheet">+ Add power supply</button>
+      <div class="sb-legend"><span><i class="dot st-complete"></i>Complete</span><span><i class="dot st-needs"></i>Needs entry</span><span><i class="dot st-error"></i>Error</span><span><i class="dot st-overridden"></i>Overridden</span></div>
+    </div>
+  </aside>
+  <main id="v2-center">
     <p class="intro">Enter each display/detector module, fan speed, and auxiliary circuit count for a cluster below. The calculator derives total current draw, standby/alarm capacity, and required battery size — then recommends the power supply and enclosure combination, or lets you hand off ModuLaser load figures to a third-party supply's own calculator.</p>
 
     <div class="pl-link-banner" id="pl-link-banner" hidden role="status"></div>
     <div id="locations-container"></div>
   </main>
+  <aside id="results-panel" aria-label="Live results">
+    <div class="rp-head"><span>Live results</span><button type="button" id="rp-close-btn" title="Hide the results panel">✕</button></div>
+    <div id="rp-body"></div>
+  </aside>
+  </div>
+
+  <div class="v2-overlay" id="pe-overlay" role="dialog" aria-modal="true" aria-labelledby="pe-title">
+    <div class="pe-card">
+      <div class="pe-head"><h2 id="pe-title">Print / Export</h2><button class="help-close" id="pe-close" title="Close">✕</button></div>
+      <div class="pe-body">
+        <div class="pe-side">
+          <div><h3>Sheets</h3><select id="pe-scope"><option value="all">All power supply sheets</option><option value="current">Current sheet only</option></select></div>
+          <div><h3>Detail level</h3>
+            <label><input type="radio" name="pe-level" value="summary" id="pe-level-summary"><span>Summary<small>Results only: one page per power supply.</small></span></label>
+            <label><input type="radio" name="pe-level" value="standard" id="pe-level-standard" checked><span>Standard<small>Adds the formulas with your values filled in.</small></span></label>
+            <label><input type="radio" name="pe-level" value="full" id="pe-level-full"><span>Full<small>Every step, per-module currents, de-rating and BOM on appendix pages after each sheet.</small></span></label>
+          </div>
+          <div><h3>Include</h3>
+            <label><input type="checkbox" id="pe-summary" checked><span>Project summary page</span></label>
+            <label><input type="checkbox" id="pe-bom" checked><span>Bill of Materials</span></label>
+          </div>
+          <div><h3>Save as</h3>
+            <div class="pe-btns">
+              <button class="btn btn-primary" id="pe-pdf" title="Print to PDF (Letter)">PDF</button>
+              <button class="btn" id="pe-docx" title="Word document, built offline">Word (.docx)</button>
+              <button class="btn" id="pe-html" title="Self-contained .html report">HTML</button>
+              <button class="btn" id="pe-xlsx" title="Excel: CAD Schedule + Detail">Excel (.xlsx)</button>
+            </div>
+          </div>
+          <div id="pe-pages"></div><div id="pe-status" role="status"></div>
+          <p style="font-size:11px;color:var(--muted);margin:0">Each power supply prints on one 8.5 × 11 in page. Excel's CAD Schedule sheet pastes cleanly into AutoCAD; its Detail sheet follows the detail level with expandable row groups.</p>
+        </div>
+        <iframe id="pe-preview" title="Print preview"></iframe>
+      </div>
+    </div>
+  </div>
 
   <footer>Reference current-draw values sourced from ModuLaser worksheet (New UL Values). Verify against project-specific design documents before final submittal.</footer>
 
@@ -1241,12 +1452,12 @@
         <button class="help-close" id="help-close-btn" title="Close">✕</button>
       </div>
       <h2>Using the ModuLaser Battery Calculator</h2>
-      <p class="help-sub">How to use the calculator · standards and formulas · FAQs · revision log</p>
+      <p class="help-sub">Screen layout · Import .pl · Print / Export · standards and formulas · FAQs · revision log (calculator 02.00)</p>
 
       <div class="howdoi-panel" id="howdoi-panel">
         <label for="howdoi-input">How Do I…</label>
         <div class="howdoi-combobox">
-          <input type="search" id="howdoi-input" placeholder="Type to filter topics (Import, Clear, battery sizing…)" autocomplete="off" spellcheck="false">
+          <input type="search" id="howdoi-input" placeholder="Type to filter topics (Import .pl, Print, detail level, CAD, sidebar…)" autocomplete="off" spellcheck="false">
           <div class="howdoi-dropdown" id="howdoi-dropdown" hidden role="listbox"></div>
         </div>
         <div class="howdoi-answer" id="howdoi-answer" hidden>
@@ -1270,29 +1481,35 @@
           <b>Every document represents one (1) ModuLaser SenseNET network. Every sheet within a document represents one (1) power supply.</b> A single power supply may serve more than one Cluster; different Clusters or Cluster segments must be powered by different circuits. The <b>Cluster number</b> is what ties modules together across sheets when a Cluster is distributed across multiple power supplies. A network has 1 Command Display Module, with up to 1 optional backup CDM for redundant SenseNET configurations.
         </p>
         <p style="font-size:12.5px; color:var(--text); background:rgba(200,30,44,0.1); border-left:3px solid #c81e2c; padding:9px 12px; margin:0 0 14px; line-height:1.55;">
-          <b>A fully clean, valid calculation is required before a sheet's power supply/battery recommendations and Bill of Materials will generate.</b> Steps 9–10 below cover the yellow Validation Error flags and the red INVALID CALCULATION banner, what triggers each, and how to fix them.
+          <b>A fully clean, valid calculation is required before a sheet's power supply/battery recommendations and Bill of Materials will generate.</b> The <b>Review Validation Error flags</b> and <b>Resolve any INVALID CALCULATION banner</b> steps below cover the yellow Validation Error flags and the red INVALID CALCULATION banner, what triggers each, and how to fix them.
         </p>
 
         <div class="qs-step">
           <div class="qs-step-num">1</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Fill in the project + network header</div>
-            <p>Every document represents one <b>ModuLaser SenseNET network</b>. Fill in <b>Project Name</b>, <b>Prepared By</b>, and <b>Date</b> plus <b>SenseNET #</b>, <b>Building</b>, and the <b>Primary</b> (and optional <b>Backup</b>) <b>Command Display Module Location</b>. A network is supported by 1 primary CDM plus up to 1 optional backup for redundant configurations — these fields identify where each is physically installed and carry into every printed sheet and the Cluster Validation Report.</p>
-            <figure class="qs-figure"><img data-qs-slot="1-project-header" alt="Project header entry"><figcaption>Screenshot: project info bar with SenseNET #, Building, CDM locations</figcaption></figure>
+            <div class="qs-step-title" id="qs-step-layout">Find your way around the screen</div>
+            <p>The screen has six parts, top to bottom and left to right. <b>Menu bar</b> — File, Edit, View and Help hold every command. <b>Quick row</b> — the most-used buttons: ☰ (show/hide the sheet sidebar), <b>Import .pl</b>, <b>+ Add Location</b>, <b>Save As…</b>, <b>Print</b>, the Auto-Save indicator and ◧ (show/hide the results panel). <b>Project Settings</b> bar — the project and network header; click its title to collapse it to a one-line summary. <b>Sheet sidebar</b> (left) — every power supply sheet, grouped by Area/Group, with a status dot. <b>Sheet</b> (center) — the selected power supply's name, location, settings and module table. <b>Live results</b> panel (right) — required Ah, PASS/FAIL, load breakdown, clusters and validation messages for the selected sheet. On a narrow window the sidebar and results panel collapse; open them with ☰ and ◧ or from the View menu.</p>
           </div>
         </div>
-
         <div class="qs-step">
           <div class="qs-step-num">2</div>
           <div class="qs-step-body">
-            <div class="qs-step-title">Add a location per power supply, then name and locate it</div>
-            <p>Each location page = one power supply. Use "+ Add Location" to add another supply's sheet. Fill in the <b>Power Supply Name</b> (e.g. <span class="mono-inline">PS-1</span>) and <b>Power Supply Location</b> (e.g. <span class="mono-inline">Riser Closet A</span>) at the top of the location — both appear on the printed sheet header and in the Cluster Validation Report so every entry-point circuit can be traced back to a specific physical supply.</p>
-            <figure class="qs-figure"><img data-qs-slot="2-add-location" alt="Add location"><figcaption>Screenshot: Add Location button, PS Name + PS Location fields</figcaption></figure>
+            <div class="qs-step-title" id="qs-step-project-settings">Fill in Project Settings</div>
+            <p>Every document represents one <b>ModuLaser SenseNET network</b>. In the <b>Project Settings</b> bar fill in <b>Project Name</b>, <b>Prepared By</b>, <b>Date</b>, <b>Network #</b>, <b>Building</b>, and the <b>Primary</b> (and optional <b>Backup</b>) <b>Command Display Location</b>, and turn <b>Auto-Save</b> on if you want it. These carry into every printed page, the export files and the Cluster Validation Report. Click <b>Project Settings</b> to collapse the bar: it then shows a one-line summary of the project and the sheet settings most sheets use (Design Basis, standby/alarm, temperature, margin).</p>
+            <p><b>Overrides:</b> Design Basis, Standby, Alarm, Ambient Temp. and Safety margin are set on each sheet. When a sheet differs from what most sheets use, it shows a blue <span class="mono-inline">Overrides project settings: …</span> badge next to its name, gets a blue dot in the sidebar, and is listed under the bar (click a name to jump to it). An override is allowed — it just makes the difference easy to spot.</p>
+            <figure class="qs-figure"><img data-qs-slot="1-project-header" alt="Project Settings bar"><figcaption>Screenshot: Project Settings bar, expanded and collapsed</figcaption></figure>
           </div>
         </div>
-
         <div class="qs-step">
           <div class="qs-step-num">3</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-sidebar">Add power supply sheets and use the sidebar</div>
+            <p>Each sheet = one power supply. Add one with <b>+ Add power supply</b> at the bottom of the sidebar, <b>+ Add Location</b> in the quick row, or <b>Edit → + Add Location</b>. Click a sheet in the sidebar to show it. Sheets are grouped by their <b>Location</b> (the Area/Group name; an Import .pl fills it from the PipeCAD floor). Each shows its required Ah and a status dot: <b>green</b> complete, <b>amber</b> needs entry (blue-outlined fields left), <b>red</b> error (an INVALID CALCULATION condition or a Validation Error; the red count shows how many), and an extra <b>blue</b> dot when the sheet overrides the project settings. At the top of the sheet fill in the <b>Power Supply Name</b> (e.g. <span class="mono-inline">PS-1</span>) and <b>Location</b> (e.g. <span class="mono-inline">Riser Closet A</span>); use <b>Remove ⌫</b> on the sheet to delete it.</p>
+            <figure class="qs-figure"><img data-qs-slot="2-add-location" alt="Sidebar"><figcaption>Screenshot: sheet sidebar with status dots and + Add power supply</figcaption></figure>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">4</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-design-basis">Pick a design basis</div>
             <p>NFPA 72 Standard/Voice, NFPA 72 + NFPA 110 Generator Backup (Non-Voice/Voice), UFC 3-600-01 Hydro or FA/MNS, AWS, CAN/ULC-S524:2024 Standard/Voice, four BS 5839-1 categories (M/L, M/L + Generator, P Staffed, P Unstaffed), or Custom — sets Standby and Alarm duration. The generator-backup presets reflect a 4-hour standby basis where a code-compliant NFPA 110 generator serves as secondary power in place of the full 24-hour battery standby — confirm with your AHJ that a generator qualifies for your specific installation before relying on this basis. BS 5839-1 presets use that standard's own formula rather than the NFPA-72-style formula used everywhere else — its De-Rating factor is determined automatically (1 or 1.75, per Annex E's own rule) based on the selected battery, and the Safety Margin control locks to 25% automatically since that matches BS 5839-1's fixed aging factor. Category P (Unstaffed) is the one preset where Standby stays editable, capped at 72 hours. A new <b>Ambient Temperature</b> selector next to Alarm applies a de-rating multiplier when batteries won't sit at the standard 77°F/25°C — set per sheet, since different power supplies may be in different environments. When a design basis has a known code citation and the sheet's calculation is clean, a compliance statement citing the exact section/paragraph appears at the bottom of the sheet automatically.</p>
@@ -1301,7 +1518,7 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">4</div>
+          <div class="qs-step-num">5</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-clusters">Build each cluster</div>
             <p>A Standard or Minimum Display starts a new cluster (numbered 01–63) and can host up to 8 Detectors. A <b>Command Display</b> works differently — it's network-wide rather than cluster-scoped (up to 2 per network), used for command/supervisory functions, and never hosts Detectors directly. Add Detectors and assign each to a cluster hosted by a Standard or Minimum Display. Detectors on a display-less sheet can reference clusters hosted on other sheets — and detectors on that same sheet sharing that same remote reference can still ribbon-connect to each other locally, forming their own portion of the cluster's ribbon topology (up to the usual 2-segment limit for that sheet's contribution), while linking back to the rest of the cluster over SNET+ rather than ribbon.</p>
@@ -1310,7 +1527,7 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">5</div>
+          <div class="qs-step-num">6</div>
           <div class="qs-step-body">
             <div class="qs-step-title">Address, Zone, Power, Circuit source</div>
             <p>Give each module an <b>Address</b> (a dropdown of 1–127, unique across the entire network — once claimed on any sheet, it's disabled everywhere else) and a Zone descriptor. Every module needs an address; leaving one blank keeps the sheet in INVALID CALCULATION until it's set. Displays are always entry points from a circuit. By default, <b>Ribbon Assignment</b> (the toggle next to "MASD Modules") is set to <b>Auto</b> — new detectors automatically ribbon-connect to the first entry point in their cluster with room, and once a cluster's ribbon capacity is full (4 followers per entry point, 2 entry points per cluster), the next detector automatically becomes a new entry point. Auto also keeps every ribbon-connected group of modules sitting in consecutive rows on the sheet, moving them together automatically as clusters change — nothing you've entered on a module is lost when it moves, since the row itself relocates rather than being recreated. Switch it to <b>Off</b> to assign Power manually instead — Auto will stop re-evaluating your choices and stop reordering rows while it's off, though a flag will still recommend moving ribbon-connected modules together if they end up scattered. Each entry point also gets an <b>AUX Circuit #</b> (AUX 01–04) — new entry points default to a circuit nobody else is using yet, and once a circuit is claimed by one entry point, it's locked out for every other entry point on that sheet — a sheet has at most 4 entry points, since there are only 4 physical circuits. If a 5th entry point needs one and all 4 are already taken, it's left unassigned with a flag calling it out — free up a circuit (consolidate a module onto ribbon) or move it to another power supply page. Enter <span class="mono-inline">Circuit source</span> on every entry point (e.g., <span class="mono-inline">PS-1 AUX-2</span>).</p>
@@ -1319,15 +1536,15 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">6</div>
+          <div class="qs-step-num">7</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-addressing">Choose Networked or Standalone addressing</div>
-            <p>Just below "Clusters supported" is a per-sheet <b>Networked / Standalone</b> toggle. <b>Networked</b> is the default (unchanged for every existing project) — Address stays the 1–127 dropdown from Step 5, unique across the whole document. <b>Standalone</b> is for a cluster with no SenseNET pathway connecting it to anything else: Address becomes a 1–9 dropdown, and uniqueness is scoped to that one cluster rather than the whole document — a completely unrelated cluster elsewhere can freely reuse the same addresses, even if it happens to share the same cluster number, since there's no physical network tying them together. A sheet with multiple clusters still gets an independent 1–9 pool per cluster even in Standalone mode, and Cluster identification is still fully required either way — Standalone only changes the addressing pool, nothing else. Cross-sheet cluster referencing (Step 4) keeps working normally no matter which scheme either sheet uses. Switching a sheet to Standalone clears any of its own addresses already set above 9, since they're no longer valid options.</p>
+            <p>Just below "Clusters supported" is a per-sheet <b>Networked / Standalone</b> toggle. <b>Networked</b> is the default (unchanged for every existing project) — Address stays the 1–127 dropdown from the Address step, unique across the whole document. <b>Standalone</b> is for a cluster with no SenseNET pathway connecting it to anything else: Address becomes a 1–9 dropdown, and uniqueness is scoped to that one cluster rather than the whole document — a completely unrelated cluster elsewhere can freely reuse the same addresses, even if it happens to share the same cluster number, since there's no physical network tying them together. A sheet with multiple clusters still gets an independent 1–9 pool per cluster even in Standalone mode, and Cluster identification is still fully required either way — Standalone only changes the addressing pool, nothing else. Cross-sheet cluster referencing (see Build each cluster) keeps working normally no matter which scheme either sheet uses. Switching a sheet to Standalone clears any of its own addresses already set above 9, since they're no longer valid options.</p>
           </div>
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">7</div>
+          <div class="qs-step-num">8</div>
           <div class="qs-step-body">
             <div class="qs-step-title">Fan speed and supply mode</div>
             <p>Set each detector's fan speed from PipeCAD. Pick Edwards A/BPS or third-party (custom loads / export ModuLaser loads only). Third-party custom mode has its own <b>Auto Battery Sizing</b> toggle, independent from built-in mode's — it defaults to <b>Off</b> so you can enter the Ah rating from your manufacturer's spec directly, with Auto available if you'd rather have it computed from total load. Enter your battery's actual <b>voltage</b> and the calculator works out how many units in series reach the 24 VDC nominal system target.</p>
@@ -1336,7 +1553,7 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">8</div>
+          <div class="qs-step-num">9</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-battery">AUX + battery size</div>
             <p><b>Auto Battery Sizing</b> (the toggle above Required Battery Capacity, default Auto) picks battery size, Power supply capacity, and Battery cabinet together from your total load — the smallest catalog size that reaches 1 supply when possible, switching to 10 A only if AUX draw needs it. Switch it to Off to set all three manually instead. Edwards AUX outputs are rated 3.0 A per circuit, 6.0 A total on a 6 A supply (APS6A/BPS6A) or 8.0 A total on a 10 A supply (APS10A/BPS10A). For 50 Ah and 65 Ah batteries, a <b>Battery cabinet</b> choice appears — Edwards 3-RCC7R (with 3-BATS shelf at 65 Ah) or Space Age SSU00507.</p>
@@ -1345,7 +1562,7 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">9</div>
+          <div class="qs-step-num">10</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-validation">Review Validation Error flags</div>
             <p>Yellow-highlighted <b>Validation Error</b> flags call out detector/display mismatches, ribbon-segment size limits, duplicate addresses, missing circuit sources, and AUX coverage. They don't block editing, but <b>the power supply/battery recommendation section, the multi-supply recommendation, the Recommended Power Supply Arrangement, and the Bill of Materials are all withheld until every flag clears</b> — including a missing fan speed selection. Resolve everything shown here before expecting a hardware recommendation at the bottom of the sheet.</p>
@@ -1354,7 +1571,7 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">10</div>
+          <div class="qs-step-num">11</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-invalid">Resolve any INVALID CALCULATION banner</div>
             <p>Separate from — and more severe than — a Validation Error flag, a bold red <b>"INVALID CALCULATION"</b> banner at the top of a sheet means the numbers themselves can't be trusted. It fires on any of four conditions, each with a specific fix:</p>
@@ -1369,24 +1586,31 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">11</div>
+          <div class="qs-step-num">12</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-results">Read the live results panel</div>
+            <p>The right-hand panel updates as you type. <b>Required capacity</b> shows the Ah per supply in large type with a gauge: the solid part is the standby + alarm load, the lighter part is the safety margin and temperature de-rating, the blue mark is the selected battery and the dashed red mark is the 65 Ah maximum. Below it a status line reads <b>PASS</b> (valid, no flags, within the selected battery and 65 Ah), <b>FAIL</b> (an INVALID CALCULATION condition, more than one supply needed, or capacity beyond the battery / 65 Ah) or <b>INCOMPLETE</b> (Validation Error flags still open). Then the selected battery and recommended hardware, the load breakdown (modules, power supply quiescent + AUX, total, standby/alarm/required Ah), the clusters on this supply, and the sheet's own validation messages — red for INVALID CALCULATION, yellow for Validation Errors, blue for fields that still need entry. The full calculation, hardware and Bill of Materials stay on the sheet below the module table.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">13</div>
           <div class="qs-step-body">
             <div class="qs-step-title">Multi-supply arrangements</div>
-            <p>If more than one supply is required, check the Recommended Power Supply Arrangement and use "Export additional arrangements" to split them onto their own sheets. Cluster numbers stay the same across sheets — the <b>Cluster Report</b> button in the toolbar ties everything back together.</p>
+            <p>If more than one supply is required, check the Recommended Power Supply Arrangement and use "Export additional arrangements" to split them onto their own sheets. Cluster numbers stay the same across sheets — <b>View → Cluster Report</b> ties everything back together. Each exported arrangement becomes its own sheet in the sidebar.</p>
             <figure class="qs-figure"><img data-qs-slot="9-arrangements" alt="Multi-supply arrangements"><figcaption>Screenshot: Recommended Power Supply Arrangement + Export button</figcaption></figure>
           </div>
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">12</div>
+          <div class="qs-step-num">14</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-save-export">Save your work and export results</div>
-            <p><b>Save As…</b> (quick row, or File → Save As…) downloads the whole document — every sheet, every field — as a single self-contained .html file you can keep, email, or reopen later in any browser; opening it restores the document exactly as saved. The <b>Autosave</b> toggle (next to it) is a convenience on top of that: once turned on, it saves your current work automatically to this browser's local storage as you go, so a reload doesn't lose it — but it's tied to this specific browser and device, not portable like a saved file, so it's not a substitute for an occasional Save As when you want a real, shareable copy. <b>Export to Excel</b> in the toolbar produces a multi-sheet .xlsx workbook, one worksheet per power supply, mirroring each sheet's module table and results — useful for handing data to someone who wants it outside this tool.</p>
+            <p><b>Save As…</b> (quick row, or File → Save As…) downloads the whole document — every sheet, every field — as a single self-contained .html file you can keep, email, or reopen later in any browser; opening it restores the document exactly as saved. The <b>Auto-Save</b> toggle (in the Project Settings bar; its state shows at the right of the quick row) is a convenience on top of that: once turned on, it saves your current work automatically to this browser's local storage as you go, so a reload doesn't lose it — but it's tied to this specific browser and device, not portable like a saved file, so it's not a substitute for an occasional Save As when you want a real, shareable copy. <b>File → Export to Excel</b> saves an .xlsx workbook with a <b>CAD Schedule</b> sheet and a <b>Detail</b> sheet (see Print or export, below) — useful for drawings and for anyone who wants the data outside this tool. <b>Print / Export…</b> offers PDF, Word and HTML as well.</p>
           </div>
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">13</div>
+          <div class="qs-step-num">15</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-needs-entry">Blue needs-entry highlights</div>
             <p>Empty editable fields — and fields still sitting on their factory defaults — show a soft <b>blue</b> border and light blue tint so unfinished entry is easy to spot. This is intentionally different from the <b>yellow</b> Validation Error panel and the <b>red</b> INVALID CALCULATION banner. Blue clears when you fill an empty field, or when you change a factory-default value away from its starter setting. <b>Date</b> is excluded: new and cleared documents still initialize Date to today, and you can edit it normally afterward, but it is never blue-highlighted. Project-header fields (Project Name, Prepared By, Network #, Building, CDM locations) use the same empty/default rules as sheet fields.</p>
@@ -1395,25 +1619,25 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">14</div>
+          <div class="qs-step-num">16</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-confirm-defaults">Confirm defaults</div>
             <p>When factory defaults are intentional (you reviewed them and want to keep them), click <b>Edit → Confirm defaults</b>. That clears blue highlighting on factory-default fields for the <b>project header</b> and the <b>current sheet</b> (the sheet you last clicked or focused — shown with a subtle outline). Empty fields stay blue until you fill them. Confirming does not change any values — it only marks those defaults as reviewed.</p>
-            <figure class="qs-figure"><img data-qs-slot="11-confirm-defaults" alt="Confirm defaults button"><figcaption>Screenshot: Confirm defaults toolbar button clearing blue on reviewed factory defaults</figcaption></figure>
+            <figure class="qs-figure"><img data-qs-slot="11-confirm-defaults" alt="Confirm defaults button"><figcaption>Screenshot: Edit → Confirm defaults clearing blue on reviewed factory defaults</figcaption></figure>
           </div>
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">15</div>
+          <div class="qs-step-num">17</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-clear">Clear a sheet or the entire file</div>
-            <p><b>Edit → Clear…</b> asks what to wipe. <b>This sheet only</b> resets the current power-supply sheet to a blank factory starter (modules + defaults) and leaves project header fields alone — you confirm before it runs. <b>Entire file</b> removes every sheet, then asks whether to <b>keep</b> or <b>clear</b> the project/header fields, and asks for a final confirm before wiping. Either path starts you with a fresh blank sheet afterward. (The separate "Clear saved data" control in the project bar is only for wiping browser Autosave storage — different from toolbar Clear.)</p>
+            <p><b>Edit → Clear…</b> asks what to wipe. <b>This sheet only</b> resets the current power-supply sheet to a blank factory starter (modules + defaults) and leaves project header fields alone — you confirm before it runs. <b>Entire file</b> removes every sheet, then asks whether to <b>keep</b> or <b>clear</b> the project/header fields, and asks for a final confirm before wiping. Either path starts you with a fresh blank sheet afterward. (The separate <b>Edit → Clear saved data</b> only wipes browser Auto-Save storage — different from Clear….)</p>
             <figure class="qs-figure"><img data-qs-slot="12-clear" alt="Clear dialog"><figcaption>Screenshot: Clear prompt choosing this sheet vs entire file</figcaption></figure>
           </div>
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">16</div>
+          <div class="qs-step-num">18</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-import">Import Calc from a saved .html</div>
             <p><b>File → Open / Import Calc…</b> opens a file picker for a calculator <span class="mono-inline">.html</span> that was produced with Save As… (those files embed the document data needed for import). If the file's revision is older than this app, you get a warning and can cancel or continue. Then choose <b>Replace document</b> (swap your current header + sheets for the imported file) or <b>Merge sheets</b> (add the imported power-supply sheets into the current file). On merge, if an imported sheet name collides with one you already have, you pick per collision: <b>Skip</b>, <b>Keep both (auto-rename)</b>, or <b>Overwrite existing</b>.</p>
@@ -1422,24 +1646,58 @@
         </div>
 
         <div class="qs-step">
-          <div class="qs-step-num">17</div>
+          <div class="qs-step-num">19</div>
           <div class="qs-step-body">
-            <div class="qs-step-title" id="qs-step-menubar">Find commands in the menu bar</div>
-            <p>The top of the calculator has a menu bar plus a short row of the most-used buttons. <b>File</b>: New…, Open / Import Calc…, Import .pl…, Linked .pl files…, Save As…, Export to Excel, Print… and the <b>Print BOM</b> switch. <b>Edit</b>: + Add Location, Clear…, Confirm defaults, Clear saved data. <b>View</b>: Cluster Report. <b>Help</b>: Help, How Do I…, Revision log. The quick row holds <b>Import .pl</b>, <b>+ Add Location</b>, <b>Save As…</b>, <b>Print</b> and the Auto-Save indicator. Menus work from the keyboard too: Tab to a menu name, press Enter or ↓ to open it, ↑/↓ to move, ←/→ to switch menus, Esc to close.</p>
+            <div class="qs-step-title" id="qs-step-menubar">Find commands in the menu bar and quick row</div>
+            <p>The menu bar at the top holds every command. <b>File</b>: New…, Open / Import Calc…, Import .pl…, Linked .pl files…, Save As…, Export to Excel, Print / Export… (Ctrl+P) and the <b>Print BOM</b> switch. <b>Edit</b>: + Add Location, Clear…, Confirm defaults, Clear saved data. <b>View</b>: Cluster Report, Project Settings bar, Sheet sidebar, Results panel. <b>Help</b>: Help, How Do I…, Revision log. The quick row underneath holds ☰ (sheet sidebar), <b>Import .pl</b>, <b>+ Add Location</b>, <b>Save As…</b>, <b>Print</b>, the Auto-Save indicator and ◧ (results panel). Menus work from the keyboard too: Tab to a menu name, press Enter or ↓ to open it, ↑/↓ to move, ←/→ to switch menus, Esc to close.</p>
           </div>
         </div>
         <div class="qs-step">
-          <div class="qs-step-num">18</div>
+          <div class="qs-step-num">20</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-import-pl">Import PipeCAD .pl files</div>
-            <p><b>File → Import .pl…</b> (or <b>Import .pl</b> in the quick row) opens a four-step wizard. <b>1 Battery settings</b> — set Design Basis, standby/alarm, ambient temperature, safety margin, NFPA 72 edition, power-supply capacity and supply mode <i>first</i>; they become the defaults on every new sheet and drive the 65 Ah check. <b>2 Pick files</b> — drop or choose one or more .pl files; each shows its project (the file name is used when ProjectName is blank), units (metric files are converted to feet), Areas/Groups, detectors, displays and PSU positions. Untick any Area/Group you don't want. Unknown detector types or display part numbers are listed and skipped. <b>3 Rename</b> — set a naming pattern from {project} {file} {area} {name} {##} (default <span class="mono-inline">{project}-{area}-Det{##}</span>, remembered for next time), edit any zone or Area/Group name, and watch the live character counter. The ModuLaser display shows 16 characters total, including spaces, so names over 16 are blocked until shortened — use the suggested short name or <b>Shorten all over 16</b>. Duplicate names are outlined in red. <b>4 Power supplies</b> — each Area/Group gets at least one supply, a supply never spans Areas/Groups, and each takes at most 4 detectors and 1 display with the required battery ≤ 65 Ah (display load included). Suggestions start from PSU positions in the file (nearest device first) and devices within 3 ft of each other in plan view (X/Y); oversize groups are split by distance. Any device that isn't near a file PSU or within 3 ft of another device is <i>not</i> auto-assigned — it waits in that Area/Group's <b>Unassigned — group these to a power supply</b> tray, and you're prompted to group it: drag it onto a supply card or use <i>Move to…</i>, and click <b>+ Add power supply</b> for more supplies (removing a supply sends its devices back to the tray). <b>Pack into fewest</b> is an optional shortcut that assigns the whole Area/Group to the fewest supplies. <b>Create sheets</b> stays disabled, showing how many detectors are still unassigned, until every device is on a supply and every rule passes. One sheet is created per supply, with type, zone name, fan speed and display model filled in; addresses and anything the file doesn't provide stay highlighted for you to enter.</p>
+            <p><b>File → Import .pl…</b> (or <b>Import .pl</b> in the quick row) opens a four-step wizard. <b>1 Battery settings</b> — set Design Basis, standby/alarm, ambient temperature, safety margin, NFPA 72 edition, power-supply capacity and supply mode <i>first</i>; they become the defaults on every new sheet and drive the 65 Ah check. <b>2 Pick files</b> — drop or choose one or more .pl files; each shows its project (the file name is used when ProjectName is blank), units (metric files are converted to feet), Areas/Groups, detectors, displays and PSU positions. Untick any Area/Group you don't want. Unknown detector types or display part numbers are listed and skipped. <b>3 Rename</b> — set a naming pattern from {project} {file} {area} {name} {##} (default <span class="mono-inline">{project}-{area}-Det{##}</span>, remembered for next time), edit any zone or Area/Group name, and watch the live character counter. The ModuLaser display shows 16 characters total, including spaces, so names over 16 are blocked until shortened — use the suggested short name or <b>Shorten all over 16</b>. Duplicate names are outlined in red. <b>4 Power supplies</b> — each Area/Group gets at least one supply, a supply never spans Areas/Groups, and each takes at most 4 detectors and 1 display with the required battery ≤ 65 Ah (display load included). Suggestions start from PSU positions in the file (nearest device first) and devices within 3 ft of each other in plan view (X/Y); oversize groups are split by distance. Any device that isn't near a file PSU or within 3 ft of another device is <i>not</i> auto-assigned — it waits in that Area/Group's <b>Unassigned — group these to a power supply</b> tray, and you're prompted to group it: drag it onto a supply card or use <i>Move to…</i>, and click <b>+ Add power supply</b> for more supplies (removing a supply sends its devices back to the tray). <b>Pack into fewest</b> is an optional shortcut that assigns the whole Area/Group to the fewest supplies. <b>Create sheets</b> stays disabled, showing how many detectors are still unassigned, until every device is on a supply and every rule passes. One sheet is created per supply, with type, zone name, fan speed and display model filled in, its Location set to the Area/Group (so the sidebar groups them), and addresses and anything the file doesn't provide highlighted for you to enter — the sidebar shows those sheets with an amber <i>needs entry</i> dot until you finish.</p>
           </div>
         </div>
         <div class="qs-step">
-          <div class="qs-step-num">19</div>
+          <div class="qs-step-num">21</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-linked-pl">Keep linked .pl files up to date</div>
             <p>Every imported .pl stays linked in the calc file: its name, size, last-modified date, SHA-256 fingerprint, and a fingerprint for each detector mapped to its sheet and row. <b>File → Linked .pl files…</b> lists them. <b>Check link…</b> asks you to pick the current copy of the .pl (a browser can't re-open a file on its own). If it changed, a banner appears above the sheets with the number of added, removed and changed devices. <b>Review &amp; re-import…</b> shows the differences: fan-speed and name updates are pre-ticked only where you haven't edited that row by hand, removed devices are only deleted if you tick them, and new devices go through the rename step, then land in the power-supply step's Unassigned tray for you to group. Addresses are never changed.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">22</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-print-export">Print or export (PDF, Word, HTML, Excel)</div>
+            <p><b>File → Print / Export…</b>, <b>Print</b> in the quick row, or <b>Ctrl+P</b> opens the Print / Export dialog with a live 8.5 × 11 in preview. Under <b>Sheets</b> choose <b>All power supply sheets</b> or <b>Current sheet only</b>; pick a <b>Detail level</b>; under <b>Include</b> tick <b>Project summary page</b> and <b>Bill of Materials</b> (the same setting as File → Print BOM); then under <b>Save as</b> click a format:</p>
+            <ul class="help-steps" style="margin:0 0 10px;">
+              <li><b>PDF</b> — opens the print window; choose “Save as PDF”, Letter. In the Windows app the PDF is written directly and you pick where to save it.</li>
+              <li><b>Word (.docx)</b> — built in the app, offline, with the same pages, tables and graphics.</li>
+              <li><b>HTML</b> — one self-contained .html report you can email or open in any browser; Full detail uses expandable sections.</li>
+              <li><b>Excel (.xlsx)</b> — the CAD Schedule and Detail sheets (see the next step). File → Export to Excel saves the same workbook directly.</li>
+            </ul>
+            <p>Page 1 is the <b>project summary</b>: project header and one row per power supply with Area/Group, required Ah, battery and PASS/FAIL. Then each power supply gets <b>one letter page</b>: header (project, PSU tag, location/Area-Group, calculator revision), the <b>capacity gauge</b>, a <b>PASS/FAIL stamp</b>, a <b>mini cluster diagram</b> (the supply with its displays ■ and detectors ○ labelled with fan speed), the module table (Zone, Type, Fan speed, Address, Standby mA, Alarm mA, with totals and Required Ah | Battery | status), the settings used, any validation messages, the BOM (if included) and the code-compliance statement when the sheet is clean.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">23</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-detail-levels">Choose a detail level</div>
+            <p>The <b>Detail level</b> in the Print / Export dialog controls how much of the calculation goes into PDF, Word, HTML and the Excel Detail sheet (the preview updates live):</p>
+            <ul class="help-steps" style="margin:0 0 10px;">
+              <li><b>Summary</b> — results only: the one-page sheet per power supply.</li>
+              <li><b>Standard</b> — adds the formulas with your values filled in (standby, alarm, margin, temperature, battery and supplies). If a sheet would overflow its page, the formulas move to an appendix page right after it.</li>
+              <li><b>Full</b> — adds appendix pages after each sheet with every step: per-module currents, subtotals, quiescent and AUX load, standby/alarm Ah, the BS 5839-1 de-rating factor D where it applies, safety margin, temperature multiplier, battery selection, supplies required and the BOM. Each step shows the formula, the formula with values substituted, the result with units, and its reference — the Design Basis citation the sheet uses (e.g. NFPA 72 (2022 Edition), Section 10.6.7.2 or BS 5839-1:2025, Annex E), or the calculator's own data table where that is the source.</li>
+            </ul>
+            <p>Every number is read from the sheet's own calculation, so exports always match the screen. The on-sheet <b>Show granular calculation detail</b> checkbox still shows the same breakdown on screen.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">24</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-cad-paste">Paste the CAD Schedule onto a drawing</div>
+            <p>The Excel workbook's <b>CAD Schedule</b> sheet has one compact table per power supply — Zone, Type, Fan speed, Address, Standby mA, Alarm mA, then Total load and a footer row Required Ah | Battery | PASS/FAIL — with thin plain borders, fixed column widths, no merged cells and no fills. To place one on a drawing: select that table's cells in Excel, copy, then in AutoCAD use <b>Paste Special → AutoCAD Entities</b> (a native table) or <b>Picture (Metafile)</b>. The <b>Detail</b> sheet holds the full calculation at the chosen detail level, grouped per power supply and per step — use Excel's outline buttons (1 / 2 / 3 or + / −) on the left to expand or collapse it.</p>
           </div>
         </div>
 
@@ -1572,6 +1830,26 @@
 
       <div class="help-section" id="help-faq">
         <h3>FAQs</h3>
+        <div class="help-faq-item">
+          <div class="q">What do the sidebar's status dots mean?</div>
+          <p class="a">Green: complete — no validation messages and no fields left to enter. Amber: needs entry — blue-outlined fields are still empty or on unconfirmed factory defaults. Red: error — the sheet has an INVALID CALCULATION condition or a Validation Error (the red number is how many). A second, blue dot means the sheet overrides the settings most sheets use (Design Basis, standby, alarm, temperature or margin). The same legend is at the bottom of the sidebar.</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">How is PASS / FAIL / INCOMPLETE decided?</div>
+          <p class="a">It only reads the sheet's own results. <b>PASS</b>: no INVALID CALCULATION condition, no Validation Error, one supply is enough and the required Ah per supply is within the selected battery and the 65 Ah maximum. <b>FAIL</b>: an INVALID CALCULATION condition, more than one supply required, or capacity beyond the selected battery or 65 Ah. <b>INCOMPLETE</b>: Validation Error flags are still open, so the recommendation and BOM are withheld. The status appears in the results panel, the summary page, each PSU page stamp and the CAD Schedule footer.</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">Why are Standby mA and Alarm mA the same in the module table?</div>
+          <p class="a">This calculator uses one current per module (from the ModuLaser 24 V current-draw reference) for both standby and alarm — the same total load drives the Standby Ah and Alarm Ah lines. Both columns are shown because CAD schedules usually list both.</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">Do the exports need an internet connection?</div>
+          <p class="a">No. PDF, Word (.docx), HTML and Excel (.xlsx) are all built inside the calculator file itself — nothing is downloaded from the internet, in the browser or in the Windows app.</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">Where did the toolbar go?</div>
+          <p class="a">Every command is in the menu bar (File, Edit, View, Help); the most-used ones are also in the quick row under it. Print is now <b>Print / Export…</b>, with PDF, Word, HTML and Excel in one dialog.</p>
+        </div>
 
         <div class="help-faq-item">
           <div class="q">How does Import .pl decide which detectors share a power supply?</div>
@@ -1673,7 +1951,7 @@
         </div>
         <div class="help-faq-item">
           <div class="q">What does the "Print BOM" switch in the File menu do?</div>
-          <p class="a">It's a single document-wide switch (not per-sheet) that leaves the Bill of Materials out of the printed/PDF output entirely when unchecked — every sheet's BOM, and its identifying header, are skipped. It only affects print; the on-screen Bill of Materials, Excel export, and Cluster Validation Report are unaffected. It's saved with the rest of the document, so it stays set the way you left it next time you open the file.</p>
+          <p class="a">It's a single document-wide switch (not per-sheet) that leaves the Bill of Materials out of the PDF, Word and HTML output when unchecked. It is the same setting as the <b>Bill of Materials</b> box in the Print / Export dialog — changing one changes the other. The on-screen Bill of Materials, the Excel workbook and the Cluster Validation Report are unaffected. It's saved with the rest of the document, so it stays set the way you left it next time you open the file.</p>
         </div>
         <div class="help-faq-item">
           <div class="q">What does the Standalone / Networked addressing toggle do?</div>
@@ -1681,7 +1959,7 @@
         </div>
         <div class="help-faq-item">
           <div class="q">What is "Show granular calculation detail," and where do I find it?</div>
-          <p class="a">It's a per-sheet checkbox at the bottom of the results panel, below the Bill of Materials. Turning it on reveals a full formula breakdown for that sheet — module and supply load (including every individual module's own current draw, not just the Displays/Detectors subtotals), standby/alarm capacity, safety margin and temperature de-rating, and battery/supply sizing — each line showing both the formula and the actual numbers behind it, so the math is fully auditable rather than just the final figures. It's for sheets where that level of transparency is genuinely needed (an AHJ review, a second set of eyes checking the math), not something every sheet needs on by default. When it's on, that sheet prints an additional page (after the calculation sheet and Bill of Materials) containing the same breakdown — it never affects whether the calculation sheet itself fits on one page, since the detail page is entirely separate. Off by default; saved per sheet with the rest of the document.</p>
+          <p class="a">It's a per-sheet checkbox at the bottom of the results panel, below the Bill of Materials. Turning it on reveals a full formula breakdown for that sheet — module and supply load (including every individual module's own current draw, not just the Displays/Detectors subtotals), standby/alarm capacity, safety margin and temperature de-rating, and battery/supply sizing — each line showing both the formula and the actual numbers behind it, so the math is fully auditable rather than just the final figures. It's for sheets where that level of transparency is genuinely needed (an AHJ review, a second set of eyes checking the math), not something every sheet needs on by default. Off by default; saved per sheet with the rest of the document. For printouts and exports use the <b>Detail level</b> in File → Print / Export… instead: <b>Standard</b> adds the formulas with values, <b>Full</b> adds appendix pages after each sheet with every step (formula, values substituted, result, reference) — available in PDF, Word, HTML and the Excel Detail sheet whether or not this checkbox is on.</p>
         </div>
         <div class="help-faq-item">
           <div class="q">How does the battery size selection work?</div>
@@ -1727,8 +2005,8 @@
 //   rrr = revision counter — auto-incremented by 1 per distinct logical
 //         change made in chat, until the minor version above is next revised
 //   YYMMDD = the actual calendar date the revision was made
-const APP_MAJOR = "01";
-const APP_MINOR = "06";
+const APP_MAJOR = "02";
+const APP_MINOR = "00";
 const APP_AUTHOR = "The BMG";
 
 // Running amendment log. Each entry is one distinct logical change.
@@ -1796,7 +2074,7 @@ const AMENDMENTS = [
   { rev: "007", minor: "05", date: "261002", desc: "Replaced unreliable native <select> option popups (Chromium/Electron still painted light OS menus with light text despite 01.05.006 CSS) with custom white-on-black listboxes for all calculator selects — Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and the rest. Native selects stay in the DOM (visually hidden) so value/change/save-load/needs-entry/validation keep working; open menus use fixed positioning to escape .location overflow clipping. Verified open menus via browser screenshots." },
   { rev: "008", minor: "05", date: "261002", desc: "Sheet header layout: Power Supply Name and Location now occupy a full row above Design Basis / Standby / Alarm / Ambient Temperature (previously side-by-side with those controls, so long PS titles encroached on the Design Basis dropdown). Design Basis control widened (flex min ~400px) so the full selected label shows for every preset — including NFPA 72 + NFPA 110 Generator Backup (Non-Voice/Voice) — without truncating into adjacent fields. Custom calc-selects, needs-entry, save/load, and print unchanged." },
   { rev: "009", minor: "05", date: "261002", desc: "Fixed tall custom calc-select menus (Fan Speed, Addresses, and any other long list) that could not scroll: a capture-phase window scroll listener was closing the menu on the list's own scrollbar drag and mouse-wheel scroll. Listener now ignores scrolls that originate from the open list; outside-click dismiss also treats pointer-down inside the open list's bounding box as inside; option commit moved from mousedown to click and lists use scrollbar-gutter:stable so scrollbar/gutter drags are not stolen by option hit-targets (overlay scrollbars). Also added keyboard navigation while a menu is open — Arrow Up/Down, Page Up/Down, Home/End move the highlight (with scroll-into-view), Enter/Space commit, Escape closes — and stopped ArrowDown on the closed-state button from toggling an already-open menu shut." },
-  { rev: "000", minor: "06", date: "261013", desc: "Minor version bumped to 01.06 per Brent; revision counter restarted at 000. Menu bar (File / Edit / View / Help, keyboard accessible, white-on-black) replaces the crowded toolbar, with a short quick-action row (Import .pl, + Add Location, Save As…, Print, Auto-Save indicator); every existing command is still reachable. New Import .pl wizard: battery settings first, multi-file pick with per-Area/Group selection and metric-to-feet conversion, rename table with {project} {file} {area} {name} {##} pattern (remembered), live 16-character counter, short-name suggestions and duplicate flags, then power-supply assignment that enforces at least one supply per Area/Group, no supply across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah per supply, seeded from PSU positions in the file or 3 ft plan-view clustering; devices outside any 3 ft cluster or file PSU are not auto-assigned but wait in a per-Area/Group Unassigned tray with a prompt to group them to a power supply (drag, Move to…, + Add power supply, or the optional Pack into fewest), and Create sheets stays blocked with \"N detectors still unassigned\" until the tray is empty and every rule passes (re-imported new devices also land in the tray). One sheet per supply with type, zone name, fan speed and display model filled in; addresses stay highlighted. Linked .pl tracking saved in the calc file (name, size, modified date, SHA-256, per-detector fingerprints mapped to sheet/row) with Check link, a change banner, a diff, and re-import that never changes addresses or hand edits without confirmation. Help: Quick Start steps 17–19, a new FAQ and How Do I… topics." },
+{ rev: "000", major: "02", minor: "00", date: "261013", desc: "Major version 02.00 per Brent; revision counter restarted at 000. Folds in the unreleased 01.06.000 work, so this one entry covers it all. <b>Calculation math unchanged</b>: the same scenarios give identical Ah and BOM results to 01.05.009. <b>New layout</b> in the PipeCAD dark theme: a menu bar (File / Edit / View / Help, keyboard accessible, white-on-black) and a quick-action row (sidebar toggle, Import .pl, + Add Location, Save As…, Print, Auto-Save indicator, results-panel toggle) replace the old toolbar; a collapsible Project Settings bar shows a one-line summary when collapsed and names the sheet settings most sheets use, with an override badge on sheets that differ; a left sidebar lists power supply sheets grouped by Area/Group with status dots (complete, needs entry, error, overridden) and + Add power supply; the center shows one sheet at a time with a compact module table, an n/16 character counter on every zone name (red over 16) and the ModuLaser 16-character note; a pinned right panel shows live results (required Ah against the selected battery and the 65 Ah limit, PASS / FAIL / INCOMPLETE, load breakdown, clusters and the sheet's real validation messages). Panels collapse on narrow screens; View menu toggles them. <b>Import .pl wizard</b> (from 01.06.000): battery settings first, multi-file pick with per-Area/Group selection and metric-to-feet conversion, rename table with {project} {file} {area} {name} {##} pattern (remembered), live 16-character counter, short-name suggestions and duplicate flags, then power-supply assignment (at least one supply per Area/Group, none across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah per supply), seeded from PSU positions in the file or 3 ft plan-view clusters; other devices wait in a per-Area/Group Unassigned tray (drag, Move to…, + Add power supply, or the optional Pack into fewest) and Create sheets stays blocked until it is empty. Step 4 restyled to the new theme, behaviour unchanged. <b>Linked .pl files</b>: name, size, date, SHA-256 and per-device fingerprints saved in the calc, with Check link, a change banner, a diff and a re-import that never changes addresses or hand edits without confirmation. <b>Print / Export</b> (File → Print / Export…, Print in the quick row, Ctrl+P): one dialog with a live 8.5 × 11 preview, sheet scope, detail level (Summary / Standard / Full), summary-page and BOM options, and PDF, Word (.docx), HTML and Excel buttons, all built offline with no CDN. The printout uses the KGS print palette: a project summary page with every PSU's Area/Group, required Ah, battery and PASS/FAIL, then one letter page per PSU with header, capacity gauge (required Ah, selected battery and 65 Ah marks, margin and de-rating shaded), PASS/FAIL stamp, mini cluster diagram, module table, settings used and BOM; Full adds calculation appendix pages after each sheet (formula, values substituted, result, reference). <b>Excel</b>: a CAD Schedule sheet with one compact table per PSU (Zone, Type, Fan speed, Address, Standby mA, Alarm mA, footer Required Ah | Battery | PASS/FAIL; thin borders, fixed widths, no merged cells, no fills) for pasting onto CAD drawings, and a Detail sheet that follows the detail level with outline row groups per PSU and per step. <b>Help</b> rewritten for the new layout: Quick Start, How Do I…, FAQ, tooltips and this log." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -1822,7 +2100,7 @@ function toggleCalcDetail(loc){
 
 function renderRevisionInfo(){
   const latest = AMENDMENTS[AMENDMENTS.length - 1];
-  const revShort = `${APP_MAJOR}.${latest.minor || APP_MINOR}.${latest.rev}`;
+  const revShort = `${latest.major || APP_MAJOR}.${latest.minor || APP_MINOR}.${latest.rev}`;
   const fullRev = `${revShort}_${latest.date}`;
 
   const revCell = document.getElementById('app-revision-cell');
@@ -1839,7 +2117,7 @@ function renderRevisionInfo(){
     // stays accurate after a later minor-version bump — entries without one predate 01.01
     // and are correctly labeled 00.
     amendBody.innerHTML = AMENDMENTS.slice().reverse().map(a =>
-      `<tr><td class="mono-inline">${APP_MAJOR}.${a.minor || "00"}.${a.rev}</td><td>${formatDateYYMMDD(a.date)}</td><td>${a.desc}</td></tr>`
+      `<tr><td class="mono-inline">${a.major || "01"}.${a.minor || "00"}.${a.rev}</td><td>${formatDateYYMMDD(a.date)}</td><td>${a.desc}</td></tr>`
     ).join('');
   }
 }
@@ -5130,7 +5408,7 @@ function renderFlags(loc, flags){
 }
 
 document.getElementById("add-location-btn").addEventListener("click", addLocation);
-document.getElementById("export-xlsx-btn").addEventListener("click", exportToExcel);
+document.getElementById("export-xlsx-btn").addEventListener("click", () => v2ExportXlsx());
 document.getElementById("cluster-report-btn").addEventListener("click", openReportModal);
 
 // Quick Start figures: if the user set a src="qs-N-name.png" on the <img>, use that.
@@ -5344,7 +5622,7 @@ const FACTORY_FIELD_DEFAULTS = [
 
 function runningRevisionFull(){
   const latest = AMENDMENTS[AMENDMENTS.length - 1];
-  return `${APP_MAJOR}.${latest.minor || APP_MINOR}.${latest.rev}_${latest.date}`;
+  return `${latest.major || APP_MAJOR}.${latest.minor || APP_MINOR}.${latest.rev}_${latest.date}`;
 }
 function runningRevisionTuple(){
   const latest = AMENDMENTS[AMENDMENTS.length - 1];
@@ -6008,10 +6286,66 @@ const HOWDOI_COMMON = [
   },
   {
     id: 'menubar',
-    title: 'Where did the toolbar buttons go?',
-    keywords: 'menu bar toolbar file edit view help where button moved',
-    blurb: 'They are in the menu bar: File (New, Open/Import Calc, Import .pl, Linked .pl files, Save As, Export to Excel, Print, Print BOM), Edit (+ Add Location, Clear, Confirm defaults, Clear saved data), View (Cluster Report), Help (Help, How Do I…, Revision log). Import .pl, + Add Location, Save As and Print are also in the quick row.',
+    title: 'Find a command (menu bar and quick row)',
+    keywords: 'menu bar toolbar file edit view help where button moved quick row',
+    blurb: 'Menu bar: File (New, Open / Import Calc, Import .pl, Linked .pl files, Save As, Export to Excel, Print / Export…, Print BOM), Edit (+ Add Location, Clear, Confirm defaults, Clear saved data), View (Cluster Report, Project Settings bar, Sheet sidebar, Results panel), Help (Help, How Do I…, Revision log). Quick row: ☰ sidebar, Import .pl, + Add Location, Save As…, Print, Auto-Save indicator, ◧ results panel.',
     target: 'qs-step-menubar',
+    common: true,
+  },
+  {
+    id: 'layout',
+    title: 'Find my way around the new screen',
+    keywords: 'layout screen sidebar results panel project settings 02.00 new design',
+    blurb: 'Top: menu bar and quick row. Then the collapsible Project Settings bar. Left: the sheet sidebar grouped by Area/Group with status dots. Center: the selected sheet. Right: live results. ☰ and ◧ (or View) show or hide the side panels.',
+    target: 'qs-step-layout',
+    common: true,
+  },
+  {
+    id: 'sidebar',
+    title: 'Switch sheets / read the status dots',
+    keywords: 'sidebar sheet list status dot green amber red blue add power supply area group',
+    blurb: 'Click a sheet in the left sidebar to show it. Green = complete, amber = needs entry, red = error (count shown), blue = overrides the project settings. + Add power supply adds a sheet.',
+    target: 'qs-step-sidebar',
+    common: true,
+  },
+  {
+    id: 'project-settings',
+    title: 'Project Settings and per-sheet overrides',
+    keywords: 'project settings bar collapse summary override badge design basis standby alarm',
+    blurb: 'Click Project Settings to collapse or expand the header bar. Sheets whose Design Basis, standby, alarm, temperature or margin differ from what most sheets use show an override badge and a blue sidebar dot.',
+    target: 'qs-step-project-settings',
+    common: true,
+  },
+  {
+    id: 'results-panel',
+    title: 'Read the results panel (PASS / FAIL)',
+    keywords: 'results panel pass fail incomplete gauge required ah battery 65 load breakdown',
+    blurb: 'The right panel shows required Ah with a gauge (load, shaded margin & de-rating, battery mark, 65 Ah limit), PASS / FAIL / INCOMPLETE, battery and hardware, load breakdown, clusters and the sheet\u2019s validation messages.',
+    target: 'qs-step-results',
+    common: true,
+  },
+  {
+    id: 'print-export',
+    title: 'Print or export to PDF, Word, HTML or Excel',
+    keywords: 'print export pdf word docx html excel preview letter page dialog ctrl+p',
+    blurb: 'File → Print / Export…, Print in the quick row, or Ctrl+P. Pick sheets, detail level, summary page and BOM, check the live preview, then click PDF, Word (.docx), HTML or Excel (.xlsx). Each power supply fits one letter page.',
+    target: 'qs-step-print-export',
+    common: true,
+  },
+  {
+    id: 'detail-levels',
+    title: 'Choose a detail level (Summary / Standard / Full)',
+    keywords: 'detail level summary standard full formulas appendix math granular calculation',
+    blurb: 'Summary = results only. Standard = formulas with values. Full = appendix pages after each sheet with every step (formula, values, result, reference), per-module currents, de-rating and BOM. The Excel Detail sheet follows the same level with expandable groups.',
+    target: 'qs-step-detail-levels',
+    common: true,
+  },
+  {
+    id: 'cad-paste',
+    title: 'Paste the schedule onto an AutoCAD drawing',
+    keywords: 'cad autocad schedule paste excel table drawing',
+    blurb: 'Export to Excel, open the CAD Schedule sheet, copy one power supply\u2019s table and use Paste Special in AutoCAD (AutoCAD Entities for a table). No merged cells or fills, thin borders, fixed widths.',
+    target: 'qs-step-cad-paste',
     common: true,
   },
   {
@@ -6050,7 +6384,7 @@ const HOWDOI_COMMON = [
     id: 'save-as',
     title: 'Save As…',
     keywords: 'save as download html portable file',
-    blurb: 'Save As… downloads a self-contained .html with every sheet and field embedded so you can reopen or share it. Prefer this over Autosave when you need a portable copy.',
+    blurb: 'Save As… (quick row or File) downloads a self-contained .html with every sheet and field embedded so you can reopen or share it. Prefer this over Autosave when you need a portable copy.',
     target: 'qs-step-save-export',
     common: true,
   },
@@ -6058,16 +6392,16 @@ const HOWDOI_COMMON = [
     id: 'autosave',
     title: 'Autosave',
     keywords: 'autosave auto-save localstorage browser',
-    blurb: 'Autosave stores work in this browser’s local storage only — convenient for reloads on the same device, but not portable. Use Save As… for a shareable file.',
+    blurb: 'Turn Auto-Save on in the Project Settings bar. It stores work in this browser’s local storage only — convenient for reloads on the same device, but not portable. Use Save As… for a shareable file.',
     target: 'qs-step-save-export',
     common: true,
   },
   {
     id: 'export-excel',
     title: 'Export to Excel',
-    keywords: 'export excel xlsx spreadsheet workbook',
-    blurb: 'Export to Excel builds a multi-sheet .xlsx workbook — one worksheet per power supply — mirroring module tables and results for handoff outside the calculator.',
-    target: 'qs-step-save-export',
+    keywords: 'export excel xlsx spreadsheet workbook cad schedule detail',
+    blurb: 'File → Export to Excel (or Excel in Print / Export) saves a workbook with a CAD Schedule sheet (one compact table per power supply) and a Detail sheet that follows the detail level, with expandable row groups.',
+    target: 'qs-step-cad-paste',
     common: true,
   },
   {
@@ -7226,7 +7560,6 @@ function wireMenuBar(){
   on('import-pl-btn', () => openPlWizard());
   on('linked-pl-btn', () => plOpenLinks());
   on('save-as-menu-btn', () => openSaveAsModal('copy'));
-  on('print-menu-btn', () => window.print());
   on('add-location-menu-btn', () => addLocation());
   on('revision-log-menu-btn', () => { document.getElementById('help-overlay').classList.add('open'); buildHowDoIIndex(); const t = document.getElementById('help-revisionlog'); if (t) t.scrollIntoView({ block: 'start' }); });
 }
@@ -7571,9 +7904,723 @@ if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.
 })();
 
 
+/* ===================== 02.00.000 — shared read-only sheet model =====================
+   Everything here READS values the calculator already computed and wrote to the sheet DOM
+   (recalcLocationInner). Nothing in this block changes the calculation. */
+function v2Num(t){ const m = String(t == null ? '' : t).replace(/,/g, '').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : NaN; }
+function v2Txt(locEl, sel){ const e = locEl.querySelector(sel); return e ? e.textContent.replace(/\s+/g, ' ').trim() : ''; }
+function v2Val(locEl, sel){ const e = locEl.querySelector(sel); return e ? String(e.value == null ? '' : e.value).trim() : ''; }
+function v2SelText(locEl, sel){ const e = locEl.querySelector(sel); return e && e.selectedOptions && e.selectedOptions[0] ? e.selectedOptions[0].text.trim() : ''; }
+function v2Esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function v2CodeRef(basisKey){
+  const p = DESIGN_BASIS_PRESETS[basisKey];
+  if (!p || !p.citation) return 'Design Basis: ' + (basisKey || 'Custom');
+  return p.citation.split(' — ')[0].replace(/^Complies with /, '');
+}
+function v2SheetModel(locEl){
+  const g = s => v2Txt(locEl, s);
+  const modeEl = locEl.querySelector('.mode-radio:checked');
+  const mode = modeEl ? modeEl.value : 'builtin';
+  const subEl = locEl.querySelector('.submode-radio:checked');
+  const submode = mode === 'thirdparty' ? (subEl ? subEl.value : 'custom') : null;
+  const exportMode = mode === 'thirdparty' && submode === 'export';
+  const invalid = locEl.classList.contains('has-invalid-calc');
+  const withheld = locEl.classList.contains('recommendations-withheld');
+  const requiredAh = v2Num(g(exportMode ? '.export-required-ah' : '.required-ah'));
+  const psRequired = parseInt(g(exportMode ? '.export-ps-required' : '.ps-required'), 10) || 1;
+  const ahPerSupply = exportMode ? requiredAh / psRequired : v2Num(g('.ah-per-supply'));
+  let batteryAh = null, batteryLabel = '—';
+  if (mode === 'builtin'){
+    batteryAh = v2Num(g('.gauge-max-label'));
+    const model = g('.cd-battery-model-detail');
+    batteryLabel = /12V/.test(model) ? model.replace(/ rated\)/, ')') : (isFinite(batteryAh) ? batteryAh + ' Ah' : '—');
+  } else if (!exportMode){
+    batteryAh = parseFloat(v2Val(locEl, '.tp-battery-ah')) || null;
+    const tpm = v2Val(locEl, '.tp-battery-model');
+    batteryLabel = (tpm ? tpm + ' · ' : '') + (batteryAh ? batteryAh + ' Ah' : '—');
+  } else {
+    batteryLabel = 'Third-party (loads exported)';
+  }
+  const invalidList = Array.from(locEl.querySelectorAll('.icb-list li')).filter(li => !li.closest('[hidden]')).map(li => li.textContent.trim()).filter(Boolean);
+  const flags = Array.from(locEl.querySelectorAll('.flags-list li')).filter(li => !li.closest('[hidden]')).map(li => li.textContent.trim()).filter(Boolean);
+  const needs = Array.from(locEl.querySelectorAll('.field-needs')).filter(e => !e.closest('[hidden]')).length;
+  let status = 'pass';
+  if (invalid || psRequired > 1 || (!exportMode && requiredAh > CHARGER_MAX_AH) || (batteryAh && ahPerSupply > batteryAh + 1e-9)) status = 'fail';
+  else if (withheld) status = 'incomplete';
+  const dot = (invalid || flags.length) ? 'error' : (needs ? 'needs' : 'complete');
+  const basisKey = v2Val(locEl, '.design-basis-select');
+  const preset = DESIGN_BASIS_PRESETS[basisKey];
+  const bs = !!(preset && preset.formula === 'bs5839');
+  const edRow = locEl.querySelector('.nfpa72-edition-select');
+  const settings = [
+    ['Design Basis', v2SelText(locEl, '.design-basis-select')],
+    ['Standby', v2Val(locEl, '.standby-hours') + ' h'],
+    ['Alarm', v2Val(locEl, '.alarm-minutes') + ' min'],
+    ['Ambient temperature', v2SelText(locEl, '.temperature-select')],
+    ['Safety margin', exportMode ? v2SelText(locEl, '.export-margin-select') : v2SelText(locEl, '.margin-select')],
+  ];
+  if (edRow && !edRow.closest('[hidden]') && !bs && basisKey !== 'Custom') settings.push(['NFPA 72 edition', v2SelText(locEl, '.nfpa72-edition-select')]);
+  if (bs) settings.push(['De-rating factor (D)', v2Val(locEl, '.derating-input')]);
+  settings.push(['Power supply mode', mode === 'builtin' ? 'Edwards A/BPS' : (exportMode ? 'Third-party (export loads)' : 'Third-party (custom loads)')]);
+  if (mode === 'builtin') settings.push(['Power supply capacity', v2SelText(locEl, '.ps-capacity-select')]);
+  settings.push(['Addressing', (locEl.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone' ? 'Standalone' : 'Networked']);
+  const modules = Array.from(locEl.querySelectorAll('[data-role="module"]')).map(r => {
+    const type = r.querySelector('.type-select').value;
+    const isDet = (MODULE_TYPES[type] || {}).kind === 'detector';
+    const ma = v2Num(r.querySelector('.module-ma').textContent);
+    return { addr: r.querySelector('.module-address').value || '', zone: r.querySelector('.zone-name').value.trim(), type, model: (MODULE_TYPES[type] || {}).model || '',
+      kind: (MODULE_TYPES[type] || {}).kind || '', fan: isDet ? (r.querySelector('.fanspeed-select').value || '') : '', ma: isFinite(ma) ? ma : 0,
+      cluster: (r.querySelector('.cluster-print-text') || {}).textContent || '', power: ((r.querySelector('.power-print-text') || {}).textContent || '').trim() };
+  });
+  const clean = !invalid && !withheld;
+  let bom = null; try { bom = clean ? buildBOM(locEl) : null; } catch (e) { bom = null; }
+  const cd = s => g(s);
+  return {
+    loc: locEl.dataset.loc, el: locEl, idx: String(locEl.dataset.loc).padStart(2, '0'),
+    psName: v2Val(locEl, '.ps-name'), area: v2Val(locEl, '.ps-location'), label: v2Val(locEl, '.location-name'),
+    mode, submode, exportMode, invalid, withheld, invalidList, flags, needs, status, dot, clean,
+    requiredAh, psRequired, ahPerSupply, batteryAh, batteryLabel,
+    initialAh: v2Num(g(exportMode ? '.cd-initial-ah-detail' : '.initial-ah')), standbyAh: v2Num(g(exportMode ? '.export-standby-ah' : '.standby-ah')), alarmAh: v2Num(g(exportMode ? '.export-alarm-ah' : '.alarm-ah')),
+    moduleMa: v2Num(g('.module-load-ma')), psMa: v2Num(g('.ps-load-ma')), totalMa: v2Num(g('.total-ma')),
+    hwSupply: g('.hw-supply'), hwEnclosure: g('.hw-enclosure'), hwBattery: g('.hw-battery'),
+    basisKey, bs, codeRef: v2CodeRef(basisKey), citation: clean && preset && preset.citation ? preset.citation : '',
+    settings, modules, bom, clusters: (typeof computeClustersSupported === 'function' ? computeClustersSupported(locEl) : []),
+    cd: {
+      displays: cd('.cd-displays-ma'), detectors: cd('.cd-detectors-ma'), quiescent: cd('.cd-quiescent-ma'), aux: cd('.cd-aux-ma'), auxF: cd('.cd-aux-formula'),
+      total: cd('.cd-total-ma-detail'), standby: cd('.cd-standby-ah-detail'), standbyF: cd('.cd-standby-formula'), alarm: cd('.cd-alarm-ah-detail'), alarmF: cd('.cd-alarm-formula'),
+      initial: cd('.cd-initial-ah-detail'), margin: cd('.cd-margin-ah-detail'), marginF: cd('.cd-margin-formula'), temp: cd('.cd-temp-mult-detail'), tempF: cd('.cd-temp-formula'),
+      required: cd('.cd-required-ah-detail'), battery: cd('.cd-battery-model-detail'), supplies: cd('.cd-supplies-detail'), suppliesF: cd('.cd-supplies-formula'), perSupply: cd('.cd-ah-per-supply-detail'),
+      perModule: Array.from(locEl.querySelectorAll('.cd-permodule-row')).map(r => [v2Txt(r, '.cd-label'), v2Txt(r, '.cd-formula'), v2Txt(r, '.cd-value')]),
+      deratingHint: g('.derating-hint'),
+    },
+  };
+}
+function v2AllModels(scope){
+  const els = scope === 'current' ? [getCurrentLocationEl()].filter(Boolean) : Array.from(document.querySelectorAll('.location'));
+  return els.map(v2SheetModel);
+}
+function v2PsTag(m){ return m.psName || ('Sheet ' + m.idx); }
+function v2StatusWord(s){ return s === 'pass' ? 'PASS' : s === 'fail' ? 'FAIL' : 'INCOMPLETE'; }
+function v2Fmt(n, d){ return isFinite(n) ? Number(n).toFixed(d == null ? 2 : d) : '—'; }
+
+/* Calculation steps by detail level. Every value string comes from the sheet's own
+   granular-detail fields (written by recalcLocationInner), so it always matches the screen. */
+const V2_LEVELS = { summary: 'Summary', standard: 'Standard', full: 'Full' };
+function v2CalcSteps(m, level){
+  if (level === 'summary') return [];
+  const c = m.cd, ref = m.codeRef, ptRef = 'ModuLaser current-draw reference (24 V, this calculator)';
+  const tempSel = (m.settings.find(s => s[0] === 'Ambient temperature') || [])[1] || '';
+  const steps = [];
+  const load = { title: '1. Module & supply load', rows: [] };
+  if (level === 'full'){
+    m.modules.forEach((mod, i) => {
+      const isDet = mod.kind === 'detector';
+      load.rows.push({ label: `I module ${i + 1} — ${mod.zone || '(no zone)'} [Addr ${mod.addr || '—'}]`,
+        sym: isDet ? 'I = FAN_SPEED_MA[fan speed]' : `I = ${mod.type} current`,
+        sub: isDet ? `I = FAN_SPEED_MA[${mod.fan || '—'}]` : `I = ${mod.model}`, res: `${mod.ma} mA`, ref: ptRef });
+    });
+  }
+  load.rows.push({ label: 'Displays subtotal', sym: 'I_disp = Σ display currents', sub: 'I_disp = ' + (m.modules.filter(x => x.kind !== 'detector').map(x => x.ma).join(' + ') || '0') + ' mA', res: c.displays, ref: ptRef });
+  load.rows.push({ label: 'Detectors subtotal', sym: 'I_det = Σ detector currents', sub: 'I_det = ' + (m.modules.filter(x => x.kind === 'detector').map(x => x.ma).join(' + ') || '0') + ' mA', res: c.detectors, ref: ptRef });
+  load.rows.push({ label: 'Quiescent load', sym: 'I_q = power supply quiescent draw', sub: 'I_q = ' + c.quiescent, res: c.quiescent, ref: m.mode === 'builtin' ? 'Edwards A/BPS data (this calculator)' : 'Third-party entry' });
+  load.rows.push({ label: 'AUX load', sym: 'I_aux = n_aux × I_per_circuit', sub: 'I_aux = ' + c.auxF, res: c.aux, ref: m.mode === 'builtin' ? 'Edwards A/BPS data (this calculator)' : 'Third-party entry' });
+  load.rows.push({ label: 'Total load', sym: 'I_total = I_disp + I_det + I_q + I_aux', sub: `I_total = ${c.displays} + ${c.detectors} + ${c.quiescent} + ${c.aux}`, res: c.total, ref: '' });
+  if (level === 'full') steps.push(load);
+  const cap = { title: (level === 'full' ? '2' : '1') + '. Standby & alarm capacity', rows: [
+    { label: 'Standby Ah', sym: 'Standby Ah = I_total × T_standby', sub: 'Standby Ah = ' + c.standbyF, res: c.standby, ref },
+    { label: 'Alarm Ah', sym: m.bs ? 'Alarm Ah = I_total × T_alarm × D' : 'Alarm Ah = I_total × T_alarm', sub: 'Alarm Ah = ' + c.alarmF, res: c.alarm, ref },
+    { label: 'Initial Ah', sym: 'Initial Ah = Standby Ah + Alarm Ah', sub: `Initial Ah = ${c.standby} + ${c.alarm}`, res: c.initial, ref },
+  ] };
+  if (m.bs && level === 'full') cap.rows.push({ label: 'De-rating factor D', sym: 'D = 1 if (C20 ÷ 20) ≥ I_alarm, else 1.75', sub: 'D = ' + (m.settings.find(s => s[0] === 'De-rating factor (D)') || [, ''])[1] + (c.deratingHint ? ' — ' + c.deratingHint : ''), res: (m.settings.find(s => s[0] === 'De-rating factor (D)') || [, ''])[1], ref });
+  steps.push(cap);
+  steps.push({ title: (level === 'full' ? '3' : '2') + '. Safety margin & temperature', rows: [
+    { label: 'Margin-adjusted Ah', sym: m.bs ? 'C = Initial Ah × 1.25' : 'C = Initial Ah × (1 + margin)', sub: 'C = ' + c.marginF, res: c.margin, ref },
+    { label: 'Temperature multiplier', sym: 'k_T = TEMPERATURE_MULTIPLIERS[ambient]', sub: `k_T at ${tempSel} — ${c.tempF}`, res: c.temp, ref: 'Calculator de-rating table (general guidance)' },
+    { label: 'Required battery capacity', sym: 'Required Ah = C × k_T', sub: `Required Ah = ${c.margin} × ${c.temp.replace('×', '')}`, res: c.required, ref },
+  ] });
+  steps.push({ title: (level === 'full' ? '4' : '3') + '. Battery & supply sizing', rows: [
+    { label: 'Selected battery', sym: 'Battery = smallest catalog size ≥ desired (never smaller)', sub: 'Battery = ' + c.battery, res: c.battery, ref: m.mode === 'builtin' ? 'Edwards battery catalog (this calculator)' : 'Third-party entry' },
+    { label: 'Power supplies required', sym: 'N = ceil(Required Ah ÷ battery Ah)', sub: 'N = ' + c.suppliesF, res: c.supplies, ref: '' },
+    { label: 'Ah per supply', sym: 'Ah per supply = Required Ah ÷ N', sub: `Ah per supply = ${c.required} ÷ ${c.supplies}`, res: c.perSupply, ref: '' },
+    { label: 'Charger / battery limit', sym: 'Ah per supply ≤ 65 Ah', sub: `${c.perSupply} ≤ ${CHARGER_MAX_AH} Ah`, res: (m.ahPerSupply <= CHARGER_MAX_AH ? 'OK' : 'Exceeds'), ref: 'Largest available battery / charger (this calculator)' },
+  ] });
+  if (m.exportMode) steps.forEach(s => s.rows.forEach(r => { if (/Selected battery|Charger/.test(r.label)) r.res = r.res; }));
+  return steps;
+}
+/* ===================== 02.00.000 — app shell: sidebar, results panel, project settings ===================== */
+const V2_KEYS = [
+  ['basis', '.design-basis-select', v => v],
+  ['standby', '.standby-hours', v => 'Standby ' + v + ' h'],
+  ['alarm', '.alarm-minutes', v => 'Alarm ' + v + ' min'],
+  ['temp', '.temperature-select', v => 'Ambient ' + v + '°F'],
+  ['margin', '.margin-select', v => 'Margin ' + Math.round(parseFloat(v) * 100) + '%'],
+];
+function v2ProjectBasis(){
+  const locs = Array.from(document.querySelectorAll('.location'));
+  const out = {};
+  V2_KEYS.forEach(([k, sel]) => {
+    const counts = {}; let best = '', bn = -1;
+    locs.forEach(l => { const v = v2Val(l, sel); counts[v] = (counts[v] || 0) + 1; if (counts[v] > bn){ bn = counts[v]; best = v; } });
+    out[k] = best;
+  });
+  return out;
+}
+function v2Overrides(locEl, basis){
+  if (document.querySelectorAll('.location').length < 2) return [];
+  return V2_KEYS.filter(([k, sel]) => v2Val(locEl, sel) !== basis[k]).map(([k, sel, f]) => f(v2Val(locEl, sel)));
+}
+let v2RefreshTimer = null;
+function v2ScheduleRefresh(){ clearTimeout(v2RefreshTimer); v2RefreshTimer = setTimeout(v2Refresh, 60); }
+function v2Refresh(){
+  const cur = getCurrentLocationEl();
+  const basis = v2ProjectBasis();
+  const models = Array.from(document.querySelectorAll('.location')).map(el => { const m = v2SheetModel(el); m.overrides = v2Overrides(el, basis); return m; });
+  v2RenderSidebar(models, cur);
+  v2RenderResults(models.find(m => m.el === cur));
+  v2RenderSettingsSummary(models, basis);
+  models.forEach(m => {
+    let b = m.el.querySelector('.v2-or-badge');
+    const row = m.el.querySelector('.location-head-ps-row');
+    if (!b && row){ b = document.createElement('span'); b.className = 'v2-or-badge'; row.appendChild(b); }
+    if (b){ b.hidden = !m.overrides.length; b.textContent = 'Overrides project settings: ' + m.overrides.join(' · '); b.title = 'This sheet differs from the setting most sheets use (shown in Project Settings).'; }
+    v2EnsureZoneCounters(m.el);
+  });
+}
+function v2RenderSidebar(models, cur){
+  const list = document.getElementById('sb-list'); if (!list) return;
+  const groups = []; const byName = {};
+  models.forEach(m => { const k = m.area || 'No Area/Group'; if (!byName[k]){ byName[k] = []; groups.push(k); } byName[k].push(m); });
+  const dotTitle = { complete: 'Complete', needs: 'Needs entry', error: 'Error — see validation messages' };
+  list.innerHTML = models.length ? groups.map(gname => `<div class="sb-group"><div class="sb-gh" title="Area/Group (Power Supply Location)">${v2Esc(gname)}</div>${byName[gname].map(m =>
+    `<button type="button" class="sb-item${m.el === cur ? ' current' : ''}" data-loc="${m.loc}" title="${v2Esc(v2PsTag(m) + ' — ' + dotTitle[m.dot] + (m.overrides.length ? ' · overrides: ' + m.overrides.join(', ') : ''))}">
+      <span class="dot st-${m.dot}" aria-label="${dotTitle[m.dot]}"></span>${m.overrides.length ? '<span class="dot st-overridden" aria-label="Overridden"></span>' : ''}
+      <span class="sb-name">${v2Esc(v2PsTag(m))}</span>
+      ${m.flags.length + m.invalidList.length ? `<span class="sb-cnt">${m.flags.length + m.invalidList.length}</span>` : ''}
+      <span class="sb-ah">${isFinite(m.requiredAh) ? v2Fmt(m.requiredAh, 1) + ' Ah' : ''}</span></button>`).join('')}</div>`).join('')
+    : '<p class="sb-empty">No power supply sheets yet. Click <b>+ Add power supply</b> or <b>Import .pl</b>.</p>';
+  const c = document.getElementById('sb-count'); if (c) c.textContent = models.length + (models.length === 1 ? ' sheet' : ' sheets');
+}
+function v2GaugeSvgDark(m){
+  const req = isFinite(m.ahPerSupply) ? m.ahPerSupply : 0, bat = m.batteryAh || 0, init = isFinite(m.initialAh) ? m.initialAh / (m.psRequired || 1) : 0;
+  const max = Math.ceil(Math.max(CHARGER_MAX_AH, req, bat) * 1.08 / 10) * 10, W = 280, x = v => 4 + (W - 8) * Math.min(v, max) / max;
+  const col = m.status === 'pass' ? '#3fb950' : m.status === 'fail' ? '#f85149' : '#d29922';
+  return `<svg viewBox="0 0 ${W} 46" width="100%" role="img" aria-label="Capacity gauge">
+    <rect x="4" y="14" width="${W - 8}" height="12" rx="3" fill="#222b36"/>
+    <rect x="4" y="14" width="${Math.max(0, x(init) - 4)}" height="12" rx="3" fill="${col}"/>
+    <rect x="${x(init)}" y="14" width="${Math.max(0, x(req) - x(init))}" height="12" fill="${col}" opacity=".45"/>
+    ${bat ? `<line x1="${x(bat)}" x2="${x(bat)}" y1="8" y2="32" stroke="#3a9ad6" stroke-width="2"/><text x="${x(bat)}" y="6" fill="#3a9ad6" font-size="8" text-anchor="middle">${v2Fmt(bat, 1)} Ah battery</text>` : ''}
+    <line x1="${x(CHARGER_MAX_AH)}" x2="${x(CHARGER_MAX_AH)}" y1="10" y2="32" stroke="#f85149" stroke-width="2" stroke-dasharray="3 2"/>
+    <text x="${x(CHARGER_MAX_AH)}" y="42" fill="#f85149" font-size="8" text-anchor="middle">${CHARGER_MAX_AH} Ah max</text>
+    <text x="4" y="42" fill="#8b98a8" font-size="8">0 Ah</text></svg>`;
+}
+function v2RenderResults(m){
+  const p = document.getElementById('rp-body'); if (!p) return;
+  if (!m){ p.innerHTML = '<p class="rp-empty">Select a power supply sheet to see its live results.</p>'; return; }
+  const word = v2StatusWord(m.status);
+  const det = m.modules.filter(x => x.kind === 'detector').length, disp = m.modules.length - det;
+  p.innerHTML = `
+    <div class="rp-card rp-cap"><div class="rp-k">Required capacity${m.psRequired > 1 ? ' (per supply)' : ''} · ${v2Esc(v2PsTag(m))}</div>
+      <div class="rp-big">${v2Fmt(m.ahPerSupply, 1)}<small> Ah</small></div>
+      ${v2GaugeSvgDark(m)}
+      <div class="rp-legend"><span><i class="lg-solid"></i>load (standby + alarm)</span><span><i class="lg-soft"></i>margin &amp; de-rating</span></div>
+      <div class="rp-status st-${m.status}" id="rp-status">${word}${m.status === 'pass' ? ' — within selected battery and 65 Ah' : m.status === 'fail' ? ' — see messages below' : ' — finish the flagged entries'}</div></div>
+    <div class="rp-card"><div class="rp-k">Selected battery &amp; hardware</div>
+      <div class="rp-row"><span>Battery</span><b>${v2Esc(m.batteryLabel)}</b></div>
+      ${m.mode === 'builtin' ? `<div class="rp-row"><span>Power supply</span><b>${v2Esc(m.hwSupply || '—')}</b></div><div class="rp-row"><span>Enclosure</span><b>${v2Esc(m.hwEnclosure || '—')}</b></div>` : ''}
+      <div class="rp-row"><span>Supplies required</span><b>${m.psRequired}</b></div></div>
+    <div class="rp-card"><div class="rp-k">Load breakdown</div>
+      <div class="rp-row"><span>ModuLaser modules</span><b>${v2Fmt(m.moduleMa, 0)} mA</b></div>
+      <div class="rp-row"><span>Power supply (quiescent + AUX)</span><b>${v2Fmt(m.psMa, 0)} mA</b></div>
+      <div class="rp-row tot"><span>Total load</span><b>${v2Fmt(m.totalMa, 0)} mA</b></div>
+      <div class="rp-row"><span>Standby capacity</span><b>${v2Fmt(m.standbyAh)} Ah</b></div>
+      <div class="rp-row"><span>Alarm capacity</span><b>${v2Fmt(m.alarmAh)} Ah</b></div>
+      <div class="rp-row tot"><span>Required (margin, temp.)</span><b>${v2Fmt(m.requiredAh)} Ah</b></div></div>
+    <div class="rp-card"><div class="rp-k">Clusters on this supply</div>
+      <div class="rp-row"><span>Clusters</span><b>${m.clusters.length ? m.clusters.map(pad2).join(', ') : '—'}</b></div>
+      <div class="rp-row"><span>Displays · Detectors</span><b>${disp} · ${det}</b></div></div>
+    <div class="rp-msgs" id="rp-msgs">
+      ${m.invalidList.map(t => `<div class="rp-msg bad">${v2Esc(t)}</div>`).join('')}
+      ${m.flags.map(t => `<div class="rp-msg warn">${v2Esc(t)}</div>`).join('')}
+      ${m.needs ? `<div class="rp-msg info">${m.needs} field${m.needs === 1 ? '' : 's'} still need entry (blue outline).</div>` : ''}
+      ${!m.invalidList.length && !m.flags.length && !m.needs ? '<div class="rp-msg ok">No validation messages on this sheet.</div>' : ''}
+    </div>`;
+}
+function v2RenderSettingsSummary(models, basis){
+  const s = document.getElementById('proj-settings-summary'); if (!s) return;
+  const v = id => (document.getElementById(id) || {}).value || '';
+  const bits = [v('project-name-input') || 'Untitled project'];
+  if (v('prepared-by-input')) bits.push('Prepared by ' + v('prepared-by-input'));
+  if (v('project-date-input')) bits.push(v('project-date-input'));
+  if (v('network-number-input')) bits.push(v('network-number-input'));
+  if (v('building-input')) bits.push(v('building-input'));
+  const or = models.filter(m => m.overrides.length).length;
+  const bm = models[0] ? models[0].el : null;
+  const basisTxt = basis.basis ? `${basis.basis} · ${basis.standby} h / ${basis.alarm} min · ${basis.temp}°F · ${Math.round(parseFloat(basis.margin || 0) * 100)}% margin` : '';
+  s.innerHTML = v2Esc(bits.join(' · ')) + (basisTxt ? ` <span class="pss-basis">${v2Esc(basisTxt)}</span>` : '') + (or ? ` <span class="v2-or-chip">${or} sheet${or === 1 ? '' : 's'} override</span>` : '');
+  const d = document.getElementById('proj-basis-line');
+  if (d) d.innerHTML = basisTxt ? `<b>Sheet settings most sheets use:</b> ${v2Esc(basisTxt)}. Design Basis, standby, alarm, temperature and margin are set on each sheet; a sheet that differs shows an <span class="v2-or-chip">override</span> badge and a blue dot in the sidebar.${or ? ' Overriding: ' + models.filter(m => m.overrides.length).map(m => `<button type="button" class="linkish" data-goto="${m.loc}">${v2Esc(v2PsTag(m))}</button>`).join(', ') : ''}` : '';
+}
+function v2EnsureZoneCounters(locEl){
+  locEl.querySelectorAll('.zone-name').forEach(inp => {
+    let c = inp.parentNode.querySelector('.v2-cc');
+    if (!c){ c = document.createElement('span'); c.className = 'v2-cc'; inp.insertAdjacentElement('afterend', c); }
+    v2UpdateCounter(inp, c);
+  });
+  if (!locEl.querySelector('.v2-16-note')){
+    const t = locEl.querySelector('.add-zone-row');
+    if (t){ const n = document.createElement('p'); n.className = 'v2-16-note'; n.textContent = 'ModuLaser display shows 16 characters total, including spaces. The n/16 counter beside each zone turns red over 16.'; t.insertAdjacentElement('afterend', n); }
+  }
+}
+function v2UpdateCounter(inp, c){ const n = inp.value.length; c.textContent = n + '/16'; c.classList.toggle('over', n > 16); c.classList.toggle('full', n === 16); inp.classList.toggle('v2-over16', n > 16); }
+function v2SetPanel(which, open){
+  document.body.classList.toggle(which + '-closed', !open);
+  try { localStorage.setItem('ml_v2_' + which, open ? '1' : '0'); } catch (e) {}
+}
+function v2ToggleSettings(force){
+  const bar = document.getElementById('proj-settings');
+  const open = force == null ? bar.classList.contains('collapsed') : force;
+  bar.classList.toggle('collapsed', !open);
+  document.getElementById('proj-settings-toggle').setAttribute('aria-expanded', String(open));
+  try { localStorage.setItem('ml_v2_settings', open ? '1' : '0'); } catch (e) {}
+}
+function wireV2Shell(){
+  document.body.classList.add('v2');
+  const setTop = () => { const t = document.querySelector('.topbar.v2-top'); if (t) document.documentElement.style.setProperty('--v2-top', t.offsetHeight + 'px'); };
+  setTop(); window.addEventListener('resize', setTop);
+  const pref = k => { try { return localStorage.getItem('ml_v2_' + k); } catch (e) { return null; } };
+  if (pref('settings') === '0') v2ToggleSettings(false);
+  if (pref('sidebar') === '0') v2SetPanel('sidebar', false);
+  if (pref('results') === '0') v2SetPanel('results', false);
+  if (window.matchMedia && window.matchMedia('(max-width: 820px)').matches){ v2SetPanel('sidebar', false); v2SetPanel('results', false); }
+  document.getElementById('proj-settings-toggle').addEventListener('click', () => v2ToggleSettings());
+  document.getElementById('proj-settings').addEventListener('click', e => { const b = e.target.closest('[data-goto]'); if (b){ const el = document.getElementById('location-' + b.dataset.goto); if (el){ setCurrentLocation(el); v2Refresh(); } } });
+  document.getElementById('sb-list').addEventListener('click', e => {
+    const b = e.target.closest('.sb-item'); if (!b) return;
+    const el = document.getElementById('location-' + b.dataset.loc); if (!el) return;
+    setCurrentLocation(el); v2Refresh(); document.getElementById('v2-center').scrollTop = 0; window.scrollTo(0, 0);
+    if (window.matchMedia('(max-width: 820px)').matches) v2SetPanel('sidebar', false);
+  });
+  document.getElementById('sb-add-btn').addEventListener('click', () => { addLocation(); v2Refresh(); });
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  on('view-settings-btn', () => v2ToggleSettings());
+  on('view-sidebar-btn', () => v2SetPanel('sidebar', document.body.classList.contains('sidebar-closed')));
+  on('view-results-btn', () => v2SetPanel('results', document.body.classList.contains('results-closed')));
+  on('sb-toggle-btn', () => v2SetPanel('sidebar', document.body.classList.contains('sidebar-closed')));
+  on('rp-toggle-btn', () => v2SetPanel('results', document.body.classList.contains('results-closed')));
+  on('rp-close-btn', () => v2SetPanel('results', false));
+  document.addEventListener('input', e => { if (e.target.classList && e.target.classList.contains('zone-name')){ const c = e.target.parentNode.querySelector('.v2-cc'); if (c) v2UpdateCounter(e.target, c); } v2ScheduleRefresh(); });
+  document.addEventListener('change', v2ScheduleRefresh);
+  document.addEventListener('focusin', e => { if (e.target.closest && e.target.closest('.location')) v2ScheduleRefresh(); });
+  new MutationObserver(v2ScheduleRefresh).observe(document.getElementById('locations-container'), { childList: true });
+  const _inner = recalcLocationInner; recalcLocationInner = function(){ const r = _inner.apply(this, arguments); v2ScheduleRefresh(); return r; };
+  const _set = setCurrentLocation; setCurrentLocation = function(el){ const r = _set.apply(this, arguments); v2ScheduleRefresh(); return r; };
+  v2Refresh();
+}
+/* ===================== 02.00.000 — Print / Export (letter pages, KGS print palette) ===================== */
+const V2_PRINT_CSS = `
+@page{size:letter;margin:0}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff;color:#1a1a1a;font:9.5pt/1.35 "Segoe UI",Roboto,Arial,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:8.5in;height:11in;padding:.45in .5in .4in;position:relative;overflow:hidden;page-break-after:always;break-after:page;display:flex;flex-direction:column;background:#fff}
+.page:last-child{page-break-after:auto;break-after:auto}
+.band{background:#102645;color:#fff;border-bottom:3px solid #0c77bc;padding:7px 10px;display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.band h1{font-size:13.5pt;margin:0;line-height:1.15}.band .sub{font-size:8.5pt;opacity:.85}
+.band .rev{font:8pt Consolas,Menlo,monospace;text-align:right;white-space:nowrap}
+h2{font-size:8.5pt;margin:9px 0 4px;color:#102645;text-transform:uppercase;letter-spacing:.06em;border-bottom:1.5px solid #0c77bc;padding-bottom:2px}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #d5d8dc;padding:2.5px 5px;text-align:left;vertical-align:top}
+th{background:#f2f2f2;color:#555;font-size:7.5pt;text-transform:uppercase;letter-spacing:.03em}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tfoot td{background:#f7f8f9;font-weight:700}
+.head{display:grid;grid-template-columns:1fr 1.55in;gap:10px;margin-top:8px;align-items:stretch}
+.info{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;border:1px solid #e2e2e2;background:#f7f8f9;padding:6px 8px}
+.info div span{display:block;font-size:6.8pt;color:#747574;text-transform:uppercase;letter-spacing:.05em}
+.info div b{font-size:9.5pt;color:#102645;word-break:break-word}
+.stamp{border:3px solid;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px;transform:none}
+.stamp b{font-size:21pt;letter-spacing:.08em;line-height:1}.stamp span{font-size:7pt;margin-top:3px}
+.stamp.pass{color:#1b7a3a;border-color:#1b7a3a;background:#e2f3e7}.stamp.fail{color:#ac242a;border-color:#ac242a;background:#fbe9ea}.stamp.incomplete{color:#8a5a00;border-color:#b07a10;background:#fdf3dc}
+.gauge{margin-top:4px}
+.two{display:grid;grid-template-columns:2.9in 1fr;gap:10px}
+.diagram{border:1px solid #e2e2e2;padding:4px}
+.kv td:first-child{color:#747574;width:44%}
+.msgs div{border-left:4px solid;padding:2px 6px;margin:2px 0;font-size:8pt}
+.msgs .bad{border-color:#ac242a;background:#fbe9ea}.msgs .warn{border-color:#b07a10;background:#fdf3dc}
+.cite{border-left:4px solid #1b7a3a;background:#e2f3e7;padding:3px 7px;font-size:7.8pt;margin-top:6px}
+.foot{margin-top:auto;padding-top:5px;border-top:1px solid #e2e2e2;font-size:7pt;color:#747574;display:flex;justify-content:space-between}
+.tiles{display:flex;gap:6px;margin:8px 0 2px}.tile{flex:1;border:1px solid #e2e2e2;border-top:3px solid #0c77bc;background:#f7f8f9;padding:5px 7px}
+.tile b{display:block;font-size:15pt;color:#102645;line-height:1.1}.tile span{font-size:7pt;color:#747574;text-transform:uppercase}
+.tile.pass{border-top-color:#1b7a3a}.tile.pass b{color:#1b7a3a}.tile.fail{border-top-color:#ac242a}.tile.fail b{color:#ac242a}.tile.incomplete{border-top-color:#b07a10}.tile.incomplete b{color:#8a5a00}
+.st{font-weight:700}.st.pass{color:#1b7a3a}.st.fail{color:#ac242a}.st.incomplete{color:#8a5a00}
+.math td{font-size:8pt}.math .sym{font-family:Consolas,Menlo,monospace;font-size:7.6pt;color:#102645}.math .sub{font-family:Consolas,Menlo,monospace;font-size:7.6pt}
+.math .res{font-weight:700;white-space:nowrap}.math .ref{font-size:7pt;color:#747574}
+.math tr.step td{background:#102645;color:#fff;font-weight:700;font-size:8pt}
+details.math-x{margin-top:6px}details.math-x summary{cursor:pointer;color:#0c77bc;font-weight:700;font-size:8.5pt}
+.dense{font-size:8.6pt}.dense th,.dense td{padding:1.5px 4px}.dense .diagram svg{max-height:1.7in}
+.denser{font-size:7.8pt}.denser th,.denser td{padding:1px 3px}.denser h2{margin:6px 0 3px}
+@media screen{body.preview{background:#5b6573;padding:14px 0}body.preview .page{margin:0 auto 14px;box-shadow:0 2px 10px rgba(0,0,0,.4)}}
+`;
+/* Runs inside the print document (iframe, exported .html, Electron PDF window): makes every PSU sheet fit one
+   letter page by tightening type, then moves a Standard formula block to its own appendix page if it still overflows. */
+const V2_FIT_SCRIPT = `(function(){function fits(p){return p.scrollHeight<=p.clientHeight+1}
+document.querySelectorAll('.page.psu').forEach(function(p){if(fits(p))return;p.classList.add('dense');if(fits(p))return;p.classList.add('denser');if(fits(p))return;
+var f=p.querySelector('.std-math');if(f){var a=document.createElement('section');a.className='page appendix';a.innerHTML='<div class="band"><div><h1>Calculation appendix — '+(p.getAttribute('data-tag')||'')+'</h1></div></div>';a.appendChild(f);var ft=p.querySelector('.foot');if(ft)a.appendChild(ft.cloneNode(true));p.parentNode.insertBefore(a,p.nextSibling);}
+if(!fits(p)){var rows=p.querySelectorAll('.mods tbody tr');if(rows.length>6){p.classList.add('overflowed');}}});
+document.querySelectorAll('.page.appendix').forEach(function(p){var guard=0;while(!fits(p)&&guard++<40){var t=p.querySelector('table.math');if(!t)break;var tb=t.tBodies[0];var rows=[].slice.call(tb.rows);var keep=Math.max(1,rows.length-1);
+var n=document.createElement('section');n.className='page appendix';n.innerHTML='<div class="band"><div><h1>'+(p.querySelector('h1')?p.querySelector('h1').textContent.replace(/ \\(cont\\.\\)$/,'')+' (cont.)':'Appendix (cont.)')+'</h1></div></div>';
+var nt=t.cloneNode(false);if(t.tHead)nt.appendChild(t.tHead.cloneNode(true));var nb=document.createElement('tbody');nt.appendChild(nb);n.appendChild(nt);
+while(!fits(p)&&tb.rows.length>1){nb.insertBefore(tb.rows[tb.rows.length-1],nb.firstChild);}
+[].slice.call(p.querySelectorAll('.after-math')).forEach(function(e){n.appendChild(e)});
+var ft=p.querySelector('.foot');if(ft)n.appendChild(ft.cloneNode(true));p.parentNode.insertBefore(n,p.nextSibling);}});
+var pages=document.querySelectorAll('.page');pages.forEach(function(p,i){var s=p.querySelector('.pgno');if(s)s.textContent='Page '+(i+1)+' of '+pages.length});
+document.documentElement.setAttribute('data-fit','done');})();`;
+
+function v2GaugeSvgPrint(m){
+  const per = isFinite(m.ahPerSupply) ? m.ahPerSupply : 0, bat = m.batteryAh || 0, init = isFinite(m.initialAh) ? m.initialAh / (m.psRequired || 1) : 0;
+  const max = Math.ceil(Math.max(CHARGER_MAX_AH, per, bat) * 1.08 / 10) * 10, W = 700, L = 10, R = W - 10, x = v => L + (R - L) * Math.min(Math.max(v, 0), max) / max;
+  const fill = m.status === 'pass' ? '#1b7a3a' : m.status === 'fail' ? '#ac242a' : '#b07a10';
+  let ticks = ''; for (let t = 0; t <= max; t += 10) ticks += `<line x1="${x(t)}" x2="${x(t)}" y1="52" y2="56" stroke="#999"/><text x="${x(t)}" y="65" font-size="9" fill="#747574" text-anchor="middle">${t}</text>`;
+  const lbl = (v, y, txt, col, anchor) => `<text x="${x(v)}" y="${y}" font-size="10" font-weight="700" fill="${col}" text-anchor="${anchor || 'middle'}">${v2Esc(txt)}</text>`;
+  const reqAnchor = x(per) > R - 60 ? 'end' : (x(per) < L + 60 ? 'start' : 'middle');
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 92" width="100%" font-family="Segoe UI,Arial,sans-serif">
+  <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#ffffff"/><line x1="0" y1="0" x2="0" y2="6" stroke="${fill}" stroke-width="3"/></pattern></defs>
+  <rect x="${L}" y="30" width="${R - L}" height="22" fill="#eef1f4" stroke="#c9ced4"/>
+  <rect x="${L}" y="30" width="${Math.max(0, x(init) - L)}" height="22" fill="${fill}"/>
+  <rect x="${x(init)}" y="30" width="${Math.max(0, x(per) - x(init))}" height="22" fill="url(#hatch)" stroke="${fill}"/>
+  ${ticks}
+  ${lbl(per, 24, 'Required ' + v2Fmt(per, 2) + ' Ah' + (m.psRequired > 1 ? ' per supply' : ''), '#102645', reqAnchor)}
+  ${bat ? `<line x1="${x(bat)}" x2="${x(bat)}" y1="27" y2="58" stroke="#0c77bc" stroke-width="3"/>${lbl(bat, 80, 'Battery ' + v2Fmt(bat, 1) + ' Ah', '#0c77bc', x(bat) > x(CHARGER_MAX_AH) - 70 && x(bat) < x(CHARGER_MAX_AH) ? 'end' : 'middle')}` : ''}
+  <line x1="${x(CHARGER_MAX_AH)}" x2="${x(CHARGER_MAX_AH)}" y1="22" y2="58" stroke="#ac242a" stroke-width="3" stroke-dasharray="5 3"/>
+  ${lbl(CHARGER_MAX_AH, 91, CHARGER_MAX_AH + ' Ah max (largest battery / charger)', '#ac242a', x(CHARGER_MAX_AH) > R - 120 ? 'end' : 'middle')}
+  <rect x="${L}" y="4" width="10" height="8" fill="${fill}"/><text x="${L + 14}" y="12" font-size="9" fill="#555">Load (standby + alarm)</text>
+  <rect x="${L + 130}" y="4" width="10" height="8" fill="url(#hatch)" stroke="${fill}"/><text x="${L + 144}" y="12" font-size="9" fill="#555">Safety margin &amp; temperature de-rating (shaded)</text>
+</svg>`;
+}
+function v2ClusterSvg(m){
+  const mods = m.modules.slice(0, 16), n = mods.length, perCol = 8, cols = Math.max(1, Math.ceil(n / perCol));
+  const rowH = 19, H = Math.max(110, Math.min(n, perCol) * rowH + 26), W = 270, psX = 8, psY = H / 2 - 22;
+  const colX = c => 92 + c * 92;
+  let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="100%" font-family="Segoe UI,Arial,sans-serif">
+  <rect x="${psX}" y="${psY}" width="58" height="44" rx="4" fill="#102645"/><text x="${psX + 29}" y="${psY + 18}" fill="#fff" font-size="10" font-weight="700" text-anchor="middle">PSU</text>
+  <text x="${psX + 29}" y="${psY + 32}" fill="#cfe3f3" font-size="8" text-anchor="middle">${v2Esc(v2PsTag(m).slice(0, 10))}</text>
+  <line x1="${psX + 58}" x2="${colX(0) - 14}" y1="${psY + 22}" y2="${psY + 22}" stroke="#0c77bc" stroke-width="2"/>`;
+  for (let c = 0; c < cols; c++){
+    const k = Math.min(perCol, n - c * perCol), y0 = 14, y1 = 14 + (k - 1) * rowH;
+    s += `<line x1="${colX(c) - 14}" x2="${colX(c) - 14}" y1="${Math.min(y0, psY + 22)}" y2="${Math.max(y1, psY + 22)}" stroke="#0c77bc" stroke-width="2"/>`;
+    if (c > 0) s += `<line x1="${colX(c - 1) - 14}" x2="${colX(c) - 14}" y1="${Math.max(y1, psY + 22)}" y2="${Math.max(y1, psY + 22)}" stroke="#0c77bc" stroke-width="1" stroke-dasharray="3 2"/>`;
+  }
+  mods.forEach((d, i) => {
+    const c = Math.floor(i / perCol), r = i % perCol, x = colX(c), y = 14 + r * rowH;
+    s += `<line x1="${x - 14}" x2="${x - 4}" y1="${y}" y2="${y}" stroke="#0c77bc" stroke-width="1.5"/>`;
+    s += d.kind === 'detector' ? `<circle cx="${x + 4}" cy="${y}" r="7" fill="#fff" stroke="#102645" stroke-width="1.5"/><text x="${x + 4}" y="${y + 3}" font-size="7.5" text-anchor="middle" fill="#102645">${v2Esc(d.fan || '?')}</text>`
+      : `<rect x="${x - 4}" y="${y - 7}" width="16" height="14" fill="#0c77bc"/><text x="${x + 4}" y="${y + 3}" font-size="7.5" text-anchor="middle" fill="#fff">D</text>`;
+    s += `<text x="${x + 15}" y="${y + 3}" font-size="7.5" fill="#1a1a1a">${v2Esc((d.zone || d.type).slice(0, 13))}</text>`;
+  });
+  if (m.modules.length > 16) s += `<text x="${W - 4}" y="${H - 4}" font-size="8" text-anchor="end" fill="#747574">+${m.modules.length - 16} more</text>`;
+  return s + `<text x="4" y="${H - 4}" font-size="7.5" fill="#747574">○ detector (fan speed) · ■ display</text></svg>`;
+}
+function v2Header(){
+  const v = id => (document.getElementById(id) || {}).value || '';
+  return { project: v('project-name-input') || '(project name)', preparedBy: v('prepared-by-input'), date: v('project-date-input'), network: v('network-number-input'),
+    building: v('building-input'), cdm1: v('primary-cdm-location-input'), cdm2: v('backup-cdm-location-input'), rev: runningRevisionFull() };
+}
+function v2MathTable(steps, cls){
+  return `<table class="math ${cls || ''}"><thead><tr><th style="width:21%">Step</th><th style="width:27%">Formula</th><th>Values substituted</th><th class="n" style="width:11%">Result</th><th style="width:17%">Reference</th></tr></thead><tbody>${steps.map(st =>
+    `<tr class="step"><td colspan="5">${v2Esc(st.title)}</td></tr>` + st.rows.map(r => `<tr><td>${v2Esc(r.label)}</td><td class="sym">${v2Esc(r.sym)}</td><td class="sub">${v2Esc(r.sub)}</td><td class="n res">${v2Esc(r.res)}</td><td class="ref">${v2Esc(r.ref)}</td></tr>`).join('')).join('')}</tbody></table>`;
+}
+function v2ModTable(m){
+  const rows = m.modules.map(d => `<tr><td>${v2Esc(d.zone || '—')}</td><td>${v2Esc(d.type)}</td><td class="n">${v2Esc(d.fan || (d.kind === 'detector' ? '—' : 'N/A'))}</td><td class="n">${v2Esc(d.addr || '—')}</td><td class="n">${d.ma}</td><td class="n">${d.ma}</td></tr>`).join('');
+  return `<table class="mods"><thead><tr><th>Zone</th><th>Type</th><th class="n">Fan speed</th><th class="n">Address</th><th class="n">Standby mA</th><th class="n">Alarm mA</th></tr></thead><tbody>${rows}
+    <tr><td colspan="4">Power supply quiescent + AUX</td><td class="n">${v2Fmt(m.psMa, 0)}</td><td class="n">${v2Fmt(m.psMa, 0)}</td></tr></tbody>
+    <tfoot><tr><td colspan="4">Total load</td><td class="n">${v2Fmt(m.totalMa, 0)}</td><td class="n">${v2Fmt(m.totalMa, 0)}</td></tr>
+    <tr><td colspan="2">Required Ah: ${v2Fmt(m.requiredAh)} Ah${m.psRequired > 1 ? ` (${m.psRequired} supplies, ${v2Fmt(m.ahPerSupply)} Ah each)` : ''}</td><td colspan="3">Battery: ${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr></tfoot></table>`;
+}
+function v2BomTable(m){
+  if (!m.bom) return '<p style="font-size:8pt;color:#747574;margin:2px 0">Bill of Materials withheld until every validation issue on this sheet is resolved.</p>';
+  return `<table><thead><tr><th class="n">Qty</th><th>Manufacturer</th><th>Part number</th><th>Description</th></tr></thead><tbody>${m.bom.map(r => `<tr><td class="n">${v2Esc(r.qty)}</td><td>${v2Esc(r.manufacturer)}</td><td>${v2Esc(r.partNumber)}</td><td>${v2Esc(r.description)}</td></tr>`).join('')}</tbody></table>`;
+}
+function v2SummaryPages(models, H, level){
+  const counts = { pass: 0, fail: 0, incomplete: 0 }; models.forEach(m => counts[m.status]++);
+  const CH = 34, chunks = []; for (let i = 0; i < Math.max(1, models.length); i += CH) chunks.push(models.slice(i, i + CH));
+  return chunks.map((ch, ci) => `<section class="page summary">
+    <div class="band"><div><h1>ModuLaser Battery Calculation — Project Summary${ci ? ' (cont.)' : ''}</h1><div class="sub">${v2Esc(H.project)}</div></div><div class="rev">Calculator rev ${v2Esc(H.rev)}<br>Detail level: ${V2_LEVELS[level]}</div></div>
+    ${ci ? '' : `<div class="info" style="margin-top:8px">${[['Project', H.project], ['Prepared by', H.preparedBy], ['Date', H.date], ['Network #', H.network], ['Building', H.building], ['Primary CDM location', H.cdm1], ['Backup CDM location', H.cdm2], ['Power supplies', String(models.length)]].map(([k, v]) => `<div><span>${k}</span><b>${v2Esc(v || '—')}</b></div>`).join('')}</div>
+    <div class="tiles"><div class="tile"><b>${models.length}</b><span>Power supplies</span></div><div class="tile pass"><b>${counts.pass}</b><span>Pass</span></div><div class="tile fail"><b>${counts.fail}</b><span>Fail</span></div><div class="tile incomplete"><b>${counts.incomplete}</b><span>Incomplete</span></div></div>`}
+    <h2>Power supplies</h2>
+    <table><thead><tr><th>Sheet</th><th>PSU</th><th>Area/Group</th><th>Design basis</th><th class="n">Required Ah</th><th>Battery</th><th>Status</th></tr></thead><tbody>
+    ${ch.map(m => `<tr><td>${m.idx}</td><td>${v2Esc(v2PsTag(m))}</td><td>${v2Esc(m.area || '—')}</td><td>${v2Esc(m.settings[0][1])}</td><td class="n">${v2Fmt(m.requiredAh)}</td><td>${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr>`).join('')}</tbody></table>
+    ${ci === chunks.length - 1 ? '<p style="font-size:7.5pt;color:#747574;margin-top:6px">PASS: the calculation is valid, every validation check is clear and the required Ah per supply is within the selected battery and the 65 Ah maximum. FAIL: an INVALID CALCULATION condition, more than one supply needed, or capacity over the selected battery / 65 Ah. INCOMPLETE: validation flags still open (recommendations and BOM withheld).</p>' : ''}
+    <div class="foot"><span>${v2Esc(H.project)} · ModuLaser Battery Calculator ${v2Esc(H.rev)}</span><span class="pgno"></span></div></section>`).join('');
+}
+function v2PsuPage(m, H, opts){
+  const level = opts.level;
+  const info = [['PSU tag', v2PsTag(m)], ['Location / Area-Group', m.area], ['Sheet', m.idx + (m.label ? ' · ' + m.label : '')], ['Prepared by · Date', [H.preparedBy, H.date].filter(Boolean).join(' · ')]];
+  const msgs = m.invalidList.map(t => `<div class="bad">${v2Esc(t)}</div>`).join('') + m.flags.map(t => `<div class="warn">${v2Esc(t)}</div>`).join('');
+  const steps = v2CalcSteps(m, level);
+  const foot = `<div class="foot"><span>${v2Esc(H.project)} · ${v2Esc(v2PsTag(m))} · ModuLaser Battery Calculator ${v2Esc(H.rev)}</span><span class="pgno"></span></div>`;
+  let page = `<section class="page psu" data-tag="${v2Esc(v2PsTag(m))}">
+    <div class="band"><div><h1>Power Supply ${v2Esc(v2PsTag(m))}</h1><div class="sub">${v2Esc(H.project)}${H.network ? ' · ' + v2Esc(H.network) : ''}${H.building ? ' · ' + v2Esc(H.building) : ''}</div></div><div class="rev">Calculator rev ${v2Esc(H.rev)}</div></div>
+    <div class="head"><div class="info">${info.map(([k, v]) => `<div><span>${k}</span><b>${v2Esc(v || '—')}</b></div>`).join('')}</div>
+      <div class="stamp ${m.status}"><b>${v2StatusWord(m.status)}</b><span>${m.status === 'pass' ? 'Within battery &amp; 65 Ah' : m.status === 'fail' ? 'Correction required' : 'Validation open'}</span></div></div>
+    <h2>Capacity</h2><div class="gauge">${v2GaugeSvgPrint(m)}</div>
+    <div class="two"><div><h2>Cluster diagram</h2><div class="diagram">${v2ClusterSvg(m)}</div><div style="font-size:7.5pt;color:#747574">Clusters: ${m.clusters.length ? m.clusters.map(pad2).join(', ') : '—'}</div></div>
+      <div><h2>Settings used</h2><table class="kv">${m.settings.map(([k, v]) => `<tr><td>${v2Esc(k)}</td><td>${v2Esc(v)}</td></tr>`).join('')}
+      ${m.mode === 'builtin' ? `<tr><td>Recommended supply</td><td>${v2Esc(m.hwSupply || '—')}</td></tr><tr><td>Enclosure</td><td>${v2Esc(m.hwEnclosure || '—')}</td></tr>` : ''}</table></div></div>
+    <h2>Modules</h2>${v2ModTable(m)}
+    ${msgs ? `<h2>Validation messages</h2><div class="msgs">${msgs}</div>` : ''}
+    ${level === 'standard' ? `<div class="std-math"><h2>Calculation (formulas with values)</h2>${v2MathTable(steps)}</div>` : ''}
+    ${opts.bom && level !== 'full' ? `<h2>Bill of Materials</h2>${v2BomTable(m)}` : ''}
+    ${m.citation ? `<div class="cite">✓ ${v2Esc(m.citation)}</div>` : ''}
+    ${foot}</section>`;
+  if (level === 'full'){
+    page += `<section class="page appendix" data-tag="${v2Esc(v2PsTag(m))}"><div class="band"><div><h1>Full calculation — ${v2Esc(v2PsTag(m))}</h1><div class="sub">Each step: formula, values substituted, result, code reference. Design Basis: ${v2Esc(m.settings[0][1])} (${v2Esc(m.codeRef)})</div></div><div class="rev">Calculator rev ${v2Esc(H.rev)}</div></div>
+      ${opts.html ? `<details class="math-x" open><summary>Show / hide every step</summary>${v2MathTable(steps)}</details>` : v2MathTable(steps)}
+      ${opts.bom ? `<div class="after-math"><h2>Bill of Materials</h2>${v2BomTable(m)}</div>` : ''}${foot}</section>`;
+  }
+  return page;
+}
+function v2BuildPrintHtml(opts){
+  opts = Object.assign({ scope: 'all', level: 'standard', bom: !!(document.getElementById('print-bom-toggle') || {}).checked, summary: true, preview: false, html: false }, opts || {});
+  const models = v2AllModels(opts.scope), H = v2Header();
+  const body = (opts.summary ? v2SummaryPages(models, H, opts.level) : '') + models.map(m => v2PsuPage(m, H, opts)).join('');
+  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>${v2Esc(H.project)} — ModuLaser Battery Calculation</title><style>${V2_PRINT_CSS}</style></head><body class="${opts.preview ? 'preview' : ''}">${body}<script>${V2_FIT_SCRIPT}<\/script></body></html>`;
+}
+
+/* ---------- dialog ---------- */
+function v2PeOpts(){ return { scope: document.getElementById('pe-scope').value, level: document.querySelector('input[name="pe-level"]:checked').value, bom: document.getElementById('pe-bom').checked, summary: document.getElementById('pe-summary').checked }; }
+function v2FileBase(){ const p = (document.getElementById('project-name-input').value || '').trim(); return (p.replace(/[^a-z0-9\-_ ]/gi, '').trim().replace(/\s+/g, '_') || 'modulaser_report'); }
+function v2Download(blob, name){
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+  const s = document.getElementById('pe-status'); if (s) s.textContent = 'Saved ' + name;
+}
+function v2RefreshPreview(){
+  const f = document.getElementById('pe-preview'); if (!f) return;
+  const html = v2BuildPrintHtml(Object.assign(v2PeOpts(), { preview: true }));
+  f.onload = () => { try { const n = f.contentDocument.querySelectorAll('.page').length; document.getElementById('pe-pages').textContent = n + ' letter page' + (n === 1 ? '' : 's'); } catch (e) {} };
+  f.srcdoc = html;
+}
+function openPrintDialog(){
+  if (typeof getCurrentLocationEl === 'function') getCurrentLocationEl();
+  const ov = document.getElementById('pe-overlay');
+  document.getElementById('pe-bom').checked = document.getElementById('print-bom-toggle').checked;
+  ov.classList.add('open'); v2RefreshPreview();
+}
+function closePrintDialog(){ document.getElementById('pe-overlay').classList.remove('open'); }
+async function v2ExportPdf(){
+  const html = v2BuildPrintHtml(v2PeOpts());
+  if (window.mlDesktop && typeof window.mlDesktop.printToPDF === 'function'){
+    const r = await window.mlDesktop.printToPDF(html, v2FileBase() + '.pdf');
+    document.getElementById('pe-status').textContent = r ? 'Saved ' + r : 'PDF cancelled'; return;
+  }
+  const fr = document.createElement('iframe'); fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; document.body.appendChild(fr);
+  fr.onload = () => { setTimeout(() => { fr.contentWindow.focus(); fr.contentWindow.print(); setTimeout(() => fr.remove(), 2000); }, 150); };
+  fr.srcdoc = html;
+  document.getElementById('pe-status').textContent = 'Choose “Save as PDF” in the print window (Letter, margins none).';
+}
+function v2ExportHtml(){ v2Download(new Blob([v2BuildPrintHtml(Object.assign(v2PeOpts(), { html: true }))], { type: 'text/html' }), v2FileBase() + '_report.html'); }
+function wirePrintDialog(){
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  on('print-menu-btn', openPrintDialog); on('print-btn', openPrintDialog); on('pe-close', closePrintDialog);
+  on('pe-pdf', v2ExportPdf); on('pe-html', v2ExportHtml);
+  on('pe-docx', () => v2ExportDocx(v2PeOpts())); on('pe-xlsx', () => v2ExportXlsx(v2PeOpts()));
+  ['pe-scope', 'pe-bom', 'pe-summary'].forEach(id => document.getElementById(id).addEventListener('change', v2RefreshPreview));
+  document.querySelectorAll('input[name="pe-level"]').forEach(r => r.addEventListener('change', v2RefreshPreview));
+  document.getElementById('pe-bom').addEventListener('change', e => { const t = document.getElementById('print-bom-toggle'); t.checked = e.target.checked; togglePrintBom(); });
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')){ e.preventDefault(); openPrintDialog(); }
+    if (e.key === 'Escape' && document.getElementById('pe-overlay').classList.contains('open')) closePrintDialog();
+  });
+}
+/* ===================== 02.00.000 — offline .xlsx / .docx writers (no external library, no CDN) ===================== */
+const V2_CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++){ let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function v2Crc32(b){ let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = V2_CRC[(c ^ b[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+/* Minimal ZIP (stored, no compression) — valid for Office Open XML packages. */
+function v2Zip(files){
+  const enc = new TextEncoder(), parts = [], central = []; let off = 0;
+  files.forEach(f => {
+    const name = enc.encode(f.name), data = typeof f.data === 'string' ? enc.encode(f.data) : f.data, crc = v2Crc32(data);
+    const h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true); h.setUint16(10, 0, true); h.setUint16(12, 0x21, true);
+    h.setUint32(14, crc, true); h.setUint32(18, data.length, true); h.setUint32(22, data.length, true); h.setUint16(26, name.length, true); h.setUint16(28, 0, true);
+    parts.push(new Uint8Array(h.buffer), name, data);
+    const c = new DataView(new ArrayBuffer(46));
+    c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true); c.setUint16(12, 0, true); c.setUint16(14, 0x21, true);
+    c.setUint32(16, crc, true); c.setUint32(20, data.length, true); c.setUint32(24, data.length, true); c.setUint16(28, name.length, true); c.setUint32(42, off, true);
+    central.push(new Uint8Array(c.buffer), name);
+    off += 30 + name.length + data.length;
+  });
+  const cdSize = central.reduce((n, p) => n + p.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, cdSize, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...central, new Uint8Array(e.buffer)]);
+}
+function v2X(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ''); }
+
+/* ---------- XLSX ---------- */
+// style ids: 0 plain · 1 thin border · 2 thin border bold · 3 bold (no border) · 4 thin border, right-aligned number
+function v2SheetXml(rows, widths){
+  const col = i => { let s = ''; i++; while (i){ const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+  const maxLevel = rows.reduce((n, r) => Math.max(n, r.level || 0), 0);
+  const data = rows.map((r, ri) => {
+    const attrs = (r.level ? ` outlineLevel="${r.level}"` : '');
+    const cells = (r.cells || []).map((v, ci) => {
+      if (v == null || v === '') return r.style ? `<c r="${col(ci)}${ri + 1}" s="${r.style}"/>` : '';
+      const st = (typeof v === 'number' && r.style === 1) ? 4 : (r.style || 0);
+      return typeof v === 'number' && isFinite(v) ? `<c r="${col(ci)}${ri + 1}" s="${st}"><v>${v}</v></c>` : `<c r="${col(ci)}${ri + 1}" s="${st}" t="inlineStr"><is><t xml:space="preserve">${v2X(v)}</t></is></c>`;
+    }).join('');
+    return `<row r="${ri + 1}"${attrs}>${cells}</row>`;
+  }).join('');
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">`
+    + (maxLevel ? `<sheetPr><outlinePr summaryBelow="0"/></sheetPr>` : '')
+    + `<sheetFormatPr defaultRowHeight="13.2"${maxLevel ? ` outlineLevelRow="${maxLevel}"` : ''}/><cols>${widths.map((w, i) => `<col min="${i + 1}" max="${i + 1}" width="${w}" customWidth="1"/>`).join('')}</cols><sheetData>${data}</sheetData><pageSetup orientation="portrait" paperSize="1"/></worksheet>`;
+}
+function v2CadRows(models){
+  const rows = [];
+  models.forEach(m => {
+    rows.push({ style: 3, cells: [`${v2PsTag(m)} — ${m.area || 'No Area/Group'}`] });
+    rows.push({ style: 2, cells: ['Zone', 'Type', 'Fan speed', 'Address', 'Standby mA', 'Alarm mA'] });
+    m.modules.forEach(d => rows.push({ style: 1, cells: [d.zone || '—', d.type, d.kind === 'detector' ? (d.fan ? Number(d.fan) : '—') : 'N/A', d.addr ? Number(d.addr) : '—', d.ma, d.ma] }));
+    rows.push({ style: 1, cells: ['PSU quiescent + AUX', '', '', '', isFinite(m.psMa) ? m.psMa : '', isFinite(m.psMa) ? m.psMa : ''] });
+    rows.push({ style: 2, cells: ['Total load', '', '', '', isFinite(m.totalMa) ? m.totalMa : '', isFinite(m.totalMa) ? m.totalMa : ''] });
+    rows.push({ style: 2, cells: ['Required Ah: ' + v2Fmt(m.requiredAh) + (m.psRequired > 1 ? ' (' + m.psRequired + ' supplies)' : ''), 'Battery: ' + m.batteryLabel, '', '', 'PASS/FAIL', v2StatusWord(m.status)] });
+    rows.push({ cells: [] });
+  });
+  return rows;
+}
+function v2DetailRows(models, level){
+  const H = v2Header(), rows = [];
+  rows.push({ style: 3, cells: ['ModuLaser Battery Calculation — Detail (' + V2_LEVELS[level] + ')', '', '', '', 'Rev ' + H.rev] });
+  rows.push({ cells: ['Project', H.project] }, { cells: ['Prepared By', H.preparedBy] }, { cells: ['Date', H.date] });
+  if (H.network) rows.push({ cells: ['Network Number', H.network] }); if (H.building) rows.push({ cells: ['Building', H.building] });
+  rows.push({ cells: [] });
+  models.forEach(m => {
+    rows.push({ style: 3, cells: [`${v2PsTag(m)} — ${m.area || 'No Area/Group'}`, 'Required Ah', isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : '—', 'Status', v2StatusWord(m.status)] });
+    if (level === 'summary'){
+      rows.push({ level: 1, cells: ['Battery', m.batteryLabel] }, { level: 1, cells: ['Design Basis', m.settings[0][1]] }, { level: 1, cells: ['Total load (mA)', m.totalMa] });
+    } else {
+      // existing per-sheet detail rows (same content as the 01.x Excel export), grouped under the PSU
+      const dl = buildLocationRows(m.el, H.project, H.preparedBy, H.date);
+      const dlx = dl.slice(dl.findIndex(r => !r.length) + 1);
+      dlx.forEach(r => rows.push({ level: 1, cells: r }));
+      v2CalcSteps(m, level).forEach(st => {
+        rows.push({ level: 1, style: 3, cells: [st.title] });
+        rows.push({ level: 2, style: 2, cells: ['Step', 'Formula', 'Values substituted', 'Result', 'Reference'] });
+        st.rows.forEach(r => rows.push({ level: 2, style: 1, cells: [r.label, r.sym, r.sub, r.res, r.ref] }));
+      });
+    }
+    rows.push({ cells: [] });
+  });
+  return rows;
+}
+function v2BuildXlsx(opts){
+  const level = (opts && opts.level) || 'standard', models = v2AllModels((opts && opts.scope) || 'all');
+  const sheets = [['CAD Schedule', v2SheetXml(v2CadRows(models), [24, 26, 10, 9, 12, 12])], ['Detail', v2SheetXml(v2DetailRows(models, level), [30, 34, 40, 14, 30, 12, 12, 14])]];
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+<fonts count="2"><font><sz val="10"/><name val="Arial"/></font><font><b/><sz val="10"/><name val="Arial"/></font></fonts>
+<fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills>
+<borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border><border><left style="thin"><color auto="1"/></left><right style="thin"><color auto="1"/></right><top style="thin"><color auto="1"/></top><bottom style="thin"><color auto="1"/></bottom><diagonal/></border></borders>
+<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>
+<cellXfs count="5"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1"/><xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/><xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="right"/></xf></cellXfs>
+<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`;
+  const files = [
+    { name: '[Content_Types].xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((s, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>` },
+    { name: '_rels/.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>` },
+    { name: 'xl/workbook.xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s, i) => `<sheet name="${v2X(s[0])}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets></workbook>` },
+    { name: 'xl/_rels/workbook.xml.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>` },
+    { name: 'xl/styles.xml', data: styles },
+    ...sheets.map((s, i) => ({ name: `xl/worksheets/sheet${i + 1}.xml`, data: s[1] })),
+  ];
+  return v2Zip(files);
+}
+function v2ExportXlsx(opts){ opts = opts || { level: v2LastLevel(), scope: 'all' }; v2Download(v2BuildXlsx(opts), v2FileBase() + '.xlsx'); }
+function v2LastLevel(){ const r = document.querySelector('input[name="pe-level"]:checked'); return r ? r.value : 'standard'; }
+
+/* ---------- DOCX ---------- */
+function v2SvgToPng(svg, wPx, hPx){
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => { const c = document.createElement('canvas'); c.width = wPx; c.height = hPx; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, wPx, hPx); x.drawImage(img, 0, 0, wPx, hPx);
+      c.toBlob(b => b ? b.arrayBuffer().then(a => res(new Uint8Array(a))) : res(null), 'image/png'); };
+    img.onerror = () => res(null);
+    const s = svg.replace('<svg ', `<svg width="${wPx}" height="${hPx}" `).replace(/width="100%"/, '');
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+  });
+}
+function v2DocxRun(t, o){ o = o || {}; return `<w:r><w:rPr>${o.b ? '<w:b/>' : ''}${o.color ? `<w:color w:val="${o.color}"/>` : ''}<w:sz w:val="${o.sz || 18}"/>${o.mono ? '<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas"/>' : ''}</w:rPr><w:t xml:space="preserve">${v2X(t)}</w:t></w:r>`; }
+function v2DocxP(t, o){ o = o || {}; return `<w:p><w:pPr><w:spacing w:before="${o.before || 0}" w:after="${o.after == null ? 40 : o.after}"/>${o.jc ? `<w:jc w:val="${o.jc}"/>` : ''}${o.shade ? `<w:shd w:val="clear" w:color="auto" w:fill="${o.shade}"/>` : ''}${o.border ? `<w:pBdr><w:bottom w:val="single" w:sz="8" w:space="1" w:color="0C77BC"/></w:pBdr>` : ''}</w:pPr>${v2DocxRun(t, o)}</w:p>`; }
+function v2DocxH(t){ return v2DocxP(t.toUpperCase(), { b: true, color: '102645', sz: 17, before: 120, border: true }); }
+function v2DocxTable(head, rows, widths, o){
+  o = o || {};
+  const tw = widths.reduce((a, b) => a + b, 0);
+  const cell = (t, w, opt) => `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${opt.fill ? `<w:shd w:val="clear" w:color="auto" w:fill="${opt.fill}"/>` : ''}${opt.span ? `<w:gridSpan w:val="${opt.span}"/>` : ''}</w:tcPr><w:p><w:pPr><w:spacing w:after="0"/>${opt.right ? '<w:jc w:val="right"/>' : ''}</w:pPr>${v2DocxRun(t, { b: opt.b, sz: opt.sz || 16, color: opt.color, mono: opt.mono })}</w:p></w:tc>`;
+  const tr = (cells, opt) => `<w:tr><w:trPr><w:cantSplit/></w:trPr>${cells.map((c, i) => cell(c, widths[i], Object.assign({ right: (o.right || []).includes(i), mono: (o.mono || []).includes(i) }, opt))).join('')}</w:tr>`;
+  return `<w:tbl><w:tblPr><w:tblW w:w="${tw}" w:type="dxa"/><w:tblBorders>${['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(s => `<w:${s} w:val="single" w:sz="4" w:color="BFC4CA"/>`).join('')}</w:tblBorders><w:tblCellMar><w:left w:w="70" w:type="dxa"/><w:right w:w="70" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${widths.map(w => `<w:gridCol w:w="${w}"/>`).join('')}</w:tblGrid>`
+    + (head ? `<w:tr><w:trPr><w:tblHeader/></w:trPr>${head.map((c, i) => cell(c, widths[i], { b: true, fill: 'F2F2F2', sz: 15, color: '555555', right: (o.right || []).includes(i) })).join('')}</w:tr>` : '')
+    + rows.map(r => Array.isArray(r) ? tr(r, {}) : tr(r.cells, r)).join('') + '</w:tbl>' + v2DocxP('', { after: 40 });
+}
+function v2DocxImg(rid, id, wIn, hIn){
+  const cx = Math.round(wIn * 914400), cy = Math.round(hIn * 914400);
+  return `<w:p><w:pPr><w:spacing w:after="40"/></w:pPr><w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${id}" name="img${id}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${id}" name="img${id}.png"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${rid}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;
+}
+const V2_PB = '<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+async function v2BuildDocx(opts){
+  opts = Object.assign({ scope: 'all', level: 'standard', bom: true, summary: true }, opts || {});
+  const models = v2AllModels(opts.scope), H = v2Header(), media = []; let body = '', imgId = 1;
+  const addImg = async (svg, wIn, hIn) => { const png = await v2SvgToPng(svg, Math.round(wIn * 150), Math.round(hIn * 150)); if (!png) return ''; const n = media.length + 1; media.push(png); return v2DocxImg('rIdImg' + n, imgId++, wIn, hIn); };
+  const band = (t, sub) => v2DocxP(t, { b: true, color: 'FFFFFF', sz: 26, shade: '102645', after: 0 }) + v2DocxP(sub, { color: 'FFFFFF', sz: 16, shade: '102645', after: 80, border: true });
+  const W = 10800; // 7.5 in content width in twips
+  if (opts.summary){
+    const c = { pass: 0, fail: 0, incomplete: 0 }; models.forEach(m => c[m.status]++);
+    body += band('ModuLaser Battery Calculation — Project Summary', `${H.project} · Calculator rev ${H.rev} · Detail level: ${V2_LEVELS[opts.level]}`);
+    body += v2DocxTable(null, [['Project', H.project, 'Prepared by', H.preparedBy || '—'], ['Date', H.date || '—', 'Network #', H.network || '—'], ['Building', H.building || '—', 'Primary CDM', H.cdm1 || '—'], ['Backup CDM', H.cdm2 || '—', 'Power supplies', String(models.length)]], [1700, 3700, 1700, 3700]);
+    body += v2DocxTable(['Power supplies', 'Pass', 'Fail', 'Incomplete'], [{ cells: [String(models.length), String(c.pass), String(c.fail), String(c.incomplete)], b: true, sz: 24 }], [2700, 2700, 2700, 2700]);
+    body += v2DocxH('Power supplies');
+    body += v2DocxTable(['Sheet', 'PSU', 'Area/Group', 'Design basis', 'Required Ah', 'Battery', 'Status'], models.map(m => [m.idx, v2PsTag(m), m.area || '—', m.settings[0][1], v2Fmt(m.requiredAh), m.batteryLabel, v2StatusWord(m.status)]), [600, 1300, 1700, 2500, 1100, 2300, 1300], { right: [4] });
+  }
+  for (let i = 0; i < models.length; i++){
+    const m = models[i]; if (body) body += V2_PB;
+    const col = m.status === 'pass' ? '1B7A3A' : m.status === 'fail' ? 'AC242A' : '8A5A00', fill = m.status === 'pass' ? 'E2F3E7' : m.status === 'fail' ? 'FBE9EA' : 'FDF3DC';
+    body += band('Power Supply ' + v2PsTag(m), `${H.project}${H.network ? ' · ' + H.network : ''} · Calculator rev ${H.rev}`);
+    body += `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/><w:tblBorders>${['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(s => `<w:${s} w:val="single" w:sz="4" w:color="BFC4CA"/>`).join('')}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="2200"/><w:gridCol w:w="3000"/><w:gridCol w:w="2200"/><w:gridCol w:w="3400"/></w:tblGrid>`
+      + `<w:tr>${[['PSU tag', v2PsTag(m)], ['Location / Area-Group', m.area || '—']].map(([k, v]) => `<w:tc><w:tcPr><w:tcW w:w="${k === 'PSU tag' ? 2200 : 3000}" w:type="dxa"/></w:tcPr>${v2DocxP(k, { sz: 13, color: '747574', after: 0 })}${v2DocxP(v, { b: true, color: '102645', after: 0 })}</w:tc>`).join('')}`
+      + `<w:tc><w:tcPr><w:tcW w:w="2200" w:type="dxa"/></w:tcPr>${v2DocxP('Sheet', { sz: 13, color: '747574', after: 0 })}${v2DocxP(m.idx + (m.label ? ' · ' + m.label : ''), { b: true, color: '102645', after: 0 })}</w:tc>`
+      + `<w:tc><w:tcPr><w:tcW w:w="3400" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="${fill}"/><w:tcBorders>${['top', 'left', 'bottom', 'right'].map(s => `<w:${s} w:val="single" w:sz="24" w:color="${col}"/>`).join('')}</w:tcBorders><w:vAlign w:val="center"/></w:tcPr>${v2DocxP(v2StatusWord(m.status), { b: true, color: col, sz: 40, jc: 'center', after: 0 })}</w:tc></w:tr></w:tbl>` + v2DocxP('', { after: 20 });
+    body += v2DocxH('Capacity') + await addImg(v2GaugeSvgPrint(m), 7.4, 0.98);
+    body += v2DocxH('Cluster diagram') + await addImg(v2ClusterSvg(m), 3.6, 1.6);
+    body += v2DocxH('Settings used') + v2DocxTable(null, m.settings.concat(m.mode === 'builtin' ? [['Recommended supply', m.hwSupply || '—'], ['Enclosure', m.hwEnclosure || '—']] : []), [3600, 7200]);
+    body += v2DocxH('Modules') + v2DocxTable(['Zone', 'Type', 'Fan speed', 'Address', 'Standby mA', 'Alarm mA'],
+      m.modules.map(d => [d.zone || '—', d.type, d.fan || (d.kind === 'detector' ? '—' : 'N/A'), d.addr || '—', String(d.ma), String(d.ma)])
+        .concat([['Power supply quiescent + AUX', '', '', '', v2Fmt(m.psMa, 0), v2Fmt(m.psMa, 0)], { cells: ['Total load', '', '', '', v2Fmt(m.totalMa, 0), v2Fmt(m.totalMa, 0)], b: true, fill: 'F7F8F9' },
+          { cells: ['Required Ah: ' + v2Fmt(m.requiredAh) + ' Ah', '', 'Battery:', m.batteryLabel, 'Status:', v2StatusWord(m.status)], b: true, fill: 'F7F8F9' }]), [2600, 2200, 1200, 1200, 1800, 1800], { right: [2, 3, 4, 5] });
+    if (m.invalidList.length || m.flags.length) body += v2DocxH('Validation messages') + m.invalidList.map(t => v2DocxP('■ ' + t, { color: 'AC242A', sz: 16 })).join('') + m.flags.map(t => v2DocxP('▲ ' + t, { color: '8A5A00', sz: 16 })).join('');
+    const steps = v2CalcSteps(m, opts.level);
+    const mathRows = steps.flatMap(st => [{ cells: [st.title, '', '', '', ''], b: true, fill: 'DCE6F0' }].concat(st.rows.map(r => [r.label, r.sym, r.sub, r.res, r.ref])));
+    if (opts.level === 'standard') body += v2DocxH('Calculation (formulas with values)') + v2DocxTable(['Step', 'Formula', 'Values substituted', 'Result', 'Reference'], mathRows, [1900, 2600, 3200, 1100, 2000], { right: [3], mono: [1, 2] });
+    if (opts.bom && opts.level !== 'full') body += v2DocxH('Bill of Materials') + (m.bom ? v2DocxTable(['Qty', 'Manufacturer', 'Part number', 'Description'], m.bom.map(r => [String(r.qty), r.manufacturer, r.partNumber, r.description]), [800, 2000, 2200, 5800], { right: [0] }) : v2DocxP('Bill of Materials withheld until every validation issue on this sheet is resolved.', { color: '747574' }));
+    if (m.citation) body += v2DocxP('✓ ' + m.citation, { color: '1B7A3A', sz: 15, shade: 'E2F3E7' });
+    if (opts.level === 'full'){
+      body += V2_PB + band('Full calculation — ' + v2PsTag(m), `Formula, values substituted, result, reference · Design Basis: ${m.settings[0][1]} (${m.codeRef})`);
+      body += v2DocxTable(['Step', 'Formula', 'Values substituted', 'Result', 'Reference'], mathRows, [1900, 2600, 3200, 1100, 2000], { right: [3], mono: [1, 2] });
+      if (opts.bom) body += v2DocxH('Bill of Materials') + (m.bom ? v2DocxTable(['Qty', 'Manufacturer', 'Part number', 'Description'], m.bom.map(r => [String(r.qty), r.manufacturer, r.partNumber, r.description]), [800, 2000, 2200, 5800], { right: [0] }) : v2DocxP('Bill of Materials withheld until every validation issue on this sheet is resolved.', { color: '747574' }));
+    }
+  }
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${body}<w:sectPr><w:footerReference w:type="default" r:id="rIdFtr"/><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const footer = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:jc w:val="right"/></w:pPr>${v2DocxRun(H.project + ' · ModuLaser Battery Calculator ' + H.rev + ' · Page ', { sz: 14, color: '747574' })}<w:r><w:rPr><w:sz w:val="14"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText>PAGE</w:instrText></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>`;
+  const files = [
+    { name: '[Content_Types].xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>` },
+    { name: '_rels/.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>` },
+    { name: 'word/_rels/document.xml.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdFtr" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>${media.map((x, i) => `<Relationship Id="rIdImg${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image${i + 1}.png"/>`).join('')}</Relationships>` },
+    { name: 'word/document.xml', data: doc }, { name: 'word/footer1.xml', data: footer },
+    ...media.map((d, i) => ({ name: `word/media/image${i + 1}.png`, data: d })),
+  ];
+  return v2Zip(files);
+}
+async function v2ExportDocx(opts){ const s = document.getElementById('pe-status'); if (s) s.textContent = 'Building Word document…'; v2Download(await v2BuildDocx(opts), v2FileBase() + '.docx'); }
+
 renderRevisionInfo();
 syncPrintHeaders();
 updateSaveIndicator();
+wireV2Shell();
+wirePrintDialog();
 </script>
 </body>
 </html>
