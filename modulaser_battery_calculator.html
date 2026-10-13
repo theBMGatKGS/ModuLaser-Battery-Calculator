@@ -975,6 +975,77 @@
 
     .gauge-labels{ display:flex; margin-top:1px !important; }
   }
+  @media print{ .plw-overlay, .pl-link-banner, .menubar, .quick-row{ display:none !important; } }
+  /* ===== 01.06.000 — menu bar + Import .pl wizard ===== */
+  .top-actions.menu-actions{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; }
+  .menubar{ display:flex; gap:2px; background:#000; border:1px solid var(--border); border-radius:6px; padding:2px; }
+  .menubar-top{ background:transparent; border:0; color:#fff; font:inherit; font-size:13px; padding:6px 12px; border-radius:4px; cursor:pointer; }
+  .menubar-top:hover, .menubar-top:focus-visible, .menubar-item.open > .menubar-top{ background:#1f2a35; outline:none; }
+  .menubar-item{ position:relative; }
+  .menubar-menu{ position:absolute; right:0; top:calc(100% + 4px); min-width:250px; background:#000; color:#fff; border:1px solid #455160; border-radius:6px; padding:4px; z-index:5000; box-shadow:0 10px 30px rgba(0,0,0,.6); }
+  .menubar-menu[hidden]{ display:none; }
+  .menubar-menu [role="menuitem"], .menubar-menu [role="menuitemcheckbox"]{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:#000; color:#fff; border:0; border-radius:4px; padding:7px 10px; font:inherit; font-size:13px; cursor:pointer; box-sizing:border-box; }
+  .menubar-menu [role="menuitem"]:hover, .menubar-menu [role="menuitem"]:focus, .menubar-menu [role="menuitemcheckbox"]:hover, .menubar-menu [role="menuitemcheckbox"]:focus{ background:#1f3550; outline:none; }
+  .menubar-menu .mi-kbd{ margin-left:auto; color:var(--text-faint); font-size:11px; }
+  .menubar-menu hr{ border:0; border-top:1px solid #2a323b; margin:4px 2px; }
+  .menubar-menu .bom-print-toggle{ background:#000; border:0; border-radius:4px; padding:7px 10px; color:#fff; }
+  .quick-row{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+  .quick-row .save-indicator{ margin-left:4px; }
+  .pl-link-banner{ margin:0 0 12px; padding:10px 14px; border:1px solid var(--accent-dim); background:var(--accent-soft); border-radius:8px; color:var(--text); display:flex; gap:12px; align-items:center; flex-wrap:wrap; font-size:13px; }
+  .pl-link-banner[hidden]{ display:none; }
+  .pl-link-banner b{ color:var(--accent); }
+  .plw-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.7); display:none; align-items:flex-start; justify-content:center; z-index:4000; overflow:auto; padding:30px 12px; }
+  .plw-overlay.open{ display:flex; }
+  .plw-card{ background:var(--panel); border:1px solid var(--border); border-radius:10px; width:min(1100px, 100%); color:var(--text); box-shadow:0 20px 60px rgba(0,0,0,.6); }
+  .plw-head{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); }
+  .plw-head h2{ margin:0; font-size:17px; }
+  .plw-steps{ display:flex; gap:4px; padding:10px 18px; border-bottom:1px solid var(--border-soft); background:var(--panel-2); }
+  .plw-step{ flex:1; display:flex; gap:8px; align-items:center; font-size:12.5px; color:var(--text-dim); padding:6px 8px; border-radius:6px; border:1px solid transparent; }
+  .plw-step .n{ width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:var(--panel-3); font-weight:700; font-size:12px; }
+  .plw-step.active{ color:var(--text); border-color:var(--accent-dim); background:var(--accent-soft); }
+  .plw-step.active .n, .plw-step.done .n{ background:var(--accent); color:#1c1206; }
+  .plw-body{ padding:16px 18px; max-height:calc(100vh - 260px); overflow:auto; font-size:13px; }
+  .plw-foot{ display:flex; gap:8px; justify-content:flex-end; align-items:center; padding:12px 18px; border-top:1px solid var(--border); }
+  .plw-foot .plw-msg{ margin-right:auto; color:#ff8a80; font-size:12.5px; }
+  .plw-note{ background:var(--panel-2); border-left:3px solid var(--accent); padding:8px 12px; border-radius:4px; color:var(--text-dim); margin:0 0 12px; }
+  .plw-warn{ background:rgba(255,193,7,.08); border-left:3px solid #ffc107; padding:8px 12px; border-radius:4px; color:#ffe08a; margin:0 0 12px; }
+  .plw-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(230px,1fr)); gap:12px; }
+  .plw-grid label{ display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--text-dim); }
+  .plw-body input[type=text], .plw-body input[type=number]{ background:#000; color:#fff; border:1px solid var(--border); border-radius:5px; padding:6px 8px; font:inherit; font-size:13px; }
+  .plw-drop{ border:2px dashed var(--border); border-radius:8px; padding:22px; text-align:center; color:var(--text-dim); margin-bottom:12px; cursor:pointer; }
+  .plw-drop.over{ border-color:var(--accent); background:var(--accent-soft); }
+  .plw-file{ border:1px solid var(--border); border-radius:8px; padding:10px 12px; margin-bottom:10px; background:var(--panel-2); }
+  .plw-file h4{ margin:0 0 4px; font-size:14px; display:flex; gap:8px; align-items:center; }
+  .plw-file .meta{ color:var(--text-dim); font-size:12px; margin-bottom:6px; }
+  .plw-groups{ display:flex; flex-wrap:wrap; gap:6px 14px; }
+  .plw-groups label{ display:flex; gap:6px; align-items:center; }
+  .plw-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  .plw-table th, .plw-table td{ border-bottom:1px solid var(--border-soft); padding:5px 6px; text-align:left; vertical-align:middle; }
+  .plw-table th{ color:var(--text-dim); font-weight:600; position:sticky; top:-16px; background:var(--panel); }
+  .plw-table input[type=text]{ width:100%; box-sizing:border-box; }
+  .plw-count{ font-family:var(--mono); font-size:11.5px; color:var(--text-dim); white-space:nowrap; }
+  .plw-count.over{ color:#ff8a80; font-weight:700; }
+  .plw-dup{ outline:2px solid #ff5252; }
+  .plw-tag{ display:inline-block; padding:1px 7px; border-radius:10px; font-size:11px; background:var(--panel-3); color:var(--text-dim); }
+  .plw-tag.bad{ background:rgba(255,82,82,.18); color:#ff8a80; }
+  .plw-tag.ok{ background:rgba(76,175,80,.18); color:#a5d6a7; }
+  .plw-area{ border:1px solid var(--border); border-radius:8px; margin-bottom:14px; }
+  .plw-area > h4{ margin:0; padding:8px 12px; background:var(--panel-2); border-bottom:1px solid var(--border); font-size:13.5px; display:flex; gap:10px; align-items:center; border-radius:8px 8px 0 0; }
+  .plw-psus{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:10px; padding:10px; }
+  .plw-psu{ border:1px solid var(--border); border-radius:8px; background:var(--panel-2); padding:8px 10px; min-height:70px; }
+  .plw-psu.bad{ border-color:#ff5252; }
+  .plw-psu.dragover{ border-color:var(--accent); background:var(--accent-soft); }
+  .plw-psu-h{ display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .plw-psu-h b{ font-size:13px; }
+  .plw-psu-h .ah{ margin-left:auto; font-family:var(--mono); font-size:12px; }
+  .plw-dev{ display:flex; gap:6px; align-items:center; padding:3px 4px; border-radius:4px; cursor:grab; font-size:12.5px; }
+  .plw-dev:hover{ background:var(--panel-3); }
+  .plw-dev .nm{ flex:1 1 auto; min-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:var(--mono); }
+  .plw-dev .calc-select-wrap{ flex:0 0 118px; width:118px; min-width:0; }
+  .plw-tag, .plw-psu-h b, .plw-psu-h .ah{ white-space:nowrap; }
+  .plw-psu-h{ flex-wrap:wrap; }
+  .plw-viol{ color:#ff8a80; font-size:11.5px; margin-top:4px; }
+  .plw-diff-added{ color:#a5d6a7; } .plw-diff-removed{ color:#ff8a80; } .plw-diff-changed{ color:#ffe08a; }
 </style>
 </head>
 <body>
@@ -997,22 +1068,60 @@
         <span class="revision-v" id="app-revision-date-cell">—</span>
       </div>
     </div>
-    <div class="top-actions">
-      <button class="btn" id="help-btn">Help</button>
-      <button class="btn" id="howdoi-toolbar-btn" title="Search How Do I… topics and open Help">How Do I…</button>
-      <button class="btn" id="save-as-copy-btn">Save As…</button>
-      <button class="btn" id="import-calc-btn" title="Import a saved calculator .html">Import Calc</button>
-      <button class="btn" id="clear-calc-btn" title="Clear this sheet or the entire file">Clear</button>
-      <button class="btn" id="confirm-defaults-btn" title="Mark factory-default fields on the project header and current sheet as confirmed (clears blue needs-entry on defaults)">Confirm defaults</button>
-      <button class="btn" id="export-xlsx-btn">Export to Excel</button>
-      <input type="file" id="import-calc-file" accept=".html,.htm,text/html" hidden>
-      <button class="btn" id="cluster-report-btn">Cluster Report</button>
-      <label class="bom-print-toggle" title="When off, the Bill of Materials is left out of the printed output for every sheet in this document">
-        <input type="checkbox" id="print-bom-toggle" checked onchange="togglePrintBom()">
-        <span>Print BOM</span>
-      </label>
-      <button class="btn" onclick="window.print()">Print</button>
-      <button class="btn btn-primary" id="add-location-btn">+ Add Location</button>
+    <div class="top-actions menu-actions">
+      <nav class="menubar" role="menubar" aria-label="Main menu">
+        <div class="menubar-item">
+          <button class="menubar-top" role="menuitem" aria-haspopup="true" aria-expanded="false" id="menu-file-btn">File</button>
+          <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-file-btn">
+            <button role="menuitem" id="new-calc-btn" title="Start a new blank calculator (same as Clear → Entire file)">New…</button>
+            <button role="menuitem" id="import-calc-btn" title="Import a saved calculator .html">Open / Import Calc…</button>
+            <button role="menuitem" id="import-pl-menu-btn" title="Import one or more PipeCAD .pl project files">Import .pl…</button>
+            <button role="menuitem" id="linked-pl-btn" title="See and check the PipeCAD .pl files linked to this calc">Linked .pl files…</button>
+            <hr>
+            <button role="menuitem" id="save-as-menu-btn">Save As…</button>
+            <button role="menuitem" id="export-xlsx-btn">Export to Excel</button>
+            <hr>
+            <button role="menuitem" id="print-menu-btn">Print…<span class="mi-kbd">Ctrl+P</span></button>
+            <label class="bom-print-toggle" role="menuitemcheckbox" tabindex="-1" title="When off, the Bill of Materials is left out of the printed output for every sheet in this document">
+              <input type="checkbox" id="print-bom-toggle" checked onchange="togglePrintBom()">
+              <span>Print BOM</span>
+            </label>
+          </div>
+        </div>
+        <div class="menubar-item">
+          <button class="menubar-top" role="menuitem" aria-haspopup="true" aria-expanded="false" id="menu-edit-btn">Edit</button>
+          <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-edit-btn">
+            <button role="menuitem" id="add-location-menu-btn">+ Add Location</button>
+            <hr>
+            <button role="menuitem" id="clear-calc-btn" title="Clear this sheet or the entire file">Clear…</button>
+            <button role="menuitem" id="confirm-defaults-btn" title="Mark factory-default fields on the project header and current sheet as confirmed (clears blue needs-entry on defaults)">Confirm defaults</button>
+            <hr>
+            <button role="menuitem" id="clear-saved-btn" title="Clear all saved entries and start over">Clear saved data</button>
+          </div>
+        </div>
+        <div class="menubar-item">
+          <button class="menubar-top" role="menuitem" aria-haspopup="true" aria-expanded="false" id="menu-view-btn">View</button>
+          <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-view-btn">
+            <button role="menuitem" id="cluster-report-btn">Cluster Report</button>
+          </div>
+        </div>
+        <div class="menubar-item">
+          <button class="menubar-top" role="menuitem" aria-haspopup="true" aria-expanded="false" id="menu-help-btn">Help</button>
+          <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-help-btn">
+            <button role="menuitem" id="help-btn">Help</button>
+            <button role="menuitem" id="howdoi-toolbar-btn" title="Search How Do I… topics and open Help">How Do I…</button>
+            <button role="menuitem" id="revision-log-menu-btn">Revision log</button>
+          </div>
+        </div>
+      </nav>
+      <div class="quick-row">
+        <input type="file" id="import-calc-file" accept=".html,.htm,text/html" hidden>
+        <button class="btn" id="import-pl-btn" title="Import one or more PipeCAD .pl files">Import .pl</button>
+        <button class="btn btn-primary" id="add-location-btn">+ Add Location</button>
+        <button class="btn" id="save-as-copy-btn">Save As…</button>
+        <button class="btn" id="print-btn" onclick="window.print()">Print</button>
+        <span id="save-indicator" class="save-indicator">Auto-Save off</span>
+      </div>
     </div>
   </div>
 
@@ -1052,10 +1161,6 @@
         <span class="toggle-track"><span class="toggle-thumb"></span></span>
       </label>
     </div>
-    <div class="pf" style="flex:1; align-items:flex-end;">
-      <span id="save-indicator" class="save-indicator">Auto-Save off</span>
-    </div>
-    <button class="btn btn-ghost btn-sm" id="clear-saved-btn" title="Clear all saved entries and start over">Clear saved data</button>
   </div>
 
   <div class="report-overlay" id="report-overlay">
@@ -1102,10 +1207,27 @@
   <main>
     <p class="intro">Enter each display/detector module, fan speed, and auxiliary circuit count for a cluster below. The calculator derives total current draw, standby/alarm capacity, and required battery size — then recommends the power supply and enclosure combination, or lets you hand off ModuLaser load figures to a third-party supply's own calculator.</p>
 
+    <div class="pl-link-banner" id="pl-link-banner" hidden role="status"></div>
     <div id="locations-container"></div>
   </main>
 
   <footer>Reference current-draw values sourced from ModuLaser worksheet (New UL Values). Verify against project-specific design documents before final submittal.</footer>
+
+  <div class="plw-overlay" id="plw-overlay" role="dialog" aria-modal="true" aria-labelledby="plw-title">
+    <div class="plw-card">
+      <div class="plw-head"><h2 id="plw-title">Import PipeCAD .pl files</h2><button class="help-close" id="plw-close" title="Close">✕</button></div>
+      <div class="plw-steps" id="plw-steps"></div>
+      <div class="plw-body" id="plw-body"></div>
+      <div class="plw-foot">
+        <span class="plw-msg" id="plw-msg" role="status"></span>
+        <span id="plw-aux-actions" style="display:flex; gap:8px"></span>
+        <button class="btn btn-ghost btn-sm" id="plw-cancel">Cancel</button>
+        <button class="btn btn-sm" id="plw-back">Back</button>
+        <button class="btn btn-primary btn-sm" id="plw-next">Next</button>
+        <button class="btn btn-primary btn-sm" id="plw-finish" hidden>Create sheets</button>
+      </div>
+    </div>
+  </div>
 
   <div class="help-overlay" id="help-overlay">
     <div class="help-card">
@@ -1254,7 +1376,7 @@
           <div class="qs-step-num">12</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-save-export">Save your work and export results</div>
-            <p><b>Save As…</b> in the toolbar downloads the whole document — every sheet, every field — as a single self-contained .html file you can keep, email, or reopen later in any browser; opening it restores the document exactly as saved. The <b>Autosave</b> toggle (next to it) is a convenience on top of that: once turned on, it saves your current work automatically to this browser's local storage as you go, so a reload doesn't lose it — but it's tied to this specific browser and device, not portable like a saved file, so it's not a substitute for an occasional Save As when you want a real, shareable copy. <b>Export to Excel</b> in the toolbar produces a multi-sheet .xlsx workbook, one worksheet per power supply, mirroring each sheet's module table and results — useful for handing data to someone who wants it outside this tool.</p>
+            <p><b>Save As…</b> (quick row, or File → Save As…) downloads the whole document — every sheet, every field — as a single self-contained .html file you can keep, email, or reopen later in any browser; opening it restores the document exactly as saved. The <b>Autosave</b> toggle (next to it) is a convenience on top of that: once turned on, it saves your current work automatically to this browser's local storage as you go, so a reload doesn't lose it — but it's tied to this specific browser and device, not portable like a saved file, so it's not a substitute for an occasional Save As when you want a real, shareable copy. <b>Export to Excel</b> in the toolbar produces a multi-sheet .xlsx workbook, one worksheet per power supply, mirroring each sheet's module table and results — useful for handing data to someone who wants it outside this tool.</p>
           </div>
         </div>
 
@@ -1271,7 +1393,7 @@
           <div class="qs-step-num">14</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-confirm-defaults">Confirm defaults</div>
-            <p>When factory defaults are intentional (you reviewed them and want to keep them), click <b>Confirm defaults</b> in the toolbar. That clears blue highlighting on factory-default fields for the <b>project header</b> and the <b>current sheet</b> (the sheet you last clicked or focused — shown with a subtle outline). Empty fields stay blue until you fill them. Confirming does not change any values — it only marks those defaults as reviewed.</p>
+            <p>When factory defaults are intentional (you reviewed them and want to keep them), click <b>Edit → Confirm defaults</b>. That clears blue highlighting on factory-default fields for the <b>project header</b> and the <b>current sheet</b> (the sheet you last clicked or focused — shown with a subtle outline). Empty fields stay blue until you fill them. Confirming does not change any values — it only marks those defaults as reviewed.</p>
             <figure class="qs-figure"><img data-qs-slot="11-confirm-defaults" alt="Confirm defaults button"><figcaption>Screenshot: Confirm defaults toolbar button clearing blue on reviewed factory defaults</figcaption></figure>
           </div>
         </div>
@@ -1280,7 +1402,7 @@
           <div class="qs-step-num">15</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-clear">Clear a sheet or the entire file</div>
-            <p><b>Clear</b> in the toolbar asks what to wipe. <b>This sheet only</b> resets the current power-supply sheet to a blank factory starter (modules + defaults) and leaves project header fields alone — you confirm before it runs. <b>Entire file</b> removes every sheet, then asks whether to <b>keep</b> or <b>clear</b> the project/header fields, and asks for a final confirm before wiping. Either path starts you with a fresh blank sheet afterward. (The separate "Clear saved data" control in the project bar is only for wiping browser Autosave storage — different from toolbar Clear.)</p>
+            <p><b>Edit → Clear…</b> asks what to wipe. <b>This sheet only</b> resets the current power-supply sheet to a blank factory starter (modules + defaults) and leaves project header fields alone — you confirm before it runs. <b>Entire file</b> removes every sheet, then asks whether to <b>keep</b> or <b>clear</b> the project/header fields, and asks for a final confirm before wiping. Either path starts you with a fresh blank sheet afterward. (The separate "Clear saved data" control in the project bar is only for wiping browser Autosave storage — different from toolbar Clear.)</p>
             <figure class="qs-figure"><img data-qs-slot="12-clear" alt="Clear dialog"><figcaption>Screenshot: Clear prompt choosing this sheet vs entire file</figcaption></figure>
           </div>
         </div>
@@ -1289,8 +1411,30 @@
           <div class="qs-step-num">16</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-import">Import Calc from a saved .html</div>
-            <p><b>Import Calc</b> opens a file picker for a calculator <span class="mono-inline">.html</span> that was produced with Save As… (those files embed the document data needed for import). If the file's revision is older than this app, you get a warning and can cancel or continue. Then choose <b>Replace document</b> (swap your current header + sheets for the imported file) or <b>Merge sheets</b> (add the imported power-supply sheets into the current file). On merge, if an imported sheet name collides with one you already have, you pick per collision: <b>Skip</b>, <b>Keep both (auto-rename)</b>, or <b>Overwrite existing</b>.</p>
+            <p><b>File → Open / Import Calc…</b> opens a file picker for a calculator <span class="mono-inline">.html</span> that was produced with Save As… (those files embed the document data needed for import). If the file's revision is older than this app, you get a warning and can cancel or continue. Then choose <b>Replace document</b> (swap your current header + sheets for the imported file) or <b>Merge sheets</b> (add the imported power-supply sheets into the current file). On merge, if an imported sheet name collides with one you already have, you pick per collision: <b>Skip</b>, <b>Keep both (auto-rename)</b>, or <b>Overwrite existing</b>.</p>
             <figure class="qs-figure"><img data-qs-slot="13-import-calc" alt="Import Calc dialog"><figcaption>Screenshot: Import Calc replace/merge prompt and sheet-name collision choices</figcaption></figure>
+          </div>
+        </div>
+
+        <div class="qs-step">
+          <div class="qs-step-num">17</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-menubar">Find commands in the menu bar</div>
+            <p>The top of the calculator has a menu bar plus a short row of the most-used buttons. <b>File</b>: New…, Open / Import Calc…, Import .pl…, Linked .pl files…, Save As…, Export to Excel, Print… and the <b>Print BOM</b> switch. <b>Edit</b>: + Add Location, Clear…, Confirm defaults, Clear saved data. <b>View</b>: Cluster Report. <b>Help</b>: Help, How Do I…, Revision log. The quick row holds <b>Import .pl</b>, <b>+ Add Location</b>, <b>Save As…</b>, <b>Print</b> and the Auto-Save indicator. Menus work from the keyboard too: Tab to a menu name, press Enter or ↓ to open it, ↑/↓ to move, ←/→ to switch menus, Esc to close.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">18</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-import-pl">Import PipeCAD .pl files</div>
+            <p><b>File → Import .pl…</b> (or <b>Import .pl</b> in the quick row) opens a four-step wizard. <b>1 Battery settings</b> — set Design Basis, standby/alarm, ambient temperature, safety margin, NFPA 72 edition, power-supply capacity and supply mode <i>first</i>; they become the defaults on every new sheet and drive the 65 Ah check. <b>2 Pick files</b> — drop or choose one or more .pl files; each shows its project (the file name is used when ProjectName is blank), units (metric files are converted to feet), Areas/Groups, detectors, displays and PSU positions. Untick any Area/Group you don't want. Unknown detector types or display part numbers are listed and skipped. <b>3 Rename</b> — set a naming pattern from {project} {file} {area} {name} {##} (default <span class="mono-inline">{project}-{area}-Det{##}</span>, remembered for next time), edit any zone or Area/Group name, and watch the live character counter. The ModuLaser display shows 16 characters total, including spaces, so names over 16 are blocked until shortened — use the suggested short name or <b>Shorten all over 16</b>. Duplicate names are outlined in red. <b>4 Power supplies</b> — each Area/Group gets at least one supply, a supply never spans Areas/Groups, and each takes at most 4 detectors and 1 display with the required battery ≤ 65 Ah (display load included). Suggestions start from PSU positions in the file (nearest device first), otherwise devices within 3 ft of each other in plan view (X/Y) are grouped; oversize groups are split by distance. Drag devices between supply cards or use <i>Move to…</i>, add or remove supplies, or click <b>Pack into fewest</b>. <b>Create sheets</b> stays disabled while any rule is broken. One sheet is created per supply, with type, zone name, fan speed and display model filled in; addresses and anything the file doesn't provide stay highlighted for you to enter.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">19</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-linked-pl">Keep linked .pl files up to date</div>
+            <p>Every imported .pl stays linked in the calc file: its name, size, last-modified date, SHA-256 fingerprint, and a fingerprint for each detector mapped to its sheet and row. <b>File → Linked .pl files…</b> lists them. <b>Check link…</b> asks you to pick the current copy of the .pl (a browser can't re-open a file on its own). If it changed, a banner appears above the sheets with the number of added, removed and changed devices. <b>Review &amp; re-import…</b> shows the differences: fan-speed and name updates are pre-ticked only where you haven't edited that row by hand, removed devices are only deleted if you tick them, and new devices go through the rename and power-supply steps. Addresses are never changed.</p>
           </div>
         </div>
 
@@ -1425,6 +1569,10 @@
         <h3>FAQs</h3>
 
         <div class="help-faq-item">
+          <div class="q">How does Import .pl decide which detectors share a power supply?</div>
+          <p class="a">PipeCAD's "Floor" level is treated as an Area/Group. Within each Area/Group, PSU positions saved in the .pl are used as the starting supplies and each device goes to the nearest one that still has room. Without PSU positions, detectors and displays within 3 ft of each other in plan view (X/Y, height ignored) are suggested together. A suggestion is split by distance if it would exceed 4 detectors, 1 display, or a required battery over 65 Ah using the step 1 battery settings, Edwards A/BPS quiescent load and one 35 mA AUX circuit. Devices more than 3 ft from everything else get their own supply; use <b>Pack into fewest</b> or drag them together if you want fewer supplies. The sheet's own calculation is still the final word once it's created.</p>
+        </div>
+        <div class="help-faq-item">
           <div class="q">What's a "cluster"?</div>
           <p class="a">A Standard or Minimum Display Module (FHSD8310-ULF / FHSD8300-ULF) plus up to 8 Detector Modules (FHSD8330-ULF) wired to it. The display is what makes a cluster a cluster — detectors alone have nowhere to report.</p>
         </div>
@@ -1519,7 +1667,7 @@
           <p class="a" style="margin-top:8px;"><b>Practical implication:</b> for initial sizing, the battery should be selected using the manufacturer's published capacity/discharge data at the anticipated operating temperature. Where the manufacturer provides temperature de-rating data or requires a temperature correction, apply that data — a battery rated at 77°F/25°C should not be assumed to deliver its full nameplate capacity at a substantially lower temperature. This calculator's temperature multiplier table is a reasonable general-guidance convenience, not itself a literal NFPA 72 mandate — where you have the specific battery manufacturer's own de-rating figures, those should take precedence over this calculator's generic table. In short: the 1.25 aging factor is required outright; temperature effects must be considered where they affect the battery's ability to meet the required duty cycle, normally using the manufacturer's own data. See <a href="https://link.nfpa.org/publications/72/2025/chapters/10#ID000720000839" target="_blank" rel="noopener">NFPA 72-2025 § 10.6.7.2.14</a> and <a href="https://link.nfpa.org/publications/72/2025/annexes/A/groups/14#ID000720004256" target="_blank" rel="noopener">Annex A.14.4.3.2</a>.</p>
         </div>
         <div class="help-faq-item">
-          <div class="q">What does the "Print BOM" toggle in the toolbar do?</div>
+          <div class="q">What does the "Print BOM" switch in the File menu do?</div>
           <p class="a">It's a single document-wide switch (not per-sheet) that leaves the Bill of Materials out of the printed/PDF output entirely when unchecked — every sheet's BOM, and its identifying header, are skipped. It only affects print; the on-screen Bill of Materials, Excel export, and Cluster Validation Report are unaffected. It's saved with the rest of the document, so it stays set the way you left it next time you open the file.</p>
         </div>
         <div class="help-faq-item">
@@ -1575,7 +1723,7 @@
 //         change made in chat, until the minor version above is next revised
 //   YYMMDD = the actual calendar date the revision was made
 const APP_MAJOR = "01";
-const APP_MINOR = "05";
+const APP_MINOR = "06";
 const APP_AUTHOR = "The BMG";
 
 // Running amendment log. Each entry is one distinct logical change.
@@ -1643,6 +1791,7 @@ const AMENDMENTS = [
   { rev: "007", minor: "05", date: "261002", desc: "Replaced unreliable native <select> option popups (Chromium/Electron still painted light OS menus with light text despite 01.05.006 CSS) with custom white-on-black listboxes for all calculator selects — Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and the rest. Native selects stay in the DOM (visually hidden) so value/change/save-load/needs-entry/validation keep working; open menus use fixed positioning to escape .location overflow clipping. Verified open menus via browser screenshots." },
   { rev: "008", minor: "05", date: "261002", desc: "Sheet header layout: Power Supply Name and Location now occupy a full row above Design Basis / Standby / Alarm / Ambient Temperature (previously side-by-side with those controls, so long PS titles encroached on the Design Basis dropdown). Design Basis control widened (flex min ~400px) so the full selected label shows for every preset — including NFPA 72 + NFPA 110 Generator Backup (Non-Voice/Voice) — without truncating into adjacent fields. Custom calc-selects, needs-entry, save/load, and print unchanged." },
   { rev: "009", minor: "05", date: "261002", desc: "Fixed tall custom calc-select menus (Fan Speed, Addresses, and any other long list) that could not scroll: a capture-phase window scroll listener was closing the menu on the list's own scrollbar drag and mouse-wheel scroll. Listener now ignores scrolls that originate from the open list; outside-click dismiss also treats pointer-down inside the open list's bounding box as inside; option commit moved from mousedown to click and lists use scrollbar-gutter:stable so scrollbar/gutter drags are not stolen by option hit-targets (overlay scrollbars). Also added keyboard navigation while a menu is open — Arrow Up/Down, Page Up/Down, Home/End move the highlight (with scroll-into-view), Enter/Space commit, Escape closes — and stopped ArrowDown on the closed-state button from toggling an already-open menu shut." },
+  { rev: "000", minor: "06", date: "261013", desc: "Minor version bumped to 01.06 per Brent; revision counter restarted at 000. Menu bar (File / Edit / View / Help, keyboard accessible, white-on-black) replaces the crowded toolbar, with a short quick-action row (Import .pl, + Add Location, Save As…, Print, Auto-Save indicator); every existing command is still reachable. New Import .pl wizard: battery settings first, multi-file pick with per-Area/Group selection and metric-to-feet conversion, rename table with {project} {file} {area} {name} {##} pattern (remembered), live 16-character counter, short-name suggestions and duplicate flags, then power-supply assignment that enforces at least one supply per Area/Group, no supply across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah per supply, seeded from PSU positions in the file or 3 ft plan-view clustering. One sheet per supply with type, zone name, fan speed and display model filled in; addresses stay highlighted. Linked .pl tracking saved in the calc file (name, size, modified date, SHA-256, per-detector fingerprints mapped to sheet/row) with Check link, a change banner, a diff, and re-import that never changes addresses or hand edits without confirmation. Help: Quick Start steps 17–19, a new FAQ and How Do I… topics." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -5837,10 +5986,34 @@ function wireFeaturePack(){
 /* ===== How Do I… searchable help ===== */
 const HOWDOI_COMMON = [
   {
+    id: 'import-pl',
+    title: 'Import PipeCAD .pl files',
+    keywords: 'pipecad pl import wizard area group floor detector rename power supply psu cluster 3 ft 65 ah metric',
+    blurb: 'File → Import .pl… (or Import .pl in the quick row): 1 set battery settings, 2 pick .pl files and tick Areas/Groups, 3 rename zones (16 characters max, including spaces), 4 review power-supply suggestions (max 4 detectors + 1 display, ≤ 65 Ah, never across Areas/Groups). One sheet per supply.',
+    target: 'qs-step-import-pl',
+    common: true,
+  },
+  {
+    id: 'linked-pl',
+    title: 'Check linked .pl files for changes',
+    keywords: 'linked pl link changed re-import update fingerprint sha banner diff',
+    blurb: 'File → Linked .pl files… → Check link… and pick the current .pl. If it changed, a banner shows added/removed/changed devices; Review & re-import updates fan speeds and names (hand edits only if you tick them) and sends new devices to power-supply assignment. Addresses are never touched.',
+    target: 'qs-step-linked-pl',
+    common: true,
+  },
+  {
+    id: 'menubar',
+    title: 'Where did the toolbar buttons go?',
+    keywords: 'menu bar toolbar file edit view help where button moved',
+    blurb: 'They are in the menu bar: File (New, Open/Import Calc, Import .pl, Linked .pl files, Save As, Export to Excel, Print, Print BOM), Edit (+ Add Location, Clear, Confirm defaults, Clear saved data), View (Cluster Report), Help (Help, How Do I…, Revision log). Import .pl, + Add Location, Save As and Print are also in the quick row.',
+    target: 'qs-step-menubar',
+    common: true,
+  },
+  {
     id: 'import-calc',
     title: 'Import Calc',
     keywords: 'import merge replace collision older revision html',
-    blurb: 'Use Import Calc in the toolbar to load a Save As… .html file. Choose Replace document or Merge sheets. On name collisions pick Skip, Keep both (rename), or Overwrite. Older calculator revisions show a warning first.',
+    blurb: 'Use File → Open / Import Calc… to load a Save As… .html file. Choose Replace document or Merge sheets. On name collisions pick Skip, Keep both (rename), or Overwrite. Older calculator revisions show a warning first.',
     target: 'qs-step-import',
     common: true,
   },
@@ -5848,7 +6021,7 @@ const HOWDOI_COMMON = [
     id: 'clear',
     title: 'Clear a sheet or the entire file',
     keywords: 'clear wipe reset blank header',
-    blurb: 'Toolbar Clear asks This sheet only (reset current power-supply sheet) or Entire file (then keep or clear project header fields). Both paths confirm before destructive action.',
+    blurb: 'Edit → Clear… asks This sheet only (reset current power-supply sheet) or Entire file (then keep or clear project header fields). Both paths confirm before destructive action.',
     target: 'qs-step-clear',
     common: true,
   },
@@ -6229,6 +6402,824 @@ document.getElementById("saveas-overlay").addEventListener("click", (e) => {
 document.getElementById("saveas-filename-input").addEventListener("keydown", (e) => {
   if (e.key === "Enter") performSaveAs();
 });
+
+/* ===== 01.06.000 — Menu bar, Import .pl wizard, linked .pl tracking ===== */
+const PL_PATTERN_KEY = 'modulaser_pl_rename_pattern';
+const PL_DEFAULT_PATTERN = '{project}-{area}-Det{##}';
+const PL_NAME_MAX = 16;
+const PL_CLUSTER_FT = 3;
+const PL_MAX_DET_PER_PSU = 4;
+const PL_MAX_DISP_PER_PSU = 1;
+const PL_DETECTOR_TYPES = { MULTISENSE: 'Detector', MODULASER_DETECTOR: 'Detector' };
+const PL_DISPLAY_PARTS = { '0': 'Standard Display', '1': 'Minimum Display', '2': 'Command Display' };
+const PL_M_TO_FT = 3.28084;
+let PL_LINKS = [];          // persisted in the calc file (state.plLinks)
+let plSheetSeq = 0;
+
+function plEsc(s){ return escapeAttr(s == null ? '' : s); }
+function plKid(el, tag){ if (!el) return null; for (const c of el.children) if (c.tagName === tag) return c; return null; }
+function plTxt(el, tag){ const k = plKid(el, tag); return k ? k.textContent.trim() : ''; }
+function plNum(el, tag){ const v = parseFloat(plTxt(el, tag)); return isFinite(v) ? v : 0; }
+function plFnv(str){ let h = 0x811c9dc5; for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, '0'); }
+async function plSha256(text){
+  try {
+    if (window.crypto && crypto.subtle){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e){}
+  return 'fnv-' + plFnv(text);
+}
+function plBaseName(n){ return String(n || '').replace(/^.*[\\/]/, '').replace(/\.pl$/i, ''); }
+
+/* ---------- parser ---------- */
+function plParse(text, fileName){
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('Not a valid PipeCAD .pl (XML) file.');
+  const root = doc.documentElement;
+  if (!root || root.tagName !== 'PipeLayout') throw new Error('Not a PipeCAD project (no <PipeLayout> root).');
+  const props = plKid(root, 'properties');
+  const unitRaw = plTxt(root, 'unit');
+  const imperial = unitRaw === '1';
+  const scale = imperial ? 1 : PL_M_TO_FT;
+  const projectName = plTxt(props, 'ProjectName');
+  const out = {
+    fileName, projectName, project: projectName || plBaseName(fileName),
+    projectFromFile: !projectName,
+    unitRaw, unitLabel: imperial ? 'Imperial (ft)' : `Metric (m, unit ${unitRaw || '?'}) — converted to ft`,
+    version: plTxt(root, 'pipecadVersion'), groups: [], skipped: []
+  };
+  const floorDb = plKid(root, 'floorDatabase');
+  const floors = floorDb ? Array.from(floorDb.children).filter(c => c.tagName === 'Floor') : [];
+  floors.forEach((fl, gi) => {
+    const gname = plTxt(fl, 'name') || `Area ${gi + 1}`;
+    const g = { idx: gi, origName: gname, name: gname, include: true, detectors: [], displays: [], psus: [] };
+    const seen = {};
+    const ddb = plKid(fl, 'detectorDatabase');
+    (ddb ? Array.from(ddb.children).filter(c => c.tagName === 'Detector') : []).forEach((d, di) => {
+      const name = plTxt(d, 'name') || `Detector ${di + 1}`;
+      const typeRaw = plTxt(d, 'type');
+      const idTxt = plTxt(d, 'id');
+      let key = `${gname}#${idTxt !== '' ? 'id' + idTxt : 'n' + name}`;
+      if (seen[key]) key += '~' + (++seen[key]); else seen[key] = 1;
+      const fan = parseInt(plTxt(d, 'aspiratorSpeed'), 10);
+      const rec = { key, ord: di, kind: 'detector', origName: name, typeRaw,
+        type: PL_DETECTOR_TYPES[typeRaw], fan: (fan >= 1 && fan <= 16) ? fan : null,
+        address: plTxt(d, 'address'),
+        x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale };
+      rec.fp = plFnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
+      if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
+      g.detectors.push(rec);
+    });
+    const disDb = plKid(fl, 'displayDatabase');
+    (disDb ? Array.from(disDb.children).filter(c => c.tagName === 'Display') : []).forEach((d, i) => {
+      const pn = plTxt(d, 'partNumber');
+      const type = PL_DISPLAY_PARTS[pn];
+      if (!type){ out.skipped.push(`${gname}: display ${i + 1} has unknown partNumber “${pn}” — skipped`); return; }
+      g.displays.push({ key: `${gname}#disp${i}`, ord: i, kind: 'display', origName: `${type} ${i + 1}`, type, partNumber: pn,
+        x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale,
+        fp: plFnv([pn, plNum(d,'startX'), plNum(d,'startY')].join('|')) });
+    });
+    const psuDb = plKid(fl, 'psuDatabase');
+    (psuDb ? Array.from(psuDb.children).filter(c => c.tagName === 'PSU') : []).forEach(p => {
+      g.psus.push({ x: plNum(p, 'startX') * scale, y: plNum(p, 'startY') * scale });
+    });
+    out.groups.push(g);
+  });
+  return out;
+}
+
+/* ---------- battery math (mirrors recalcLocationInner, Edwards A/BPS, 1 AUX circuit) ---------- */
+function plDeviceMa(dev){
+  if (dev.kind === 'display') return (MODULE_TYPES[dev.type] || {}).ma || 0;
+  return FAN_SPEED_MA[dev.fan] || FAN_SPEED_MA[16];
+}
+function plRequiredAh(devices, s){
+  const set = s || plWiz.settings;
+  if (!devices.length) return 0;
+  const preset = DESIGN_BASIS_PRESETS[set.designBasis] || {};
+  const devMa = devices.reduce((a, d) => a + plDeviceMa(d), 0);
+  const totalMa = devMa + (set.mode === 'thirdparty' ? 0 : QUIESCENT_MA + AUX_MA_PER_CIRCUIT);
+  const d = preset.formula === 'bs5839' ? (preset.derating || 1.75) : 1;
+  const margin = preset.formula === 'bs5839' ? 0.25 : (preset.fixedMargin !== undefined ? preset.fixedMargin : parseFloat(set.margin));
+  const standbyAh = (parseFloat(set.standbyHours) || 0) * totalMa / 1000;
+  const alarmAh = ((parseFloat(set.alarmMinutes) || 0) / 60) * totalMa / 1000 * d;
+  return (standbyAh + alarmAh) * (1 + margin) * (TEMPERATURE_MULTIPLIERS[parseInt(set.temperature)] || 1);
+}
+function plPsuCheck(psu){
+  const dets = psu.devices.filter(d => d.kind === 'detector').length;
+  const disp = psu.devices.filter(d => d.kind === 'display').length;
+  const ah = plRequiredAh(psu.devices);
+  const v = [];
+  if (dets > PL_MAX_DET_PER_PSU) v.push(`${dets} detectors — max ${PL_MAX_DET_PER_PSU} per power supply`);
+  if (disp > PL_MAX_DISP_PER_PSU) v.push(`${disp} displays — max ${PL_MAX_DISP_PER_PSU} per power supply`);
+  if (ah > CHARGER_MAX_AH) v.push(`${ah.toFixed(1)} Ah required — over the ${CHARGER_MAX_AH} Ah charger limit`);
+  return { dets, disp, ah, violations: v };
+}
+function plFits(devs){
+  const dets = devs.filter(d => d.kind === 'detector').length, disp = devs.filter(d => d.kind === 'display').length;
+  return dets <= PL_MAX_DET_PER_PSU && disp <= PL_MAX_DISP_PER_PSU && plRequiredAh(devs) <= CHARGER_MAX_AH;
+}
+const plDist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/* ---------- PSU suggestion ---------- */
+function plSplitByDistance(devs){
+  // Greedy: seed with the left-/bottom-most device, grow with nearest-neighbour while rules allow.
+  const rest = devs.slice().sort((a, b) => a.x - b.x || a.y - b.y);
+  const groups = [];
+  while (rest.length){
+    const cur = [rest.shift()];
+    let grew = true;
+    while (grew && rest.length){
+      grew = false;
+      let best = -1, bestD = Infinity;
+      rest.forEach((d, i) => {
+        const dd = Math.min(...cur.map(c => plDist(c, d)));
+        if (dd < bestD && plFits(cur.concat([d]))){ bestD = dd; best = i; }
+      });
+      if (best >= 0){ cur.push(rest.splice(best, 1)[0]); grew = true; }
+    }
+    groups.push(cur);
+  }
+  return groups;
+}
+function plClusterDevices(devs){
+  // Single-linkage clusters of devices within 3 ft (plan view X/Y).
+  const n = devs.length, parent = devs.map((_, i) => i);
+  const find = i => parent[i] === i ? i : (parent[i] = find(parent[i]));
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++)
+    if (plDist(devs[i], devs[j]) <= PL_CLUSTER_FT) parent[find(i)] = find(j);
+  const map = {};
+  devs.forEach((d, i) => { (map[find(i)] = map[find(i)] || []).push(d); });
+  const out = [];
+  Object.values(map).forEach(c => { if (plFits(c)) out.push(c); else plSplitByDistance(c).forEach(s => out.push(s)); });
+  return out;
+}
+function plSuggestForGroup(g, devs){
+  const psus = [];
+  let left = devs.slice();
+  if (g.psus.length){
+    g.psus.forEach((p, i) => psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), seed: p, fromFile: true, devices: [] }));
+    const pairs = [];
+    left.forEach(d => psus.forEach(p => pairs.push({ d, p, dist: plDist(d, p.seed) })));
+    pairs.sort((a, b) => a.dist - b.dist);
+    const placed = new Set();
+    pairs.forEach(({ d, p }) => {
+      if (placed.has(d.key)) return;
+      if (plFits(p.devices.concat([d]))){ p.devices.push(d); placed.add(d.key); }
+    });
+    left = left.filter(d => !placed.has(d.key));
+  }
+  plClusterDevices(left).forEach(c => psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c }));
+  return psus.filter(p => p.devices.length || p.fromFile);
+}
+
+/* ---------- naming ---------- */
+function plAbbr(s){
+  const str = String(s || '').trim();
+  if (str.length <= 6) return str.replace(/\s+/g, '');
+  const words = str.split(/[^A-Za-z0-9]+/).filter(Boolean);
+  if (words.length > 1) return words.map(w => /^\d+$/.test(w) ? w : w[0].toUpperCase()).join('').slice(0, 6);
+  return str.slice(0, 6);
+}
+function plApplyPattern(pattern, ctx){
+  return String(pattern)
+    .replace(/\{project\}/g, ctx.project).replace(/\{file\}/g, ctx.file)
+    .replace(/\{area\}/g, ctx.area).replace(/\{name\}/g, ctx.name)
+    .replace(/\{##\}/g, String(ctx.n).padStart(2, '0')).replace(/\{#\}/g, String(ctx.n));
+}
+function plShortName(ctx, isDisplay){
+  const tail = (isDisplay ? 'DSP' : 'D') + ctx.n;
+  const cands = [`${plAbbr(ctx.project)}-${plAbbr(ctx.area)}-${tail}`, `${plAbbr(ctx.area)}-${tail}`, `${ctx.area.replace(/\s+/g, '')}`.slice(0, PL_NAME_MAX - tail.length - 1) + '-' + tail];
+  for (const c of cands) if (c.length <= PL_NAME_MAX) return c;
+  return cands[cands.length - 1].slice(0, PL_NAME_MAX);
+}
+function plGetPattern(){ try { return localStorage.getItem(PL_PATTERN_KEY) || PL_DEFAULT_PATTERN; } catch (e){ return PL_DEFAULT_PATTERN; } }
+function plSetPattern(p){ try { localStorage.setItem(PL_PATTERN_KEY, p); } catch (e){} }
+
+/* ---------- wizard state ---------- */
+const plWiz = { step: 1, files: [], settings: null, psuByGroup: {}, mode: 'new', linkUpdate: null };
+function plDefaultSettings(){
+  const cur = getCurrentLocationEl && getCurrentLocationEl();
+  const g = sel => cur && cur.querySelector(sel);
+  return {
+    designBasis: g('.design-basis-select') ? g('.design-basis-select').value : 'NFPA 72 Voice',
+    standbyHours: g('.standby-hours') ? g('.standby-hours').value : '24',
+    alarmMinutes: g('.alarm-minutes') ? g('.alarm-minutes').value : '15',
+    temperature: g('.temperature-select') ? g('.temperature-select').value : '77',
+    margin: g('.margin-select') ? g('.margin-select').value : '0.25',
+    nfpa72Edition: g('.nfpa72-edition-select') ? g('.nfpa72-edition-select').value : '2022plus',
+    psCapacity: g('.ps-capacity-select') ? g('.ps-capacity-select').value : '6',
+    mode: g('.mode-radio:checked') ? g('.mode-radio:checked').value : 'builtin'
+  };
+}
+function plIncludedGroups(){
+  const out = [];
+  plWiz.files.forEach((f, fi) => f.groups.forEach(g => { if (g.include) out.push({ f, fi, g }); }));
+  return out;
+}
+function plGroupKey(fi, g){ return fi + ':' + g.idx; }
+
+function openPlWizard(opts){
+  opts = opts || {};
+  plWiz.step = opts.step || 1;
+  plWiz.files = opts.files || [];
+  plWiz.settings = plDefaultSettings();
+  plWiz.psuByGroup = {};
+  plWiz.mode = opts.mode || 'new';
+  plWiz.linkUpdate = opts.linkUpdate || null;
+  document.getElementById('plw-overlay').classList.add('open');
+  plRender();
+}
+function closePlWizard(){ document.getElementById('plw-overlay').classList.remove('open'); }
+
+const PL_STEPS = ['Battery settings', 'Pick .pl files', 'Rename', 'Power supplies'];
+function plRender(){
+  const strip = document.getElementById('plw-steps');
+  strip.innerHTML = PL_STEPS.map((t, i) => `<div class="plw-step ${i + 1 === plWiz.step ? 'active' : (i + 1 < plWiz.step ? 'done' : '')}"><span class="n">${i + 1}</span>${t}</div>`).join('');
+  const body = document.getElementById('plw-body');
+  document.getElementById('plw-msg').textContent = '';
+  if (plWiz.step === 1) plRenderStep1(body);
+  else if (plWiz.step === 2) plRenderStep2(body);
+  else if (plWiz.step === 3) plRenderStep3(body);
+  else plRenderStep4(body);
+  document.getElementById('plw-back').disabled = plWiz.step === 1 || (plWiz.mode === 'update' && plWiz.step <= 3);
+  document.getElementById('plw-next').hidden = plWiz.step === 4;
+  document.getElementById('plw-finish').hidden = plWiz.step !== 4;
+  if (plWiz.step === 4) plValidateStep4();
+}
+
+function plRenderStep1(body){
+  const s = plWiz.settings;
+  const bases = Object.keys(DESIGN_BASIS_PRESETS).concat(['Custom']);
+  body.innerHTML = `
+    <p class="plw-warn"><b>Set these before importing.</b> Standby, alarm, ambient temperature, safety margin and the other battery factors drive the 65 Ah check that the power-supply suggestions in step 4 use. They're applied as the defaults on every new sheet the import creates; you can still change any sheet afterwards.</p>
+    <div class="plw-grid">
+      <label>Design Basis<select id="plw-basis">${bases.map(b => `<option ${b === s.designBasis ? 'selected' : ''}>${plEsc(b)}</option>`).join('')}</select></label>
+      <label>Standby (h)<input type="number" id="plw-standby" min="0" step="1" value="${plEsc(s.standbyHours)}"></label>
+      <label>Alarm (min)<input type="number" id="plw-alarm" min="0" step="1" value="${plEsc(s.alarmMinutes)}"></label>
+      <label>Ambient Temp.<select id="plw-temp">${[['77','77°F / 25°C (no de-rating)'],['68','68°F / 20°C'],['50','50°F / 10°C'],['32','32°F / 0°C'],['14','14°F / -10°C']].map(([v,t]) => `<option value="${v}" ${v === String(s.temperature) ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+      <label>Safety margin<select id="plw-margin">${[['0.25','25%'],['0.20','20%'],['0.30','30%'],['0','0%']].map(([v,t]) => `<option value="${v}" ${parseFloat(v) === parseFloat(s.margin) ? 'selected' : ''}>${t}</option>`).join('')}</select></label>
+      <label>NFPA 72 Edition<select id="plw-edition"><option value="2022plus" ${s.nfpa72Edition === '2022plus' ? 'selected' : ''}>2022 and Later</option><option value="2019minus" ${s.nfpa72Edition === '2019minus' ? 'selected' : ''}>2019 and Earlier</option></select></label>
+      <label>Power supply capacity<select id="plw-pscap"><option value="6" ${s.psCapacity === '6' ? 'selected' : ''}>6 A (APS6A / BPS6A)</option><option value="10" ${s.psCapacity === '10' ? 'selected' : ''}>10 A (APS10A / BPS10A)</option></select></label>
+      <label>Battery / supply mode<select id="plw-mode"><option value="builtin" ${s.mode === 'builtin' ? 'selected' : ''}>Edwards A/BPS</option><option value="thirdparty" ${s.mode === 'thirdparty' ? 'selected' : ''}>Third-party power supply</option></select></label>
+    </div>
+    <p class="plw-note" style="margin-top:12px">Presets fill Standby/Alarm automatically (BS 5839-1 and CAN/ULC-S524 lock the margin to 25%). Pick <b>Custom</b> to type your own standby and alarm times.</p>`;
+  const basisSel = body.querySelector('#plw-basis');
+  const sync = () => {
+    const p = DESIGN_BASIS_PRESETS[basisSel.value];
+    const st = body.querySelector('#plw-standby'), al = body.querySelector('#plw-alarm'), mg = body.querySelector('#plw-margin');
+    if (p){ if (!p.editableStandby) st.value = p.standby; al.value = p.alarm; st.disabled = !p.editableStandby; al.disabled = true;
+      if (p.formula === 'bs5839' || p.fixedMargin !== undefined){ mg.value = '0.25'; mg.disabled = true; } else mg.disabled = false; }
+    else { st.disabled = false; al.disabled = false; mg.disabled = false; }
+    mg.dispatchEvent(new Event('change'));
+  };
+  basisSel.addEventListener('change', sync);
+  sync();
+}
+function plReadStep1(){
+  const b = document.getElementById('plw-body');
+  const v = id => b.querySelector(id).value;
+  plWiz.settings = { designBasis: v('#plw-basis'), standbyHours: v('#plw-standby'), alarmMinutes: v('#plw-alarm'),
+    temperature: v('#plw-temp'), margin: v('#plw-margin'), nfpa72Edition: v('#plw-edition'), psCapacity: v('#plw-pscap'), mode: v('#plw-mode') };
+}
+
+async function plAddFiles(fileList){
+  for (const file of Array.from(fileList || [])){
+    if (!/\.pl$/i.test(file.name)){ plWiz.errors = (plWiz.errors || []).concat([`${file.name}: not a .pl file`]); continue; }
+    const text = await file.text();
+    try {
+      const parsed = plParse(text, file.name);
+      parsed.size = file.size; parsed.lastModified = file.lastModified; parsed.path = file.path || '';
+      parsed.sha256 = await plSha256(text);
+      parsed.linkId = 'pl-' + parsed.sha256.slice(0, 12) + '-' + plWiz.files.length;
+      if (plWiz.files.some(f => f.sha256 === parsed.sha256)){ plWiz.errors = (plWiz.errors || []).concat([`${file.name}: already added`]); continue; }
+      plWiz.files.push(parsed);
+    } catch (e){ plWiz.errors = (plWiz.errors || []).concat([`${file.name}: ${e.message}`]); }
+  }
+  plRender();
+}
+function plRenderStep2(body){
+  const errs = plWiz.errors || []; plWiz.errors = [];
+  body.innerHTML = `
+    <div class="plw-drop" id="plw-drop" tabindex="0" role="button">Drop PipeCAD <b>.pl</b> files here, or <u>click to choose</u> (you can add several, and more later)</div>
+    <input type="file" id="plw-file" accept=".pl" multiple hidden>
+    ${errs.map(e => `<p class="plw-warn">${plEsc(e)}</p>`).join('')}
+    <div id="plw-files">${plWiz.files.map((f, fi) => {
+      const dets = f.groups.reduce((a, g) => a + g.detectors.length, 0);
+      const disp = f.groups.reduce((a, g) => a + g.displays.length, 0);
+      const psus = f.groups.reduce((a, g) => a + g.psus.length, 0);
+      return `<div class="plw-file" data-fi="${fi}">
+        <h4>${plEsc(f.fileName)} <span class="plw-tag">${plEsc(f.unitLabel)}</span>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" data-rmfile="${fi}" title="Remove this file">Remove</button></h4>
+        <div class="meta">Project: <b>${plEsc(f.project)}</b>${f.projectFromFile ? ' <span class="plw-tag">no ProjectName in file — using file name</span>' : ''} · PipeCAD ${plEsc(f.version || '—')} · ${f.groups.length} Area/Group(s) · ${dets} detector(s) · ${disp} display(s) · ${psus} PSU position(s)</div>
+        ${f.skipped.length ? `<div class="plw-warn">${f.skipped.map(plEsc).join('<br>')}</div>` : ''}
+        <div class="plw-groups">${f.groups.map((g, gi) => `<label><input type="checkbox" data-grp="${fi}:${gi}" ${g.include ? 'checked' : ''}> ${plEsc(g.origName)} <span class="plw-tag">${g.detectors.length} det · ${g.displays.length} disp${g.psus.length ? ' · ' + g.psus.length + ' PSU' : ''}</span></label>`).join('')}</div>
+      </div>`; }).join('') || '<p class="plw-note">No files yet.</p>'}</div>`;
+  const drop = body.querySelector('#plw-drop'), input = body.querySelector('#plw-file');
+  drop.addEventListener('click', () => { input.value = ''; input.click(); });
+  drop.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); input.click(); } });
+  input.addEventListener('change', () => plAddFiles(input.files));
+  drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('over'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+  drop.addEventListener('drop', e => { e.preventDefault(); drop.classList.remove('over'); plAddFiles(e.dataTransfer.files); });
+  body.querySelectorAll('[data-grp]').forEach(cb => cb.addEventListener('change', () => {
+    const [fi, gi] = cb.dataset.grp.split(':').map(Number); plWiz.files[fi].groups[gi].include = cb.checked;
+  }));
+  body.querySelectorAll('[data-rmfile]').forEach(b => b.addEventListener('click', () => { plWiz.files.splice(+b.dataset.rmfile, 1); plRender(); }));
+}
+
+function plAssignNames(force){
+  const pattern = plWiz.pattern || plGetPattern();
+  plIncludedGroups().forEach(({ f, g }) => {
+    let n = 0, dn = 0;
+    const area = g.name;
+    g.detectors.forEach(d => {
+      n++;
+      const ctx = { project: f.project, file: plBaseName(f.fileName), area, name: d.origName, n };
+      d.patternName = plApplyPattern(pattern, ctx);
+      d.suggest = plShortName(ctx, false);
+      if (force || !d.userNamed) d.newName = d.patternName;
+    });
+    g.displays.forEach(d => {
+      dn++;
+      const ctx = { project: f.project, file: plBaseName(f.fileName), area, name: d.origName, n: dn };
+      d.suggest = plShortName(ctx, true);
+      if (force || !d.userNamed) d.newName = d.suggest;
+    });
+  });
+}
+function plRenderStep3(body){
+  if (!plWiz.pattern) plWiz.pattern = plGetPattern();
+  plAssignNames(false);
+  const groups = plIncludedGroups();
+  body.innerHTML = `
+    <p class="plw-warn">ModuLaser display shows 16 characters total, including spaces.</p>
+    <div class="plw-grid" style="grid-template-columns:2fr 1fr; align-items:end">
+      <label>Detector naming pattern — tokens: {project} {file} {area} {name} {##}<input type="text" id="plw-pattern" value="${plEsc(plWiz.pattern)}"></label>
+      <div style="display:flex; gap:6px"><button class="btn btn-sm" id="plw-pattern-apply">Apply pattern to all</button><button class="btn btn-sm" id="plw-suggest-all" title="Replace every name over 16 characters with its suggested short name">Shorten all over 16</button></div>
+    </div>
+    <h4 style="margin:14px 0 6px">Area / Group names <span class="plw-tag">become the sheet's Location</span></h4>
+    <table class="plw-table"><thead><tr><th>File</th><th>PipeCAD Area/Group</th><th>Name in calculator</th></tr></thead><tbody>
+      ${groups.map(({ f, fi, g }) => `<tr><td>${plEsc(f.fileName)}</td><td>${plEsc(g.origName)}</td><td><input type="text" data-area="${fi}:${g.idx}" value="${plEsc(g.name)}"></td></tr>`).join('')}
+    </tbody></table>
+    <h4 style="margin:14px 0 6px">Zone names (detectors and displays)</h4>
+    <table class="plw-table" id="plw-rename"><thead><tr><th>Area/Group</th><th>Type</th><th>PipeCAD name</th><th>Fan</th><th style="width:34%">Zone name</th><th>Chars</th><th></th></tr></thead><tbody>
+      ${groups.map(({ fi, g }) => g.displays.concat(g.detectors).map(d => `<tr data-key="${plEsc(fi + '|' + d.key)}">
+        <td>${plEsc(g.name)}</td><td>${plEsc(d.kind === 'display' ? d.type : 'Detector')}</td><td>${plEsc(d.origName)}</td><td>${d.fan || '—'}</td>
+        <td><input type="text" class="plw-name" value="${plEsc(d.newName)}"></td><td class="plw-count"></td>
+        <td><button class="btn btn-ghost btn-sm plw-suggest" title="Use suggested short name: ${plEsc(d.suggest)}">Use “${plEsc(d.suggest)}”</button></td></tr>`).join('')).join('')}
+    </tbody></table>`;
+  const findDev = key => { const [fi, k] = [key.slice(0, key.indexOf('|')), key.slice(key.indexOf('|') + 1)];
+    for (const g of plWiz.files[+fi].groups){ const d = g.detectors.concat(g.displays).find(x => x.key === k); if (d) return d; } };
+  body.querySelectorAll('#plw-rename tbody tr').forEach(tr => {
+    const d = findDev(tr.dataset.key), inp = tr.querySelector('.plw-name');
+    inp.addEventListener('input', () => { d.newName = inp.value; d.userNamed = true; plRefreshCounts(); });
+    tr.querySelector('.plw-suggest').addEventListener('click', () => { d.newName = d.suggest; d.userNamed = true; inp.value = d.suggest; plRefreshCounts(); });
+  });
+  body.querySelectorAll('[data-area]').forEach(inp => inp.addEventListener('input', () => {
+    const [fi, gi] = inp.dataset.area.split(':').map(Number); plWiz.files[fi].groups[gi].name = inp.value;
+  }));
+  body.querySelectorAll('[data-area]').forEach(inp => inp.addEventListener('change', () => plRender()));
+  body.querySelector('#plw-pattern-apply').addEventListener('click', () => {
+    plWiz.pattern = body.querySelector('#plw-pattern').value || PL_DEFAULT_PATTERN; plSetPattern(plWiz.pattern);
+    plIncludedGroups().forEach(({ g }) => g.detectors.forEach(d => { d.userNamed = false; })); plRender();
+  });
+  body.querySelector('#plw-suggest-all').addEventListener('click', () => {
+    plIncludedGroups().forEach(({ g }) => g.detectors.concat(g.displays).forEach(d => { if ((d.newName || '').length > PL_NAME_MAX){ d.newName = d.suggest; d.userNamed = true; } })); plRender();
+  });
+  plRefreshCounts();
+}
+function plRefreshCounts(){
+  const rows = Array.from(document.querySelectorAll('#plw-rename tbody tr'));
+  const counts = {};
+  rows.forEach(tr => { const v = tr.querySelector('.plw-name').value.trim().toLowerCase(); counts[v] = (counts[v] || 0) + 1; });
+  rows.forEach(tr => {
+    const inp = tr.querySelector('.plw-name'), len = inp.value.length, c = tr.querySelector('.plw-count');
+    c.textContent = `${len}/${PL_NAME_MAX}`; c.classList.toggle('over', len > PL_NAME_MAX);
+    inp.classList.toggle('plw-dup', counts[inp.value.trim().toLowerCase()] > 1);
+    inp.title = counts[inp.value.trim().toLowerCase()] > 1 ? 'Duplicate zone name' : (len > PL_NAME_MAX ? 'Over 16 characters' : '');
+  });
+}
+function plStep3Problems(){
+  const names = {}, probs = [];
+  plIncludedGroups().forEach(({ g }) => {
+    if (!g.name.trim()) probs.push(`An Area/Group name is blank (PipeCAD “${g.origName}”).`);
+    g.detectors.concat(g.displays).forEach(d => {
+      const n = (d.newName || '').trim();
+      if (!n) probs.push(`${g.name}: “${d.origName}” has no zone name.`);
+      if (n.length > PL_NAME_MAX) probs.push(`${g.name}: “${n}” is ${n.length} characters (max ${PL_NAME_MAX}).`);
+      names[n.toLowerCase()] = (names[n.toLowerCase()] || 0) + 1;
+    });
+  });
+  Object.entries(names).forEach(([n, c]) => { if (c > 1 && n) probs.push(`Duplicate zone name “${n}” (${c}×).`); });
+  return probs;
+}
+
+function plBuildSuggestions(){
+  plWiz.psuByGroup = {};
+  plIncludedGroups().forEach(({ fi, g }) => {
+    const devs = g.displays.concat(g.detectors);
+    plWiz.psuByGroup[plGroupKey(fi, g)] = plSuggestForGroup(g, devs);
+  });
+}
+function plAllPsus(){ return Object.entries(plWiz.psuByGroup); }
+function plRenderStep4(body){
+  if (!plWiz.suggested){ plBuildSuggestions(); plWiz.suggested = true; }
+  let seq = 0;
+  body.innerHTML = `<p class="plw-note">One sheet is created per power supply. Rules: at least one power supply per Area/Group, a supply never spans Areas/Groups, max ${PL_MAX_DET_PER_PSU} detectors + ${PL_MAX_DISP_PER_PSU} display each, and required battery ≤ ${CHARGER_MAX_AH} Ah (display load included). Suggestions come from PSU positions in the file, otherwise devices within ${PL_CLUSTER_FT} ft (plan view). Drag a device to another supply, or use its <i>Move to</i> list.</p>` +
+    plIncludedGroups().map(({ f, fi, g }) => {
+      const gk = plGroupKey(fi, g), psus = plWiz.psuByGroup[gk] || [];
+      return `<div class="plw-area" data-gk="${gk}"><h4>${plEsc(g.name)} <span class="plw-tag">${plEsc(f.fileName)}</span><span class="plw-tag">${psus.length} power suppl${psus.length === 1 ? 'y' : 'ies'}</span>
+        <button class="btn btn-sm" style="margin-left:auto" data-pack="${gk}" title="Re-suggest this Area/Group using the fewest supplies: nearest devices grouped together up to the 4 detector / 1 display / 65 Ah limits (ignores the 3 ft rule)">Pack into fewest</button>
+        <button class="btn btn-sm" data-resuggest="${gk}" title="Go back to the 3 ft / file-PSU suggestion for this Area/Group">Re-suggest</button>
+        <button class="btn btn-sm" data-addpsu="${gk}">+ Add power supply</button></h4>
+        <div class="plw-psus">${psus.map((p, pi) => { seq++; const chk = plPsuCheck(p); return `<div class="plw-psu ${chk.violations.length ? 'bad' : ''}" data-gk="${gk}" data-pi="${pi}">
+          <div class="plw-psu-h"><b>PS-${seq}</b>${p.fromFile ? '<span class="plw-tag">from file</span>' : ''}<span class="plw-tag ${chk.dets > PL_MAX_DET_PER_PSU ? 'bad' : ''}">${chk.dets}/${PL_MAX_DET_PER_PSU} det</span><span class="plw-tag ${chk.disp > PL_MAX_DISP_PER_PSU ? 'bad' : ''}">${chk.disp}/${PL_MAX_DISP_PER_PSU} disp</span>
+            <span class="ah ${chk.ah > CHARGER_MAX_AH ? 'plw-diff-removed' : ''}">${chk.ah.toFixed(1)} / ${CHARGER_MAX_AH} Ah</span>
+            <button class="btn btn-ghost btn-sm" data-rmpsu="${gk}:${pi}" title="Remove this power supply (its devices move to the first other supply)">✕</button></div>
+          ${p.devices.map(d => `<div class="plw-dev" draggable="true" data-dkey="${plEsc(d.key)}"><span class="nm" title="${plEsc(d.origName)}">${plEsc(d.newName || d.origName)}</span><span class="plw-tag">${d.kind === 'display' ? plEsc(d.type.replace(' Display','')) + ' disp' : 'fan ' + (d.fan || '?')}</span>
+            <select class="plw-move" aria-label="Move ${plEsc(d.newName)} to">${psus.map((q, qi) => `<option value="${qi}" ${qi === pi ? 'selected' : ''}>${qi === pi ? 'Move to…' : 'PS ' + (seq - pi + qi)}</option>`).join('')}</select></div>`).join('') || '<div class="plw-note" style="margin:0">Empty — drag devices here, or remove it.</div>'}
+          ${chk.violations.map(v => `<div class="plw-viol">⚠ ${plEsc(v)}</div>`).join('')}
+        </div>`; }).join('')}</div></div>`;
+    }).join('');
+  const findPsu = (gk, pi) => plWiz.psuByGroup[gk][pi];
+  const moveDev = (gk, fromPi, key, toPi) => {
+    const from = findPsu(gk, fromPi), to = findPsu(gk, toPi);
+    if (!from || !to || from === to) return;
+    const i = from.devices.findIndex(d => d.key === key); if (i < 0) return;
+    to.devices.push(from.devices.splice(i, 1)[0]); plRender();
+  };
+  body.querySelectorAll('.plw-move').forEach(sel => sel.addEventListener('change', () => {
+    const card = sel.closest('.plw-psu'), dev = sel.closest('.plw-dev');
+    moveDev(card.dataset.gk, +card.dataset.pi, dev.dataset.dkey, +sel.value);
+  }));
+  body.querySelectorAll('.plw-dev').forEach(dev => dev.addEventListener('dragstart', e => {
+    const card = dev.closest('.plw-psu');
+    e.dataTransfer.setData('text/plain', JSON.stringify({ gk: card.dataset.gk, pi: +card.dataset.pi, key: dev.dataset.dkey }));
+  }));
+  body.querySelectorAll('.plw-psu').forEach(card => {
+    card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('dragover'); });
+    card.addEventListener('dragleave', () => card.classList.remove('dragover'));
+    card.addEventListener('drop', e => {
+      e.preventDefault(); card.classList.remove('dragover');
+      let d; try { d = JSON.parse(e.dataTransfer.getData('text/plain')); } catch (x){ return; }
+      if (d.gk !== card.dataset.gk){ document.getElementById('plw-msg').textContent = 'A power supply cannot span Areas/Groups — devices can only move within their own Area/Group.'; return; }
+      moveDev(d.gk, d.pi, d.key, +card.dataset.pi);
+    });
+  });
+  const groupOf = gk => { const [fi, gi] = gk.split(':').map(Number); return plWiz.files[fi].groups[gi]; };
+  body.querySelectorAll('[data-pack]').forEach(b => b.addEventListener('click', () => {
+    const g = groupOf(b.dataset.pack);
+    plWiz.psuByGroup[b.dataset.pack] = plSplitByDistance(g.displays.concat(g.detectors)).map(c => ({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c })); plRender();
+  }));
+  body.querySelectorAll('[data-resuggest]').forEach(b => b.addEventListener('click', () => {
+    const g = groupOf(b.dataset.resuggest);
+    plWiz.psuByGroup[b.dataset.resuggest] = plSuggestForGroup(g, g.displays.concat(g.detectors)); plRender();
+  }));
+  body.querySelectorAll('[data-addpsu]').forEach(b => b.addEventListener('click', () => {
+    plWiz.psuByGroup[b.dataset.addpsu].push({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: [] }); plRender();
+  }));
+  body.querySelectorAll('[data-rmpsu]').forEach(b => b.addEventListener('click', () => {
+    const [gk, pi] = [b.dataset.rmpsu.slice(0, b.dataset.rmpsu.lastIndexOf(':')), +b.dataset.rmpsu.slice(b.dataset.rmpsu.lastIndexOf(':') + 1)];
+    const list = plWiz.psuByGroup[gk];
+    if (list.length <= 1 && list[0].devices.length){ document.getElementById('plw-msg').textContent = 'Each Area/Group needs at least one power supply.'; return; }
+    const [rm] = list.splice(pi, 1);
+    if (rm.devices.length && list.length) list[0].devices.push(...rm.devices);
+    plRender();
+  }));
+}
+function plStep4Problems(){
+  const probs = [];
+  plIncludedGroups().forEach(({ fi, g }) => {
+    const psus = plWiz.psuByGroup[plGroupKey(fi, g)] || [];
+    const used = psus.filter(p => p.devices.length);
+    if ((g.detectors.length + g.displays.length) && !used.length) probs.push(`${g.name}: needs at least one power supply.`);
+    psus.forEach((p, i) => plPsuCheck(p).violations.forEach(v => probs.push(`${g.name}, supply ${i + 1}: ${v}`)));
+  });
+  return probs;
+}
+function plValidateStep4(){
+  const probs = plStep4Problems();
+  const fin = document.getElementById('plw-finish');
+  fin.disabled = probs.length > 0;
+  fin.title = probs.length ? 'Blocked: ' + probs.join(' · ') : 'Create the sheets';
+  document.getElementById('plw-msg').textContent = probs.length ? `Blocked — ${probs.length} rule violation(s): ${probs[0]}${probs.length > 1 ? ' …' : ''}` : '';
+}
+function plNext(){
+  const msg = document.getElementById('plw-msg');
+  if (plWiz.step === 1){ plReadStep1(); plWiz.step = 2; plWiz.suggested = false; return plRender(); }
+  if (plWiz.step === 2){
+    if (!plWiz.files.length){ msg.textContent = 'Add at least one .pl file.'; return; }
+    if (!plIncludedGroups().length){ msg.textContent = 'Tick at least one Area/Group to import.'; return; }
+    plWiz.step = 3; plWiz.suggested = false; return plRender();
+  }
+  if (plWiz.step === 3){
+    const p = plStep3Problems();
+    if (p.length){ msg.textContent = p[0] + (p.length > 1 ? ` (+${p.length - 1} more)` : ''); return; }
+    plWiz.step = 4; return plRender();
+  }
+}
+function plBack(){ if (plWiz.step > 1){ plWiz.step--; plRender(); } }
+
+/* ---------- create sheets ---------- */
+function plSavedLocation(s, psName, psLocation, label, modules, sheetId){
+  return { name: label, psName, psLocation, psCapacity: s.psCapacity, ribbonAssignMode: 'auto', autoBatteryMode: 'auto', tpAutoBatteryMode: 'off',
+    standbyHours: s.standbyHours, alarmMinutes: s.alarmMinutes, designBasis: s.designBasis, temperature: s.temperature,
+    nfpa72Edition: s.nfpa72Edition, margin: s.margin, mode: s.mode, addrScheme: 'networked', modules, plSheetId: sheetId };
+}
+function plIsPristineDoc(){
+  const locs = document.querySelectorAll('.location');
+  if (locs.length !== 1) return false;
+  return Array.from(locs[0].querySelectorAll('[data-role="module"]')).every(r => !r.querySelector('.zone-name').value && !r.querySelector('.module-address').value && !r.querySelector('.fanspeed-select').value)
+    && !locs[0].querySelector('.ps-name').value;
+}
+function plFinish(){
+  if (plStep4Problems().length) return plValidateStep4();
+  const s = plWiz.settings;
+  if (plWiz.mode !== 'update' && plIsPristineDoc()){ document.getElementById('locations-container').innerHTML = ''; }
+  let psNum = document.querySelectorAll('.location').length;
+  const created = [];
+  const linkByFile = {};
+  plIncludedGroups().forEach(({ f, fi, g }) => {
+    const link = linkByFile[fi] || (linkByFile[fi] = plWiz.linkUpdate || { id: f.linkId, name: f.fileName, path: f.path, size: f.size, lastModified: f.lastModified,
+      sha256: f.sha256, project: f.project, unit: f.unitLabel, importedAt: new Date().toISOString(), groups: [], devices: {} });
+    if (!link.groups.includes(g.origName)) link.groups.push(g.origName);
+    (plWiz.psuByGroup[plGroupKey(fi, g)] || []).filter(p => p.devices.length).forEach((p, pi) => {
+      psNum++;
+      const sheetId = 'pls-' + Date.now().toString(36) + '-' + (++plSheetSeq);
+      const devs = p.devices.slice().sort((a, b) => ((a.kind === 'display' ? 0 : 1) - (b.kind === 'display' ? 0 : 1)) || (a.ord - b.ord));
+      const modules = devs.map(d => ({ type: d.kind === 'display' ? d.type : 'Detector', zone: d.newName, address: '', fan: d.kind === 'detector' && d.fan ? String(d.fan) : '', cluster: '', power: '', circuitSource: '', auxCircuitNum: '', plKey: link.id + '|' + d.key }));
+      const loc = restoreLocation(plSavedLocation(s, `PS-${psNum}`, g.name, `${f.project} · ${f.fileName}`, modules, sheetId));
+      created.push(loc);
+      devs.forEach(d => { link.devices[d.key] = { fp: d.fp, kind: d.kind, origName: d.origName, type: d.kind === 'display' ? d.type : 'Detector', fan: d.fan || null, zone: d.newName, group: g.origName, sheetId }; });
+    });
+  });
+  Object.values(linkByFile).forEach(link => {
+    if (plWiz.linkUpdate) return; // already in PL_LINKS
+    PL_LINKS = PL_LINKS.filter(l => l.sha256 !== link.sha256).concat([link]);
+  });
+  if (plWiz.linkUpdate && plWiz.newFile){ Object.assign(plWiz.linkUpdate, plWiz.newFile); }
+  // Batch recalc: per-sheet inner pass with the cross-sheet cascade suspended, then one global pass
+  // (calling recalcLocation per sheet is O(n²) and took >30 s for ~100 sheets).
+  window.__inCascade = true;
+  try { created.forEach(loc => recalcLocationInner(loc)); } finally { window.__inCascade = false; }
+  updateNetworkAddressAvailability();
+  created.forEach(loc => recalcLocationInner(loc));
+  refreshAllClusterSummaries();
+  document.querySelectorAll('[data-role="module"]').forEach(row => stampFactoryTypeOnRow(row));
+  if (!document.getElementById('project-name-input').value && plWiz.files[0]) document.getElementById('project-name-input').value = plWiz.files[0].project;
+  const first = created.length && document.getElementById('location-' + created[0]);
+  if (first){ setCurrentLocation(first); first.scrollIntoView({ block: 'start' }); }
+  refreshAllAmber(); syncPrintHeaders(); scheduleSave(); plRenderBanner();
+  closePlWizard();
+}
+
+/* ---------- persistence hooks ---------- */
+(function hookPlState(){
+  const _ser = serializeLocation;
+  serializeLocation = function(locEl){
+    const o = _ser(locEl);
+    if (locEl.dataset.plSheetId) o.plSheetId = locEl.dataset.plSheetId;
+    const rows = Array.from(locEl.querySelectorAll('[data-role="module"]'));
+    o.modules.forEach((m, i) => { if (rows[i] && rows[i].dataset.plKey) m.plKey = rows[i].dataset.plKey; });
+    return o;
+  };
+  const _res = restoreLocation;
+  restoreLocation = function(saved){
+    const loc = _res(saved);
+    const locEl = document.getElementById('location-' + loc);
+    if (locEl && saved.plSheetId) locEl.dataset.plSheetId = saved.plSheetId;
+    const rows = locEl ? Array.from(locEl.querySelectorAll('[data-role="module"]')) : [];
+    (saved.modules || []).forEach((m, i) => { if (m.plKey && rows[i]) rows[i].dataset.plKey = m.plKey; });
+    return loc;
+  };
+  const _bso = buildStateObject;
+  buildStateObject = function(){ const st = _bso(); st.plLinks = PL_LINKS; return st; };
+  const _apply = applyLoadedState;
+  applyLoadedState = function(state){ PL_LINKS = Array.isArray(state.plLinks) ? state.plLinks : []; _apply(state); plRenderBanner(); };
+  const _clr = clearEntireDocument;
+  clearEntireDocument = function(o){ PL_LINKS = []; plRenderBanner(); return _clr(o); };
+})();
+
+/* ---------- linked files / change detection ---------- */
+function plRenderBanner(){
+  const b = document.getElementById('pl-link-banner'); if (!b) return;
+  const changed = PL_LINKS.filter(l => l.pendingDiff && (l.pendingDiff.added.length + l.pendingDiff.removed.length + l.pendingDiff.changed.length));
+  if (!changed.length){ b.hidden = true; b.innerHTML = ''; return; }
+  b.hidden = false;
+  b.innerHTML = changed.map(l => `<span>⚠ Linked PipeCAD file <b>${plEsc(l.name)}</b> has changed since import: <span class="plw-diff-added">+${l.pendingDiff.added.length} added</span> · <span class="plw-diff-removed">−${l.pendingDiff.removed.length} removed</span> · <span class="plw-diff-changed">~${l.pendingDiff.changed.length} changed</span></span>
+    <button class="btn btn-sm" data-review="${plEsc(l.id)}">Review &amp; re-import…</button>`).join('<br>');
+  b.querySelectorAll('[data-review]').forEach(btn => btn.addEventListener('click', () => plOpenDiff(btn.dataset.review)));
+}
+function plRowsForKey(plKey){ return Array.from(document.querySelectorAll('[data-role="module"]')).filter(r => r.dataset.plKey === plKey); }
+function plDiff(link, parsed){
+  const now = {};
+  parsed.groups.forEach(g => g.detectors.concat(g.displays).forEach(d => { now[d.key] = { d, g }; }));
+  const added = [], removed = [], changed = [];
+  Object.keys(now).forEach(k => { if (!link.devices[k] && link.groups.includes(now[k].g.origName)) added.push(now[k]); });
+  Object.entries(link.devices).forEach(([k, old]) => {
+    const cur = now[k];
+    if (!cur){ removed.push({ key: k, old }); return; }
+    if (cur.d.fp !== old.fp){
+      const what = [];
+      if (cur.d.origName !== old.origName) what.push(`name “${old.origName}” → “${cur.d.origName}”`);
+      if (cur.d.kind === 'detector' && cur.d.fan !== old.fan) what.push(`fan ${old.fan || '—'} → ${cur.d.fan || '—'}`);
+      if (cur.d.kind === 'display' && cur.d.type !== old.type) what.push(`model ${old.type} → ${cur.d.type}`);
+      if (!what.length) what.push('position moved');
+      changed.push({ key: k, old, d: cur.d, what });
+    }
+  });
+  return { added, removed, changed };
+}
+async function plCheckLinkWithFile(linkId, file){
+  const link = PL_LINKS.find(l => l.id === linkId); if (!link || !file) return;
+  const text = await file.text();
+  const sha = await plSha256(text);
+  let parsed; try { parsed = plParse(text, file.name); } catch (e){ alert(`${file.name}: ${e.message}`); return; }
+  parsed.sha256 = sha; parsed.size = file.size; parsed.lastModified = file.lastModified; parsed.path = file.path || link.path || '';
+  link.lastChecked = new Date().toISOString();
+  if (sha === link.sha256){ link.pendingDiff = null; link.status = 'unchanged'; plRenderBanner(); plOpenLinks(); scheduleSave(); return; }
+  const diff = plDiff(link, parsed);
+  link.status = 'changed';
+  link.pendingDiff = { added: diff.added.map(a => a.d.key), removed: diff.removed.map(r => r.key), changed: diff.changed.map(c => c.key) };
+  plDiffCache[linkId] = { parsed, diff };
+  plRenderBanner(); scheduleSave();
+  plOpenDiff(linkId);
+}
+const plDiffCache = {};
+function plPromptFile(cb){
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.pl'; inp.hidden = true;
+  inp.addEventListener('change', () => { cb(inp.files[0]); inp.remove(); });
+  document.body.appendChild(inp); inp.click();
+}
+function plOpenLinks(){
+  const html = PL_LINKS.length ? `<table class="plw-table"><thead><tr><th>File</th><th>Areas/Groups</th><th>Devices</th><th>Imported</th><th>Status</th><th></th></tr></thead><tbody>${PL_LINKS.map(l => `<tr>
+    <td><b>${plEsc(l.name)}</b><div class="plw-count" title="SHA-256">${plEsc((l.sha256 || '').slice(0, 16))}… · ${(l.size / 1024).toFixed(0)} KB · modified ${l.lastModified ? new Date(l.lastModified).toLocaleString() : '—'}${l.path ? '<br>' + plEsc(l.path) : ''}</div></td>
+    <td>${l.groups.map(plEsc).join(', ')}</td><td>${Object.keys(l.devices).length}</td><td>${new Date(l.importedAt).toLocaleDateString()}</td>
+    <td>${l.status === 'changed' ? '<span class="plw-tag bad">changed</span>' : l.status === 'unchanged' ? '<span class="plw-tag ok">unchanged</span>' : '<span class="plw-tag">not checked</span>'}</td>
+    <td><button class="btn btn-sm" data-check="${plEsc(l.id)}">Check link…</button> <button class="btn btn-ghost btn-sm" data-unlink="${plEsc(l.id)}">Unlink</button></td></tr>`).join('')}</tbody></table>
+    <p class="plw-note" style="margin-top:10px">Browsers can't re-open a file by itself, so <b>Check link…</b> asks you to pick the current copy of the .pl. The calculator compares its SHA-256 fingerprint and each detector's fingerprint with what was imported.</p>`
+    : '<p class="plw-note">No PipeCAD .pl files are linked to this calc yet. Use File → Import .pl… to import and link them.</p>';
+  plShowAux('Linked .pl files', html);
+  const body = document.getElementById('plw-body');
+  body.querySelectorAll('[data-check]').forEach(b => b.addEventListener('click', () => plPromptFile(f => plCheckLinkWithFile(b.dataset.check, f))));
+  body.querySelectorAll('[data-unlink]').forEach(b => b.addEventListener('click', () => {
+    PL_LINKS = PL_LINKS.filter(l => l.id !== b.dataset.unlink); plRenderBanner(); scheduleSave(); plOpenLinks();
+  }));
+}
+function plShowAux(title, html, footHtml){
+  document.getElementById('plw-title').textContent = title;
+  document.getElementById('plw-steps').innerHTML = '';
+  document.getElementById('plw-steps').hidden = true;
+  document.getElementById('plw-body').innerHTML = html;
+  document.getElementById('plw-msg').textContent = '';
+  ['plw-back', 'plw-next', 'plw-finish'].forEach(id => document.getElementById(id).hidden = true);
+  document.getElementById('plw-aux-actions').innerHTML = footHtml || '';
+  plWiz.aux = true;
+  document.getElementById('plw-overlay').classList.add('open');
+}
+function plOpenDiff(linkId){
+  const link = PL_LINKS.find(l => l.id === linkId);
+  const cache = plDiffCache[linkId];
+  if (!link) return;
+  if (!cache){ plPromptFile(f => plCheckLinkWithFile(linkId, f)); return; }
+  const { diff } = cache;
+  const rowInfo = key => {
+    const rows = plRowsForKey(link.id + '|' + key); const r = rows[0];
+    if (!r) return { r: null, label: '<i>row no longer in calc</i>' };
+    const locEl = r.closest('.location');
+    return { r, label: `${plEsc(sheetDisplayName(locEl))} · “${plEsc(r.querySelector('.zone-name').value)}”` };
+  };
+  const chRows = diff.changed.map((c, i) => {
+    const { r, label } = rowInfo(c.key);
+    const zoneManual = r && r.querySelector('.zone-name').value !== c.old.zone;
+    const fanManual = r && c.d.kind === 'detector' && r.querySelector('.fanspeed-select').value !== String(c.old.fan || '');
+    const nameChange = c.d.origName !== c.old.origName, fanChange = c.d.kind === 'detector' && c.d.fan !== c.old.fan;
+    return `<tr><td class="plw-diff-changed">~ ${plEsc(c.d.origName)}</td><td>${c.what.map(plEsc).join('; ')}</td><td>${label}</td><td>
+      ${fanChange && r ? `<label><input type="checkbox" data-apply-fan="${i}" ${fanManual ? '' : 'checked'}> update fan to ${c.d.fan}${fanManual ? ' <span class="plw-tag bad">fan was edited by hand — tick to overwrite</span>' : ''}</label><br>` : ''}
+      ${nameChange && r ? `<label><input type="checkbox" data-apply-name="${i}" ${zoneManual ? '' : 'checked'}> rename zone to <input type="text" data-new-name="${i}" maxlength="16" value="${plEsc(c.d.origName.slice(0, 16))}" style="width:150px">${zoneManual ? ' <span class="plw-tag bad">zone was edited by hand — tick to overwrite</span>' : ''}</label>` : ''}
+      ${!fanChange && !nameChange ? '<span class="plw-tag">reference only</span>' : ''}</td></tr>`;
+  }).join('');
+  const rmRows = diff.removed.map((c, i) => { const { r, label } = rowInfo(c.key);
+    return `<tr><td class="plw-diff-removed">− ${plEsc(c.old.origName)}</td><td>no longer in the .pl</td><td>${label}</td><td>${r ? `<label><input type="checkbox" data-remove="${i}"> remove this row</label>` : ''}</td></tr>`; }).join('');
+  const addRows = diff.added.map(a => `<tr><td class="plw-diff-added">+ ${plEsc(a.d.origName)}</td><td>new in ${plEsc(a.g.origName)}${a.d.fan ? ' · fan ' + a.d.fan : ''}</td><td>—</td><td>goes to rename + power-supply assignment</td></tr>`).join('');
+  plShowAux(`Changes in ${link.name}`, `
+    <p class="plw-note">Addresses are never changed. Rows you edited by hand are left alone unless you tick them.</p>
+    <table class="plw-table"><thead><tr><th>Device</th><th>Change</th><th>Calc row</th><th>Action</th></tr></thead><tbody>${chRows + rmRows + addRows || '<tr><td colspan="4">Only file-level changes (no detector differences).</td></tr>'}</tbody></table>`,
+    `<button class="btn btn-ghost btn-sm" id="pld-cancel">Not now</button><button class="btn btn-primary btn-sm" id="pld-apply">${diff.added.length ? 'Apply &amp; assign new devices…' : 'Apply updates'}</button>`);
+  document.getElementById('pld-cancel').addEventListener('click', closePlWizard);
+  document.getElementById('pld-apply').addEventListener('click', () => plApplyDiff(link, cache));
+}
+function plApplyDiff(link, cache){
+  const { diff, parsed } = cache;
+  const body = document.getElementById('plw-body');
+  const touched = new Set();
+  diff.changed.forEach((c, i) => {
+    const r = plRowsForKey(link.id + '|' + c.key)[0];
+    const rec = link.devices[c.key];
+    if (r && body.querySelector(`[data-apply-fan="${i}"]`)?.checked){ r.querySelector('.fanspeed-select').value = String(c.d.fan); r.querySelector('.fanspeed-select').dispatchEvent(new Event('change', { bubbles: true })); rec.fan = c.d.fan; }
+    if (r && body.querySelector(`[data-apply-name="${i}"]`)?.checked){ const nv = body.querySelector(`[data-new-name="${i}"]`).value.slice(0, 16); r.querySelector('.zone-name').value = nv; rec.zone = nv; }
+    rec.origName = c.d.origName; rec.fp = c.d.fp;
+    if (r) touched.add(r.closest('.location'));
+  });
+  diff.removed.forEach((c, i) => {
+    const r = plRowsForKey(link.id + '|' + c.key)[0];
+    if (r && body.querySelector(`[data-remove="${i}"]`)?.checked){
+      const locEl = r.closest('.location');
+      if (locEl.querySelectorAll('[data-role="module"]').length > 1) r.remove(); else delete r.dataset.plKey;
+      touched.add(locEl);
+    }
+    delete link.devices[c.key];
+  });
+  touched.forEach(locEl => { if (document.body.contains(locEl)) recalcLocation(locEl.dataset.loc); });
+  const newMeta = { sha256: parsed.sha256, size: parsed.size, lastModified: parsed.lastModified, path: parsed.path, status: 'unchanged', pendingDiff: null, lastChecked: new Date().toISOString() };
+  delete plDiffCache[link.id];
+  if (diff.added.length){
+    const addedKeys = new Set(diff.added.map(a => a.d.key));
+    parsed.groups.forEach(g => { g.include = link.groups.includes(g.origName) && g.detectors.concat(g.displays).some(d => addedKeys.has(d.key));
+      g.detectors = g.detectors.filter(d => addedKeys.has(d.key)); g.displays = g.displays.filter(d => addedKeys.has(d.key)); g.psus = []; });
+    parsed.linkId = link.id;
+    openPlWizard({ files: [parsed], step: 3, mode: 'update', linkUpdate: link });
+    plWiz.newFile = newMeta;
+    document.getElementById('plw-title').textContent = `Add new devices from ${link.name}`;
+  } else {
+    Object.assign(link, newMeta);
+    closePlWizard();
+  }
+  plRenderBanner(); scheduleSave();
+}
+
+/* ---------- menu bar ---------- */
+function wireMenuBar(){
+  const bar = document.querySelector('.menubar'); if (!bar) return;
+  const items = Array.from(bar.querySelectorAll('.menubar-item'));
+  const tops = items.map(i => i.querySelector('.menubar-top'));
+  const menuOf = it => it.querySelector('.menubar-menu');
+  const entries = it => Array.from(menuOf(it).querySelectorAll('[role="menuitem"], [role="menuitemcheckbox"]'));
+  let openIdx = -1;
+  const closeAll = () => { items.forEach((it, i) => { menuOf(it).hidden = true; it.classList.remove('open'); tops[i].setAttribute('aria-expanded', 'false'); }); openIdx = -1; };
+  const open = (i, focusFirst) => { closeAll(); openIdx = i; const it = items[i]; menuOf(it).hidden = false; it.classList.add('open'); tops[i].setAttribute('aria-expanded', 'true'); if (focusFirst) entries(it)[0].focus(); };
+  tops.forEach((t, i) => {
+    t.addEventListener('click', e => { e.stopPropagation(); openIdx === i ? closeAll() : open(i, e.detail === 0); });
+    t.addEventListener('mouseenter', () => { if (openIdx >= 0 && openIdx !== i) open(i, false); });
+    t.addEventListener('keydown', e => {
+      if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' '){ e.preventDefault(); open(i, true); }
+      else if (e.key === 'ArrowRight'){ e.preventDefault(); tops[(i + 1) % tops.length].focus(); }
+      else if (e.key === 'ArrowLeft'){ e.preventDefault(); tops[(i - 1 + tops.length) % tops.length].focus(); }
+    });
+  });
+  items.forEach((it, i) => {
+    menuOf(it).addEventListener('keydown', e => {
+      const list = entries(it), idx = list.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown'){ e.preventDefault(); list[(idx + 1) % list.length].focus(); }
+      else if (e.key === 'ArrowUp'){ e.preventDefault(); list[(idx - 1 + list.length) % list.length].focus(); }
+      else if (e.key === 'Home'){ e.preventDefault(); list[0].focus(); }
+      else if (e.key === 'End'){ e.preventDefault(); list[list.length - 1].focus(); }
+      else if (e.key === 'Escape'){ e.preventDefault(); closeAll(); tops[i].focus(); }
+      else if (e.key === 'ArrowRight'){ e.preventDefault(); open((i + 1) % items.length, true); }
+      else if (e.key === 'ArrowLeft'){ e.preventDefault(); open((i - 1 + items.length) % items.length, true); }
+      else if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.matches('label[role="menuitemcheckbox"]')){
+        e.preventDefault(); const cb = document.activeElement.querySelector('input'); cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
+    menuOf(it).addEventListener('click', e => { if (e.target.closest('button[role="menuitem"]')) closeAll(); });
+  });
+  document.addEventListener('click', e => { if (!bar.contains(e.target)) closeAll(); });
+  const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
+  on('new-calc-btn', async () => {
+    const ok = await showPromptModal({ title: 'New calculator', desc: 'Start a new blank calculator? Every sheet, the project header and linked .pl files are cleared. Save As first if you want to keep this one.',
+      buttons: [{ label: 'Cancel', value: false }, { label: 'Start new', value: true, primary: true }] });
+    if (ok) clearEntireDocument({ clearHeaders: true });
+  });
+  on('import-pl-menu-btn', () => openPlWizard());
+  on('import-pl-btn', () => openPlWizard());
+  on('linked-pl-btn', () => plOpenLinks());
+  on('save-as-menu-btn', () => openSaveAsModal('copy'));
+  on('print-menu-btn', () => window.print());
+  on('add-location-menu-btn', () => addLocation());
+  on('revision-log-menu-btn', () => { document.getElementById('help-overlay').classList.add('open'); buildHowDoIIndex(); const t = document.getElementById('help-revisionlog'); if (t) t.scrollIntoView({ block: 'start' }); });
+}
+function wirePlWizard(){
+  document.getElementById('plw-close').addEventListener('click', closePlWizard);
+  document.getElementById('plw-cancel').addEventListener('click', closePlWizard);
+  document.getElementById('plw-next').addEventListener('click', plNext);
+  document.getElementById('plw-back').addEventListener('click', plBack);
+  document.getElementById('plw-finish').addEventListener('click', plFinish);
+  const ov = document.getElementById('plw-overlay');
+  const origOpen = openPlWizard;
+  openPlWizard = function(o){
+    plWiz.aux = false; document.getElementById('plw-steps').hidden = false; document.getElementById('plw-aux-actions').innerHTML = '';
+    document.getElementById('plw-title').textContent = 'Import PipeCAD .pl files';
+    ['plw-back', 'plw-next'].forEach(id => document.getElementById(id).hidden = false);
+    plWiz.suggested = false; plWiz.pattern = null; plWiz.newFile = null;
+    origOpen(o);
+  };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && ov.classList.contains('open') && !document.querySelector('.calc-select-list:not([hidden])')) closePlWizard(); });
+}
+wireMenuBar();
+wirePlWizard();
+plRenderBanner();
 
 if (!tryLoadEmbeddedState() && !loadState()){
   projectDateInput.value = new Date().toISOString().slice(0, 10);
