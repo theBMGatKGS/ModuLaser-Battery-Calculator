@@ -1044,6 +1044,11 @@
   .plw-dev .calc-select-wrap{ flex:0 0 118px; width:118px; min-width:0; }
   .plw-tag, .plw-psu-h b, .plw-psu-h .ah{ white-space:nowrap; }
   .plw-psu-h{ flex-wrap:wrap; }
+  #plw-finish:disabled{ opacity:0.45; cursor:not-allowed; filter:grayscale(0.6); }
+  .plw-tray{ margin:10px 10px 0; border:2px dashed #ffb74d; border-radius:8px; background:rgba(255,183,77,0.08); padding:8px 10px; display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:4px 10px; }
+  .plw-tray > .plw-psu-h{ grid-column:1 / -1; color:#ffcc80; }
+  .plw-tray.dragover{ border-color:var(--accent); background:var(--accent-soft); }
+  .plw-prompt{ border:1px solid #ffb74d; background:rgba(255,183,77,0.12); color:var(--text); border-radius:8px; padding:10px 12px; margin:0 0 10px; font-size:13px; line-height:1.45; }
   .plw-viol{ color:#ff8a80; font-size:11.5px; margin-top:4px; }
   .plw-diff-added{ color:#a5d6a7; } .plw-diff-removed{ color:#ff8a80; } .plw-diff-changed{ color:#ffe08a; }
 </style>
@@ -1427,14 +1432,14 @@
           <div class="qs-step-num">18</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-import-pl">Import PipeCAD .pl files</div>
-            <p><b>File → Import .pl…</b> (or <b>Import .pl</b> in the quick row) opens a four-step wizard. <b>1 Battery settings</b> — set Design Basis, standby/alarm, ambient temperature, safety margin, NFPA 72 edition, power-supply capacity and supply mode <i>first</i>; they become the defaults on every new sheet and drive the 65 Ah check. <b>2 Pick files</b> — drop or choose one or more .pl files; each shows its project (the file name is used when ProjectName is blank), units (metric files are converted to feet), Areas/Groups, detectors, displays and PSU positions. Untick any Area/Group you don't want. Unknown detector types or display part numbers are listed and skipped. <b>3 Rename</b> — set a naming pattern from {project} {file} {area} {name} {##} (default <span class="mono-inline">{project}-{area}-Det{##}</span>, remembered for next time), edit any zone or Area/Group name, and watch the live character counter. The ModuLaser display shows 16 characters total, including spaces, so names over 16 are blocked until shortened — use the suggested short name or <b>Shorten all over 16</b>. Duplicate names are outlined in red. <b>4 Power supplies</b> — each Area/Group gets at least one supply, a supply never spans Areas/Groups, and each takes at most 4 detectors and 1 display with the required battery ≤ 65 Ah (display load included). Suggestions start from PSU positions in the file (nearest device first), otherwise devices within 3 ft of each other in plan view (X/Y) are grouped; oversize groups are split by distance. Drag devices between supply cards or use <i>Move to…</i>, add or remove supplies, or click <b>Pack into fewest</b>. <b>Create sheets</b> stays disabled while any rule is broken. One sheet is created per supply, with type, zone name, fan speed and display model filled in; addresses and anything the file doesn't provide stay highlighted for you to enter.</p>
+            <p><b>File → Import .pl…</b> (or <b>Import .pl</b> in the quick row) opens a four-step wizard. <b>1 Battery settings</b> — set Design Basis, standby/alarm, ambient temperature, safety margin, NFPA 72 edition, power-supply capacity and supply mode <i>first</i>; they become the defaults on every new sheet and drive the 65 Ah check. <b>2 Pick files</b> — drop or choose one or more .pl files; each shows its project (the file name is used when ProjectName is blank), units (metric files are converted to feet), Areas/Groups, detectors, displays and PSU positions. Untick any Area/Group you don't want. Unknown detector types or display part numbers are listed and skipped. <b>3 Rename</b> — set a naming pattern from {project} {file} {area} {name} {##} (default <span class="mono-inline">{project}-{area}-Det{##}</span>, remembered for next time), edit any zone or Area/Group name, and watch the live character counter. The ModuLaser display shows 16 characters total, including spaces, so names over 16 are blocked until shortened — use the suggested short name or <b>Shorten all over 16</b>. Duplicate names are outlined in red. <b>4 Power supplies</b> — each Area/Group gets at least one supply, a supply never spans Areas/Groups, and each takes at most 4 detectors and 1 display with the required battery ≤ 65 Ah (display load included). Suggestions start from PSU positions in the file (nearest device first) and devices within 3 ft of each other in plan view (X/Y); oversize groups are split by distance. Any device that isn't near a file PSU or within 3 ft of another device is <i>not</i> auto-assigned — it waits in that Area/Group's <b>Unassigned — group these to a power supply</b> tray, and you're prompted to group it: drag it onto a supply card or use <i>Move to…</i>, and click <b>+ Add power supply</b> for more supplies (removing a supply sends its devices back to the tray). <b>Pack into fewest</b> is an optional shortcut that assigns the whole Area/Group to the fewest supplies. <b>Create sheets</b> stays disabled, showing how many detectors are still unassigned, until every device is on a supply and every rule passes. One sheet is created per supply, with type, zone name, fan speed and display model filled in; addresses and anything the file doesn't provide stay highlighted for you to enter.</p>
           </div>
         </div>
         <div class="qs-step">
           <div class="qs-step-num">19</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-linked-pl">Keep linked .pl files up to date</div>
-            <p>Every imported .pl stays linked in the calc file: its name, size, last-modified date, SHA-256 fingerprint, and a fingerprint for each detector mapped to its sheet and row. <b>File → Linked .pl files…</b> lists them. <b>Check link…</b> asks you to pick the current copy of the .pl (a browser can't re-open a file on its own). If it changed, a banner appears above the sheets with the number of added, removed and changed devices. <b>Review &amp; re-import…</b> shows the differences: fan-speed and name updates are pre-ticked only where you haven't edited that row by hand, removed devices are only deleted if you tick them, and new devices go through the rename and power-supply steps. Addresses are never changed.</p>
+            <p>Every imported .pl stays linked in the calc file: its name, size, last-modified date, SHA-256 fingerprint, and a fingerprint for each detector mapped to its sheet and row. <b>File → Linked .pl files…</b> lists them. <b>Check link…</b> asks you to pick the current copy of the .pl (a browser can't re-open a file on its own). If it changed, a banner appears above the sheets with the number of added, removed and changed devices. <b>Review &amp; re-import…</b> shows the differences: fan-speed and name updates are pre-ticked only where you haven't edited that row by hand, removed devices are only deleted if you tick them, and new devices go through the rename step, then land in the power-supply step's Unassigned tray for you to group. Addresses are never changed.</p>
           </div>
         </div>
 
@@ -1570,7 +1575,7 @@
 
         <div class="help-faq-item">
           <div class="q">How does Import .pl decide which detectors share a power supply?</div>
-          <p class="a">PipeCAD's "Floor" level is treated as an Area/Group. Within each Area/Group, PSU positions saved in the .pl are used as the starting supplies and each device goes to the nearest one that still has room. Without PSU positions, detectors and displays within 3 ft of each other in plan view (X/Y, height ignored) are suggested together. A suggestion is split by distance if it would exceed 4 detectors, 1 display, or a required battery over 65 Ah using the step 1 battery settings, Edwards A/BPS quiescent load and one 35 mA AUX circuit. Devices more than 3 ft from everything else get their own supply; use <b>Pack into fewest</b> or drag them together if you want fewer supplies. The sheet's own calculation is still the final word once it's created.</p>
+          <p class="a">PipeCAD's "Floor" level is treated as an Area/Group. Within each Area/Group, PSU positions saved in the .pl are used as the starting supplies and each device goes to the nearest one that still has room. Without PSU positions, detectors and displays within 3 ft of each other in plan view (X/Y, height ignored) are suggested together. A suggestion is split by distance if it would exceed 4 detectors, 1 display, or a required battery over 65 Ah using the step 1 battery settings, Edwards A/BPS quiescent load and one 35 mA AUX circuit. Devices more than 3 ft from everything else (and not placed on a file PSU) are left in the Area/Group's <b>Unassigned</b> tray for you to group — drag them onto a supply, use <i>Move to…</i>, add supplies, or use the optional <b>Pack into fewest</b>. Create sheets stays blocked until the tray is empty. Re-imported new devices also start in the tray. The sheet's own calculation is still the final word once it's created.</p>
         </div>
         <div class="help-faq-item">
           <div class="q">What's a "cluster"?</div>
@@ -1791,7 +1796,7 @@ const AMENDMENTS = [
   { rev: "007", minor: "05", date: "261002", desc: "Replaced unreliable native <select> option popups (Chromium/Electron still painted light OS menus with light text despite 01.05.006 CSS) with custom white-on-black listboxes for all calculator selects — Addresses, Module Types, Design Basis, Ambient Temp, Fan Speed, and the rest. Native selects stay in the DOM (visually hidden) so value/change/save-load/needs-entry/validation keep working; open menus use fixed positioning to escape .location overflow clipping. Verified open menus via browser screenshots." },
   { rev: "008", minor: "05", date: "261002", desc: "Sheet header layout: Power Supply Name and Location now occupy a full row above Design Basis / Standby / Alarm / Ambient Temperature (previously side-by-side with those controls, so long PS titles encroached on the Design Basis dropdown). Design Basis control widened (flex min ~400px) so the full selected label shows for every preset — including NFPA 72 + NFPA 110 Generator Backup (Non-Voice/Voice) — without truncating into adjacent fields. Custom calc-selects, needs-entry, save/load, and print unchanged." },
   { rev: "009", minor: "05", date: "261002", desc: "Fixed tall custom calc-select menus (Fan Speed, Addresses, and any other long list) that could not scroll: a capture-phase window scroll listener was closing the menu on the list's own scrollbar drag and mouse-wheel scroll. Listener now ignores scrolls that originate from the open list; outside-click dismiss also treats pointer-down inside the open list's bounding box as inside; option commit moved from mousedown to click and lists use scrollbar-gutter:stable so scrollbar/gutter drags are not stolen by option hit-targets (overlay scrollbars). Also added keyboard navigation while a menu is open — Arrow Up/Down, Page Up/Down, Home/End move the highlight (with scroll-into-view), Enter/Space commit, Escape closes — and stopped ArrowDown on the closed-state button from toggling an already-open menu shut." },
-  { rev: "000", minor: "06", date: "261013", desc: "Minor version bumped to 01.06 per Brent; revision counter restarted at 000. Menu bar (File / Edit / View / Help, keyboard accessible, white-on-black) replaces the crowded toolbar, with a short quick-action row (Import .pl, + Add Location, Save As…, Print, Auto-Save indicator); every existing command is still reachable. New Import .pl wizard: battery settings first, multi-file pick with per-Area/Group selection and metric-to-feet conversion, rename table with {project} {file} {area} {name} {##} pattern (remembered), live 16-character counter, short-name suggestions and duplicate flags, then power-supply assignment that enforces at least one supply per Area/Group, no supply across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah per supply, seeded from PSU positions in the file or 3 ft plan-view clustering. One sheet per supply with type, zone name, fan speed and display model filled in; addresses stay highlighted. Linked .pl tracking saved in the calc file (name, size, modified date, SHA-256, per-detector fingerprints mapped to sheet/row) with Check link, a change banner, a diff, and re-import that never changes addresses or hand edits without confirmation. Help: Quick Start steps 17–19, a new FAQ and How Do I… topics." },
+  { rev: "000", minor: "06", date: "261013", desc: "Minor version bumped to 01.06 per Brent; revision counter restarted at 000. Menu bar (File / Edit / View / Help, keyboard accessible, white-on-black) replaces the crowded toolbar, with a short quick-action row (Import .pl, + Add Location, Save As…, Print, Auto-Save indicator); every existing command is still reachable. New Import .pl wizard: battery settings first, multi-file pick with per-Area/Group selection and metric-to-feet conversion, rename table with {project} {file} {area} {name} {##} pattern (remembered), live 16-character counter, short-name suggestions and duplicate flags, then power-supply assignment that enforces at least one supply per Area/Group, no supply across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah per supply, seeded from PSU positions in the file or 3 ft plan-view clustering; devices outside any 3 ft cluster or file PSU are not auto-assigned but wait in a per-Area/Group Unassigned tray with a prompt to group them to a power supply (drag, Move to…, + Add power supply, or the optional Pack into fewest), and Create sheets stays blocked with \"N detectors still unassigned\" until the tray is empty and every rule passes (re-imported new devices also land in the tray). One sheet per supply with type, zone name, fan speed and display model filled in; addresses stay highlighted. Linked .pl tracking saved in the calc file (name, size, modified date, SHA-256, per-detector fingerprints mapped to sheet/row) with Check link, a change banner, a diff, and re-import that never changes addresses or hand edits without confirmation. Help: Quick Start steps 17–19, a new FAQ and How Do I… topics." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -5989,7 +5994,7 @@ const HOWDOI_COMMON = [
     id: 'import-pl',
     title: 'Import PipeCAD .pl files',
     keywords: 'pipecad pl import wizard area group floor detector rename power supply psu cluster 3 ft 65 ah metric',
-    blurb: 'File → Import .pl… (or Import .pl in the quick row): 1 set battery settings, 2 pick .pl files and tick Areas/Groups, 3 rename zones (16 characters max, including spaces), 4 review power-supply suggestions (max 4 detectors + 1 display, ≤ 65 Ah, never across Areas/Groups). One sheet per supply.',
+    blurb: 'File → Import .pl… (or Import .pl in the quick row): 1 set battery settings, 2 pick .pl files and tick Areas/Groups, 3 rename zones (16 characters max, including spaces), 4 review power-supply suggestions (3 ft clusters and file PSUs only) and group the rest: lone detectors wait in the Unassigned tray, so drag them onto a supply, use Move to…, + Add power supply, or the optional Pack into fewest (max 4 detectors + 1 display, ≤ 65 Ah, never across Areas/Groups). Create sheets stays blocked while any detector is unassigned. One sheet per supply.',
     target: 'qs-step-import-pl',
     common: true,
   },
@@ -5997,7 +6002,7 @@ const HOWDOI_COMMON = [
     id: 'linked-pl',
     title: 'Check linked .pl files for changes',
     keywords: 'linked pl link changed re-import update fingerprint sha banner diff',
-    blurb: 'File → Linked .pl files… → Check link… and pick the current .pl. If it changed, a banner shows added/removed/changed devices; Review & re-import updates fan speeds and names (hand edits only if you tick them) and sends new devices to power-supply assignment. Addresses are never touched.',
+    blurb: 'File → Linked .pl files… → Check link… and pick the current .pl. If it changed, a banner shows added/removed/changed devices; Review & re-import updates fan speeds and names (hand edits only if you tick them) and sends new devices to the power-supply step\u2019s Unassigned tray for you to group. Addresses are never touched.',
     target: 'qs-step-linked-pl',
     common: true,
   },
@@ -6570,8 +6575,15 @@ function plSuggestForGroup(g, devs){
     });
     left = left.filter(d => !placed.has(d.key));
   }
-  plClusterDevices(left).forEach(c => psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c }));
-  return psus.filter(p => p.devices.length || p.fromFile);
+  // Only real 3 ft clusters (2+ devices) are pre-suggested; lone devices go to the Unassigned tray for the user to group.
+  const unassigned = [];
+  plClusterDevices(left).forEach(c => {
+    if (c.length > 1) psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c });
+    else unassigned.push(...c);
+  });
+  const out = psus.filter(p => p.devices.length || p.fromFile);
+  out.unassigned = unassigned;
+  return out;
 }
 
 /* ---------- naming ---------- */
@@ -6598,7 +6610,7 @@ function plGetPattern(){ try { return localStorage.getItem(PL_PATTERN_KEY) || PL
 function plSetPattern(p){ try { localStorage.setItem(PL_PATTERN_KEY, p); } catch (e){} }
 
 /* ---------- wizard state ---------- */
-const plWiz = { step: 1, files: [], settings: null, psuByGroup: {}, mode: 'new', linkUpdate: null };
+const plWiz = { step: 1, files: [], settings: null, psuByGroup: {}, unassignedByGroup: {}, mode: 'new', linkUpdate: null };
 function plDefaultSettings(){
   const cur = getCurrentLocationEl && getCurrentLocationEl();
   const g = sel => cur && cur.querySelector(sel);
@@ -6817,48 +6829,60 @@ function plStep3Problems(){
 }
 
 function plBuildSuggestions(){
-  plWiz.psuByGroup = {};
+  plWiz.psuByGroup = {}; plWiz.unassignedByGroup = {};
   plIncludedGroups().forEach(({ fi, g }) => {
-    const devs = g.displays.concat(g.detectors);
-    plWiz.psuByGroup[plGroupKey(fi, g)] = plSuggestForGroup(g, devs);
+    const devs = g.displays.concat(g.detectors), gk = plGroupKey(fi, g);
+    if (plWiz.mode === 'update'){ plWiz.psuByGroup[gk] = []; plWiz.unassignedByGroup[gk] = devs.slice(); return; } // re-import: new devices land in the tray
+    const ps = plSuggestForGroup(g, devs);
+    plWiz.unassignedByGroup[gk] = ps.unassigned || [];
+    plWiz.psuByGroup[gk] = ps;
   });
 }
+function plUnassignedCount(){ return plIncludedGroups().reduce((n, { fi, g }) => n + (plWiz.unassignedByGroup[plGroupKey(fi, g)] || []).length, 0); }
+function plUnassignedReason(n){ return `${n} detector${n === 1 ? '' : 's'} still unassigned — group them to a power supply`; }
 function plAllPsus(){ return Object.entries(plWiz.psuByGroup); }
 function plRenderStep4(body){
   if (!plWiz.suggested){ plBuildSuggestions(); plWiz.suggested = true; }
   let seq = 0;
-  body.innerHTML = `<p class="plw-note">One sheet is created per power supply. Rules: at least one power supply per Area/Group, a supply never spans Areas/Groups, max ${PL_MAX_DET_PER_PSU} detectors + ${PL_MAX_DISP_PER_PSU} display each, and required battery ≤ ${CHARGER_MAX_AH} Ah (display load included). Suggestions come from PSU positions in the file, otherwise devices within ${PL_CLUSTER_FT} ft (plan view). Drag a device to another supply, or use its <i>Move to</i> list.</p>` +
+  body.innerHTML = `<p class="plw-note">One sheet is created per power supply. Rules: at least one power supply per Area/Group, a supply never spans Areas/Groups, max ${PL_MAX_DET_PER_PSU} detectors + ${PL_MAX_DISP_PER_PSU} display each, and required battery ≤ ${CHARGER_MAX_AH} Ah (display load included). Suggestions come only from PSU positions in the file and from devices within ${PL_CLUSTER_FT} ft of each other (plan view). Everything else waits in each Area/Group's <b>Unassigned</b> tray.</p>` +
+    (plUnassignedCount() ? `<div class="plw-prompt" role="alert"><b>Group detectors to a power supply.</b> ${plUnassignedCount()} device${plUnassignedCount() === 1 ? '' : 's'} aren't within ${PL_CLUSTER_FT} ft of another device or a file PSU, so they weren't assigned. For each Area/Group, drag them from the <b>Unassigned</b> tray onto a supply (or use <i>Move to…</i>), click <b>+ Add power supply</b> for more supplies, or use <b>Pack into fewest</b> as a shortcut. <b>Create sheets</b> unlocks once every device is on a supply and all rules pass.</div>` : '') +
     plIncludedGroups().map(({ f, fi, g }) => {
-      const gk = plGroupKey(fi, g), psus = plWiz.psuByGroup[gk] || [];
+      const gk = plGroupKey(fi, g), psus = plWiz.psuByGroup[gk] || [], un = plWiz.unassignedByGroup[gk] || [];
+      const seq0 = seq;
+      const moveOpts = (cur) => `<option value="" selected>Move to…</option>${cur !== -1 ? '<option value="-1">Unassigned</option>' : ''}${psus.map((q, qi) => qi === cur ? '' : `<option value="${qi}">PS-${seq0 + qi + 1}</option>`).join('')}`;
+      const devHtml = (d, cur) => `<div class="plw-dev" draggable="true" data-dkey="${plEsc(d.key)}"><span class="nm" title="${plEsc(d.origName)}">${plEsc(d.newName || d.origName)}</span><span class="plw-tag">${d.kind === 'display' ? plEsc(d.type.replace(' Display','')) + ' disp' : 'fan ' + (d.fan || '?')}</span>
+            <select class="plw-move" aria-label="Move ${plEsc(d.newName)} to">${moveOpts(cur)}</select></div>`;
       return `<div class="plw-area" data-gk="${gk}"><h4>${plEsc(g.name)} <span class="plw-tag">${plEsc(f.fileName)}</span><span class="plw-tag">${psus.length} power suppl${psus.length === 1 ? 'y' : 'ies'}</span>
-        <button class="btn btn-sm" style="margin-left:auto" data-pack="${gk}" title="Re-suggest this Area/Group using the fewest supplies: nearest devices grouped together up to the 4 detector / 1 display / 65 Ah limits (ignores the 3 ft rule)">Pack into fewest</button>
-        <button class="btn btn-sm" data-resuggest="${gk}" title="Go back to the 3 ft / file-PSU suggestion for this Area/Group">Re-suggest</button>
+        <button class="btn btn-sm" style="margin-left:auto" data-pack="${gk}" title="Optional helper: assign every device in this Area/Group (tray included) to the fewest supplies, nearest devices together up to the 4 detector / 1 display / 65 Ah limits (ignores the 3 ft rule)">Pack into fewest</button>
+        <button class="btn btn-sm" data-resuggest="${gk}" title="Go back to the 3 ft / file-PSU suggestion for this Area/Group (lone devices return to the Unassigned tray)">Re-suggest</button>
         <button class="btn btn-sm" data-addpsu="${gk}">+ Add power supply</button></h4>
+        ${un.length ? `<div class="plw-tray" data-gk="${gk}" data-pi="-1"><div class="plw-psu-h"><b>Unassigned — group these to a power supply</b><span class="plw-tag bad">${un.length} waiting</span></div>${un.map(d => devHtml(d, -1)).join('')}</div>` : ''}
         <div class="plw-psus">${psus.map((p, pi) => { seq++; const chk = plPsuCheck(p); return `<div class="plw-psu ${chk.violations.length ? 'bad' : ''}" data-gk="${gk}" data-pi="${pi}">
           <div class="plw-psu-h"><b>PS-${seq}</b>${p.fromFile ? '<span class="plw-tag">from file</span>' : ''}<span class="plw-tag ${chk.dets > PL_MAX_DET_PER_PSU ? 'bad' : ''}">${chk.dets}/${PL_MAX_DET_PER_PSU} det</span><span class="plw-tag ${chk.disp > PL_MAX_DISP_PER_PSU ? 'bad' : ''}">${chk.disp}/${PL_MAX_DISP_PER_PSU} disp</span>
             <span class="ah ${chk.ah > CHARGER_MAX_AH ? 'plw-diff-removed' : ''}">${chk.ah.toFixed(1)} / ${CHARGER_MAX_AH} Ah</span>
-            <button class="btn btn-ghost btn-sm" data-rmpsu="${gk}:${pi}" title="Remove this power supply (its devices move to the first other supply)">✕</button></div>
-          ${p.devices.map(d => `<div class="plw-dev" draggable="true" data-dkey="${plEsc(d.key)}"><span class="nm" title="${plEsc(d.origName)}">${plEsc(d.newName || d.origName)}</span><span class="plw-tag">${d.kind === 'display' ? plEsc(d.type.replace(' Display','')) + ' disp' : 'fan ' + (d.fan || '?')}</span>
-            <select class="plw-move" aria-label="Move ${plEsc(d.newName)} to">${psus.map((q, qi) => `<option value="${qi}" ${qi === pi ? 'selected' : ''}>${qi === pi ? 'Move to…' : 'PS ' + (seq - pi + qi)}</option>`).join('')}</select></div>`).join('') || '<div class="plw-note" style="margin:0">Empty — drag devices here, or remove it.</div>'}
+            <button class="btn btn-ghost btn-sm" data-rmpsu="${gk}:${pi}" title="Remove this power supply (its devices go back to the Unassigned tray)">✕</button></div>
+          ${p.devices.map(d => devHtml(d, pi)).join('') || '<div class="plw-note" style="margin:0">Empty — drag devices here, or remove it.</div>'}
           ${chk.violations.map(v => `<div class="plw-viol">⚠ ${plEsc(v)}</div>`).join('')}
         </div>`; }).join('')}</div></div>`;
     }).join('');
-  const findPsu = (gk, pi) => plWiz.psuByGroup[gk][pi];
+  const findPsu = (gk, pi) => pi === -1 ? { devices: (plWiz.unassignedByGroup[gk] = plWiz.unassignedByGroup[gk] || []) } : plWiz.psuByGroup[gk][pi];
   const moveDev = (gk, fromPi, key, toPi) => {
+    if (fromPi === toPi) return;
     const from = findPsu(gk, fromPi), to = findPsu(gk, toPi);
-    if (!from || !to || from === to) return;
+    if (!from || !to) return;
     const i = from.devices.findIndex(d => d.key === key); if (i < 0) return;
     to.devices.push(from.devices.splice(i, 1)[0]); plRender();
   };
   body.querySelectorAll('.plw-move').forEach(sel => sel.addEventListener('change', () => {
-    const card = sel.closest('.plw-psu'), dev = sel.closest('.plw-dev');
+    if (sel.value === '') return;
+    const card = sel.closest('.plw-psu, .plw-tray'), dev = sel.closest('.plw-dev');
     moveDev(card.dataset.gk, +card.dataset.pi, dev.dataset.dkey, +sel.value);
   }));
   body.querySelectorAll('.plw-dev').forEach(dev => dev.addEventListener('dragstart', e => {
-    const card = dev.closest('.plw-psu');
+    const card = dev.closest('.plw-psu, .plw-tray');
     e.dataTransfer.setData('text/plain', JSON.stringify({ gk: card.dataset.gk, pi: +card.dataset.pi, key: dev.dataset.dkey }));
   }));
-  body.querySelectorAll('.plw-psu').forEach(card => {
+  body.querySelectorAll('.plw-psu, .plw-tray').forEach(card => {
     card.addEventListener('dragover', e => { e.preventDefault(); card.classList.add('dragover'); });
     card.addEventListener('dragleave', () => card.classList.remove('dragover'));
     card.addEventListener('drop', e => {
@@ -6871,11 +6895,15 @@ function plRenderStep4(body){
   const groupOf = gk => { const [fi, gi] = gk.split(':').map(Number); return plWiz.files[fi].groups[gi]; };
   body.querySelectorAll('[data-pack]').forEach(b => b.addEventListener('click', () => {
     const g = groupOf(b.dataset.pack);
-    plWiz.psuByGroup[b.dataset.pack] = plSplitByDistance(g.displays.concat(g.detectors)).map(c => ({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c })); plRender();
+    const all = plWiz.psuByGroup[b.dataset.pack].flatMap(p => p.devices).concat(plWiz.unassignedByGroup[b.dataset.pack] || []);
+    plWiz.psuByGroup[b.dataset.pack] = plSplitByDistance(all).map(c => ({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c }));
+    plWiz.unassignedByGroup[b.dataset.pack] = []; plRender();
   }));
   body.querySelectorAll('[data-resuggest]').forEach(b => b.addEventListener('click', () => {
     const g = groupOf(b.dataset.resuggest);
-    plWiz.psuByGroup[b.dataset.resuggest] = plSuggestForGroup(g, g.displays.concat(g.detectors)); plRender();
+    const all = plWiz.psuByGroup[b.dataset.resuggest].flatMap(p => p.devices).concat(plWiz.unassignedByGroup[b.dataset.resuggest] || []);
+    const ps = plSuggestForGroup(g, all);
+    plWiz.unassignedByGroup[b.dataset.resuggest] = ps.unassigned || []; plWiz.psuByGroup[b.dataset.resuggest] = ps; plRender();
   }));
   body.querySelectorAll('[data-addpsu]').forEach(b => b.addEventListener('click', () => {
     plWiz.psuByGroup[b.dataset.addpsu].push({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: [] }); plRender();
@@ -6883,18 +6911,20 @@ function plRenderStep4(body){
   body.querySelectorAll('[data-rmpsu]').forEach(b => b.addEventListener('click', () => {
     const [gk, pi] = [b.dataset.rmpsu.slice(0, b.dataset.rmpsu.lastIndexOf(':')), +b.dataset.rmpsu.slice(b.dataset.rmpsu.lastIndexOf(':') + 1)];
     const list = plWiz.psuByGroup[gk];
-    if (list.length <= 1 && list[0].devices.length){ document.getElementById('plw-msg').textContent = 'Each Area/Group needs at least one power supply.'; return; }
     const [rm] = list.splice(pi, 1);
-    if (rm.devices.length && list.length) list[0].devices.push(...rm.devices);
+    if (rm.devices.length) (plWiz.unassignedByGroup[gk] = plWiz.unassignedByGroup[gk] || []).push(...rm.devices);
     plRender();
   }));
 }
 function plStep4Problems(){
   const probs = [];
+  const nUn = plUnassignedCount();
+  if (nUn) probs.push(plUnassignedReason(nUn));
   plIncludedGroups().forEach(({ fi, g }) => {
     const psus = plWiz.psuByGroup[plGroupKey(fi, g)] || [];
     const used = psus.filter(p => p.devices.length);
     if ((g.detectors.length + g.displays.length) && !used.length) probs.push(`${g.name}: needs at least one power supply.`);
+    if (psus.some(p => p.devices.some(d => !(g.detectors.includes(d) || g.displays.includes(d))))) probs.push(`${g.name}: a power supply holds a device from another Area/Group.`);
     psus.forEach((p, i) => plPsuCheck(p).violations.forEach(v => probs.push(`${g.name}, supply ${i + 1}: ${v}`)));
   });
   return probs;
@@ -6904,7 +6934,7 @@ function plValidateStep4(){
   const fin = document.getElementById('plw-finish');
   fin.disabled = probs.length > 0;
   fin.title = probs.length ? 'Blocked: ' + probs.join(' · ') : 'Create the sheets';
-  document.getElementById('plw-msg').textContent = probs.length ? `Blocked — ${probs.length} rule violation(s): ${probs[0]}${probs.length > 1 ? ' …' : ''}` : '';
+  document.getElementById('plw-msg').textContent = probs.length ? (nUnTxt => nUnTxt ? `Blocked — ${nUnTxt}${probs.length > 1 ? ` (+${probs.length - 1} more)` : ''}` : `Blocked — ${probs.length} rule violation(s): ${probs[0]}${probs.length > 1 ? ' …' : ''}`)(plUnassignedCount() ? probs[0] : '') : '';
 }
 function plNext(){
   const msg = document.getElementById('plw-msg');
