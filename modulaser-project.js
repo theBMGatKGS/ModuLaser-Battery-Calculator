@@ -10,7 +10,7 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.2.0';
+MLP.VERSION = '1.3.0';
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -27,8 +27,8 @@ MLP.TYPICAL_DEFAULTS = {
   // Manual-sourced (ModuLaser Install Manual 04-4001-501-0803-05): flow High/Low limit 20% and flow-fault delay 120 s (Table 29, p.76).
   // Fire 1 per class = the FM/UL HOLE-sensitivity limit (App. A, printed p.113) used as a starting point; the manual gives no %obs/ft
   // alarm default (thresholds come from ClassiFire; Table 24 p.71 factors: Alert 10, Prealarm 6, Alarm 8, Alarm 2 absolute 20).
-  // VEWFD Alert 0.2 = per NFPA 76, as summarized in Honeywell ASAG44201 Table 1 (secondary). Everything else
-  // (EWFD 0.5 / SFD 1.0 Alert, Prealarm, Fire 2, the 5 s delays — site choice, Table 26 range 0–90 s) is 'typical – unverified'.
+  // VEWFD Alert 0.2 = per NFPA 76-2024 8.5.3.1.2.5 (VEWFD Alert 0.2 / Alarm 1.0 %/ft = 0.65 / 3.2 %/m, effective at each port, above ambient). Everything else
+  // (EWFD 0.5 / SFD 1.0 Alert — site/design choice, no code basis; Prealarm, Fire 2, the 5 s delays — site choice, Table 26 range 0–90 s) is 'typical – unverified'.
   VEWFD: { alert: 0.2, action: 0.5, fire1: 1.0, fire2: 2.0, actionDly: 5, fire1Dly: 5, flowLow: 20, flowHigh: 20, flowDly: 120 },
   EWFD:  { alert: 0.5, action: 1.0, fire1: 1.5, fire2: 3.0, actionDly: 5, fire1Dly: 5, flowLow: 20, flowHigh: 20, flowDly: 120 },
   SFD:   { alert: 1.0, action: 1.5, fire1: 2.5, fire2: 5.0, actionDly: 5, fire1Dly: 5, flowLow: 20, flowHigh: 20, flowDly: 120 }
@@ -202,7 +202,7 @@ MLP.MANUAL_SOURCED = { flowLow: 'Table 29, p.76 (Flow Low Limit default 20%)', f
 /* Per-key citation / status text shown in tooltips and reports. */
 MLP.CITES = {
   fire1: 'Starting point = FM/UL hole-sensitivity limit for the class (ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113: VEWFD <1.00, EWFD <1.50, SFD <2.50 %obs/ft). Not a manual alarm default — Alarm Level is a ClassiFire factor (Table 24, p.71, default 8). Verify.',
-  alert: 'Typical – unverified. Alert Level is a ClassiFire factor (Table 24, p.71, default 10). VEWFD 0.2 %obs/ft: per NFPA 76, as summarized in Honeywell ASAG44201 Table 1. EWFD 0.5 / SFD 1.0: no source.',
+  alert: 'Typical – unverified. Alert Level is a ClassiFire factor (Table 24, p.71, default 10). VEWFD 0.2 %obs/ft: per NFPA 76-2024 8.5.3.1.2.5 (VEWFD Alert 0.2 / Alarm 1.0 %/ft = 0.65 / 3.2 %/m, effective at each port, above ambient). EWFD 0.5 / SFD 1.0: site/design choice, no code basis.',
   action: 'Typical – unverified. ModuLaser has no "Action" level; this is the Prealarm level (Table 24, p.71: Prealarm factor default 6).',
   fire2: 'Typical – unverified. Alarm 2 Level is absolute (Table 24, p.71: 0.10–25, default 20; units not stated).',
   actionDly: 'Typical – unverified site choice. Prealarm Delay range 0–90 s (Table 26, p.73).',
@@ -375,68 +375,123 @@ MLP.diffHtml = function (diff, esc){
 };
 
 /* ---------------- Performance Criteria (design.performance) ----------------
-   market 'UL': printouts state "Complies with UL 268, 7th Edition"; UL least-sensitive hole limits enforced
-   (VEWFD 1.0, EWFD 1.5, SFD/OAP 2.18 %obs/ft — overrides the manual's FM SFD 2.50 for UL).
-   market 'other': the engineer selects the basis and enters per-class limits; the project is blocked until defined.
-   narrative: required text aligned with the Engineer of Record's published intent (printed on the summary page). */
-MLP.PERF_BASES = ['UL', 'FM', 'NFPA 75', 'NFPA 76', 'NFPA 318', 'Other', 'Custom'];
+   perf.standard = one 'Referenced standard' preset (project), optional per-Area/Group overrides (perf.areas[a].standard).
+   NFPA presets: UL 268 7th Ed. thresholds (hole sensitivity strictly less than VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft;
+   transport time no more than 60 / 43 / 43 s) plus the selected code's prescriptions; printouts state "Complies with UL 268, 7th Edition".
+   FM DS presets: FM requirements only (not UL, no UL 268 statement). BS presets mirror the Battery Calculator's BS design bases.
+   Only cited values are prefilled; the rest are blank ("engineer to define") and must be entered, referenced and confirmed. */
 MLP.PERF_CLASSES = ['VEWFD', 'EWFD', 'SFD'];
 MLP.UL_STATEMENT = 'Complies with UL 268, 7th Edition';
-MLP.UL_LIMITS = { VEWFD: { sens: 1.0, tt: 60 }, EWFD: { sens: 1.5, tt: 90 }, SFD: { sens: 2.18, tt: 120 } };   // SFD = SFD/OAP (UL 268 7th Ed. open-area least-sensitive)
-/* Cited prefills per basis. Only values with a source are prefilled; everything else stays blank (never invented). */
-MLP.PERF_SOURCED = {
-  FM: { ref: 'FM Class 3230 per ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113 (FM/UL hole limits)',
-        VEWFD: { sens: 1.00, tt: 60 }, EWFD: { sens: 1.50, tt: 90 }, SFD: { sens: 2.50, tt: 120 } },
-  'NFPA 76': { ref: 'Per NFPA 76, as summarized in Honeywell ASAG44201 Table 1 (VEWFD alarm 1.0 %obs/ft per hole, <60 s); EWFD/SFD not stated there',
-        VEWFD: { sens: 1.0, tt: 60 } }
+/* Brent 2026-10-13: UL thresholds for the NFPA presets — sensitivity strictly less than, transport time less than or equal.
+   UL 268 7th Ed. ranges per ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113. */
+MLP.UL_LIMITS = { VEWFD: { sens: 1.0, tt: 60 }, EWFD: { sens: 1.5, tt: 43 }, SFD: { sens: 2.18, tt: 43 } };   // SFD = SFD/OAP
+MLP.UL_REFS = {
+  VEWFD: 'UL 268, 7th Ed. Special Application Range 1 — ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113; NFPA 76-2024 8.5.3.1.2.5 (1.0 %/ft) and 8.5.3.1.2.6 (60 s)',
+  EWFD: 'UL 268, 7th Ed. Special Application Range 2 — Install Manual App. A, printed p.113; 1.5 %obs/ft from NFPA 76-2024 8.5.3.2.1.3 (maximum permitted threshold based on the UL detector limit and NFPA 76 sensitivity); NFPA 76-2024 8.5.3.2.1.4 allows 90 s but UL governs (43 s)',
+  SFD: 'UL 268, 7th Ed. Open Area (SFD/OAP) — Install Manual App. A, printed p.113' };
+MLP.UL_REF = 'UL 268, 7th Edition ranges per ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113 (EWFD 1.5 %obs/ft from NFPA 76)';
+MLP.FM_REF = 'FM Class 3230 per ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113 (FM/UL hole limits)';
+MLP.FM_LIMITS = { VEWFD: { sens: 1.00, tt: 60 }, EWFD: { sens: 1.50, tt: 90 }, SFD: { sens: 2.50, tt: 120 } };
+/* family NFPA → UL thresholds + code; FM → FM only; BS / Custom → engineer-defined */
+MLP.PERF_PRESETS = [
+  { id: 'VEWFD – NFPA 76/318', cls: 'VEWFD', family: 'NFPA', code: 'NFPA 76 / NFPA 318' },
+  { id: 'EWFD – NFPA 76', cls: 'EWFD', family: 'NFPA', code: 'NFPA 76' },
+  { id: 'EWFD – FM DS 5-32', cls: 'EWFD', family: 'FM', code: 'FM Global Property Loss Prevention Data Sheet 5-32' },
+  { id: 'SFD/OAP – NFPA 72', cls: 'SFD', family: 'NFPA', code: 'NFPA 72' },
+  { id: 'SFD – FM DS 5-48', cls: 'SFD', family: 'FM', code: 'FM Global Property Loss Prevention Data Sheet 5-48' },
+  /* British Standards: exactly the BS options of the Battery Calculator's Design Basis drop-down */
+  { id: 'BS 5839-1 Category M/L', cls: '', family: 'BS', code: 'BS 5839-1 Category M/L' },
+  { id: 'BS 5839-1 Category M/L + Generator', cls: '', family: 'BS', code: 'BS 5839-1 Category M/L + Generator' },
+  { id: 'BS 5839-1 Category P (Staffed)', cls: '', family: 'BS', code: 'BS 5839-1 Category P (Staffed)' },
+  { id: 'BS 5839-1 Category P (Unstaffed)', cls: '', family: 'BS', code: 'BS 5839-1 Category P (Unstaffed)' },
+  { id: 'Custom', cls: '', family: 'Custom', code: '' }
+];
+MLP.perfPreset = id => MLP.PERF_PRESETS.find(p => p.id === id) || null;
+MLP.perfIsUl = id => { const p = MLP.perfPreset(id); return !!(p && p.family === 'NFPA'); };
+/* code prescriptions per preset: cited rows prefilled, everything else 'engineer to define' (value blank). */
+/* Research 2026-10-13 (/workspace/deliverables/ModuLaser-Commissioning-Defaults-Citations-2026-10-13.md): NFPA 76-2024 clauses. */
+MLP.PERF_CODE_CITED = {
+  'VEWFD – NFPA 76/318': [
+    { item: 'NFPA 76 VEWFD sensitivity at each sampling port (effective, above ambient)', value: 'Alert 0.2 %/ft (0.65 %/m); Alarm 1.0 %/ft (3.2 %/m)', ref: 'NFPA 76-2024 8.5.3.1.2.5' },
+    { item: 'NFPA 76 VEWFD coverage area per port / detector', value: 'per NFPA 76-2024 8.5.3.1.2.1–8.5.3.1.2.2 (engineer to apply to this layout)', ref: 'NFPA 76-2024 8.5.3.1.2.1–8.5.3.1.2.2' },
+    { item: 'NFPA 76 VEWFD transport time', value: '≤ 60 s from the most remote port', ref: 'NFPA 76-2024 8.5.3.1.2.6' },
+    { item: 'NFPA 76 VEWFD manufacturer criteria', value: 'Installed per the manufacturer: ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113', ref: 'NFPA 76-2024 8.5.3.1.2.4' }],
+  'EWFD – NFPA 76': [
+    { item: 'NFPA 76 EWFD alarm sensitivity', value: 'Alarm 1.5 %/ft (5.0 %/m)', ref: 'NFPA 76-2024 8.5.3.2.1.3' },
+    { item: 'NFPA 76 EWFD coverage area', value: '400 ft² per port / detector', ref: 'NFPA 76-2024 8.5.3.2.1.2' },
+    { item: 'EWFD transport time', value: '≤ 43 s (UL 268, 7th Ed. Special Application Range 2 governs; NFPA 76 alone allows 90 s)', ref: 'UL 268 Range 2 per Install Manual App. A p.113; NFPA 76-2024 8.5.3.2.1.4 (90 s)' },
+    { item: 'NFPA 76 EWFD manufacturer criteria', value: 'Installed per the manufacturer: ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113', ref: 'NFPA 76-2024 8.5.3.2.1.5' }],
+  'SFD/OAP – NFPA 72': [],
+  'EWFD – FM DS 5-32': [], 'SFD – FM DS 5-48': []
 };
-MLP.UL_REF = 'UL 268, 7th Edition (least-sensitive hole limits; SFD/OAP 2.18 %obs/ft)';
+MLP.perfCodeReqs = function (id){
+  const p = MLP.perfPreset(id); if (!p || p.family === 'Custom') return [];
+  const rows = (MLP.PERF_CODE_CITED[id] || []).map(r => Object.assign({}, r, { src: 'cited', confirmed: false }));
+  rows.push({ item: `${p.code}: further prescriptions for this application (engineer to define)`, value: '', ref: '', src: 'engineer', confirmed: false });
+  return rows;
+};
 MLP.perfLimitBlank = () => ({ sens: null, tt: null, ref: '', confirmed: false, src: '' });
-MLP.perfPrefill = function (basis){
-  const S = MLP.PERF_SOURCED[basis] || {}; const out = {};
-  MLP.PERF_CLASSES.forEach(c => { const v = S[c]; out[c] = v ? { sens: v.sens, tt: v.tt, ref: S.ref, confirmed: false, src: 'prefill' } : MLP.perfLimitBlank(); });
+/* UL 268 compliance is never auto-confirmed: limits carry the scope's ulConfirmed flag (QA re-check 2026-10-13). */
+MLP.perfUlLimits = ulConfirmed => { const o = {}; MLP.PERF_CLASSES.forEach(c => { o[c] = { sens: MLP.UL_LIMITS[c].sens, tt: MLP.UL_LIMITS[c].tt, ref: MLP.UL_REFS[c], confirmed: !!ulConfirmed, src: 'UL' }; }); return o; };
+MLP.perfPresetLimits = function (id){
+  const p = MLP.perfPreset(id); const out = {};
+  if (p && p.family === 'NFPA') return MLP.perfUlLimits(false);
+  MLP.PERF_CLASSES.forEach(c => { out[c] = p && p.family === 'FM' ? { sens: MLP.FM_LIMITS[c].sens, tt: MLP.FM_LIMITS[c].tt, ref: MLP.FM_REF, confirmed: false, src: 'prefill' } : MLP.perfLimitBlank(); });
   return out;
 };
-MLP.perfBlank = () => ({ market: 'UL', basis: 'UL', basisOther: '', limits: MLP.perfUlLimits(), areas: {}, narrative: '', narrativeDraft: '', eorName: '', specRef: '', statement: MLP.UL_STATEMENT, definedBy: '', definedAt: '' });
-MLP.perfUlLimits = () => { const o = {}; MLP.PERF_CLASSES.forEach(c => { o[c] = { sens: MLP.UL_LIMITS[c].sens, tt: MLP.UL_LIMITS[c].tt, ref: MLP.UL_REF, confirmed: true, src: 'UL' }; }); return o; };
-/* effective per-class limits for the project or an Area/Group override (null when not defined) */
-MLP.perfLimits = function (perf, area){
-  if (!perf) return null;
-  const o = area && perf.areas && perf.areas[area] && perf.areas[area].enabled ? perf.areas[area] : perf;
-  if ((o.market || perf.market) === 'UL' && o === perf) return MLP.perfUlLimits();
-  if (o.basis === 'UL') return MLP.perfUlLimits();
-  return o.limits || null;
+MLP.perfScopeInit = (o, id) => { o.standard = id; o.ulConfirmed = false; o.limits = MLP.perfPresetLimits(id); o.codeReqs = MLP.perfCodeReqs(id); return o; };
+MLP.perfBlank = () => Object.assign(MLP.perfScopeInit({ standardOther: '', areas: {}, narrative: '', narrativeDraft: '', eorName: '', specRef: '', definedBy: '', definedAt: '' }, 'SFD/OAP – NFPA 72'), { statement: '', market: 'UL' });
+/* migrate 1.2.0 drafts (market/basis) to presets */
+MLP.perfMigrate = function (perf){
+  if (!perf || perf.standard !== undefined) return perf;
+  const map = b => b === 'UL' ? 'SFD/OAP – NFPA 72' : b === 'FM' ? 'EWFD – FM DS 5-32' : b === 'NFPA 76' ? 'EWFD – NFPA 76' : 'Custom';
+  const one = (o, b) => { const keep = o.limits; MLP.perfScopeInit(o, map(b)); if (!MLP.perfIsUl(o.standard) && keep) o.limits = keep; if (o.standard === 'Custom') o.standardOther = o.basisOther || b || ''; };
+  one(perf, perf.market === 'UL' ? 'UL' : perf.basis);
+  Object.values(perf.areas || {}).forEach(o => o && one(o, o.basis));
+  return perf;
 };
+MLP.perfScope = (perf, area) => area && perf.areas && perf.areas[area] && perf.areas[area].enabled ? perf.areas[area] : perf;
+/* effective per-class limits for the project or an Area/Group override */
+MLP.perfLimits = function (perf, area){
+  if (!perf) return null; MLP.perfMigrate(perf);
+  const o = MLP.perfScope(perf, area);
+  return MLP.perfIsUl(o.standard) ? MLP.perfUlLimits(o.ulConfirmed) : (o.limits || null);
+};
+MLP.perfStdName = o => o.standard === 'Custom' ? (o.standardOther || 'Custom') : (o.standard || 'not selected');
 function perfScopeIssues(o, tag, out){
-  if (o.basis === 'UL') return;
-  if (!o.basis) out.push(`${tag}Select the performance basis (UL, FM, NFPA 75, NFPA 76, NFPA 318, Other or Custom)`);
-  if ((o.basis === 'Other' || o.basis === 'Custom') && !String(o.basisOther || '').trim()) out.push(`${tag}Describe the Other/Custom basis`);
-  MLP.PERF_CLASSES.forEach(c => { const l = (o.limits || {})[c] || {};
-    if (!(Number(l.sens) > 0)) out.push(`${tag}${c}: enter the per-hole sensitivity limit (%obs/ft)`);
-    if (!(Number(l.tt) > 0)) out.push(`${tag}${c}: enter the transport-time limit (s)`);
+  if (!o.standard){ out.push(`${tag}Select the referenced standard`); return; }
+  if (o.standard === 'Custom' && !String(o.standardOther || '').trim()) out.push(`${tag}Name the custom standard`);
+  if (MLP.perfIsUl(o.standard) && !o.ulConfirmed) out.push(`${tag}Engineer must confirm compliance with UL 268, 7th Edition before it is stated`);
+  if (!MLP.perfIsUl(o.standard)) MLP.PERF_CLASSES.forEach(c => { const l = (o.limits || {})[c] || {};
+    if (!(Number(l.sens) > 0)) out.push(`${tag}${c}: hole sensitivity limit — engineer to define (%obs/ft)`);
+    if (!(Number(l.tt) > 0)) out.push(`${tag}${c}: transport-time limit — engineer to define (s)`);
     if (!String(l.ref || '').trim()) out.push(`${tag}${c}: record the reference for these limits`);
     if (!l.confirmed) out.push(`${tag}${c}: engineer must confirm the limits`); });
+  (o.codeReqs || []).forEach((r, i) => { const n = `${tag}Code prescription ${i + 1}`;
+    if (!String(r.value || '').trim()) out.push(`${n}: engineer to define`);
+    if (!String(r.ref || '').trim()) out.push(`${n}: record the reference`);
+    if (!r.confirmed) out.push(`${n}: engineer must confirm`); });
 }
-/* blocking issues for the performance criteria */
 MLP.perfIssues = function (perf){
   const out = [];
   if (!perf){ out.push('Performance Criteria not defined'); return out; }
+  MLP.perfMigrate(perf);
   if (!String(perf.narrative || '').trim()) out.push('Performance narrative is required (align it with the Engineer of Record\'s published intent)');
   else if (!perf.narrativeConfirmed) out.push('Engineer must confirm the performance narrative (auto-drafted from the selections)');
-  if (perf.market !== 'UL') perfScopeIssues(perf, '', out);
+  perfScopeIssues(perf, '', out);
   Object.entries(perf.areas || {}).forEach(([a, o]) => { if (o && o.enabled) perfScopeIssues(o, `Area/Group "${a}" override — `, out); });
   return out;
 };
-/* auto-draft narrative from the selections; the engineer edits it */
 MLP.perfDraft = function (perf, classesUsed){
-  if (!perf) return '';
+  if (!perf) return ''; MLP.perfMigrate(perf);
   const L = MLP.perfLimits(perf) || {}; const cls = (classesUsed && classesUsed.length ? classesUsed : MLP.PERF_CLASSES);
-  const basis = perf.market === 'UL' ? 'UL 268, 7th Edition' : (perf.basis === 'Other' || perf.basis === 'Custom' ? (perf.basisOther || perf.basis) : perf.basis);
-  const lim = cls.map(c => { const l = L[c] || {}; return `${c === 'SFD' ? 'SFD/OAP' : c}: every sampling hole less than ${l.sens ?? '[limit]'} %obs/ft with transport time less than ${l.tt ?? '[time]'} s`; }).join('; ');
-  const areas = Object.entries(perf.areas || {}).filter(([, o]) => o && o.enabled).map(([a, o]) => `${a} (${o.basis || 'basis not set'})`);
-  return `The aspirating smoke detection system is designed to ${basis}${perf.specRef ? ' as required by ' + perf.specRef : ''}. Performance classes used: ${cls.join(', ')}. Design limits — ${lim}.${areas.length ? ' Area/Group overrides: ' + areas.join(', ') + '.' : ''} ${perf.market === 'UL' ? MLP.UL_STATEMENT + '.' : 'Limits are engineer-defined; references are recorded per class.'}${perf.eorName ? ' Engineer of Record: ' + perf.eorName + '.' : ''}`;
+  const std = MLP.perfStdName(perf); const ul = MLP.perfIsUl(perf.standard); const fm = (MLP.perfPreset(perf.standard) || {}).family === 'FM';
+  const lim = cls.map(c => { const l = L[c] || {}; return `${c === 'SFD' ? 'SFD/OAP' : c}: every sampling hole less than ${l.sens ?? '[engineer to define]'} %obs/ft with transport time no more than ${l.tt ?? '[engineer to define]'} s`; }).join('; ');
+  const areas = Object.entries(perf.areas || {}).filter(([, o]) => o && o.enabled).map(([a, o]) => `${a} (${MLP.perfStdName(o)})`);
+  return `The aspirating smoke detection system is designed to the referenced standard ${std}${perf.specRef ? ' as required by ' + perf.specRef : ''}${ul ? ', applying the UL 268, 7th Edition thresholds (Install Manual App. A, printed p.113: VEWFD Special Application Range 1, EWFD Special Application Range 2 with 1.5 %obs/ft from NFPA 76, SFD/OAP Open Area) plus the code\'s prescriptions' : fm ? ', applying FM requirements only' : ''}. Performance classes used: ${cls.join(', ')}. Design limits — ${lim}.${areas.length ? ' Area/Group overrides: ' + areas.join(', ') + '.' : ''} ${ul ? (perf.ulConfirmed ? MLP.UL_STATEMENT + '.' : 'UL 268, 7th Edition compliance to be confirmed by the engineer.') : 'Limits and references are recorded and confirmed by the engineer.'}${perf.eorName ? ' Engineer of Record: ' + perf.eorName + '.' : ''}`;
 };
-MLP.perfStatement = perf => perf ? (perf.market === 'UL' ? MLP.UL_STATEMENT : `Performance basis: ${perf.basis === 'Other' || perf.basis === 'Custom' ? (perf.basisOther || perf.basis) : (perf.basis || 'not selected')} (engineer-defined limits)`) : '';
+MLP.perfStatement = perf => { if (!perf) return ''; MLP.perfMigrate(perf); const std = MLP.perfStdName(perf);
+  return MLP.perfIsUl(perf.standard) ? (perf.ulConfirmed ? `${MLP.UL_STATEMENT} · Referenced standard: ${std}` : `UL 268, 7th Edition compliance NOT YET CONFIRMED by the engineer · Referenced standard: ${std}`) : `Referenced standard: ${std}${(MLP.perfPreset(perf.standard) || {}).family === 'FM' ? ' (FM requirements; not a UL 268 listing statement)' : ' (engineer-defined limits)'}`; };
 root.MLP = MLP;
 if (typeof module !== 'undefined' && module.exports) module.exports = MLP;
 })(typeof window !== 'undefined' ? window : globalThis);
