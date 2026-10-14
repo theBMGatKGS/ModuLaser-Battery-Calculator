@@ -104,7 +104,7 @@ Actions" (one-time change, safe — it doesn't touch either branch's content).
    ```
 
 3. **The PWA files live in a `pwa/` subfolder in the branch** (alongside the
-   standalone `.html` file and `electron-app/`), not at the branch root — the
+   standalone `.html` file and the Electron `app/`), not at the branch root — the
    workflow above already accounts for this by copying `pwa/`'s *contents*
    into `_site/calculator/`, not the `pwa/` folder itself. You don't need to
    reorganize anything in the branch to make this work; keep `pwa/` where it
