@@ -8,12 +8,13 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 - **Needs entry now shows where.** Sheets with the amber *Needs entry* status outline every field still needing entry with a 2px **amber** outline and tint (inputs, custom dropdowns, radio groups), matching the sidebar dot. Before, the 1px soft-blue outline from 01.05 was indistinguishable from normal borders on the 02.00 dark theme, and the dropdown highlights sat on hidden native selects' visible buttons in the same blue.
 - **Show next ›** button on the Live Results message (*N fields still need entry (amber outline)*) scrolls to and focuses each field in turn.
 - **Print contrast:** KGS label grey `#747574` → `#6b6c6b` (5.0:1 on the info panel, 5.3:1 on white).
+- **Module table columns (per Brent):** Module Type labels DISP-MIN / DISP-STD / DISP-CMD / DETECTOR; Cluster shows the 2-digit number only (01); Power shows *Own circuit* or *Ribbon Path*. Fixed column widths so nothing truncates or wraps; the table scrolls sideways on narrow windows. Print/Export and Word module tables gain Model, Cluster and Power columns, single-line. Saved files are unaffected (stored values unchanged).
 - Status logic, counts and calculation math unchanged (regression scenarios identical).
 
 ### QA audit
 | Date | Commit audited | Result | Brief |
 |---|---|---|---|
-| 2026-10-14 | branch fix/print-label-contrast (pre-release) | Needs-entry regression on Brent's saved file: 1/3 on 02.00.002 → 5/5 fixed | `qa/needs-entry-2026-10-14.md` |
+| 2026-10-14 | branch fix/print-label-contrast (pre-release) | Needs-entry regression on Brent's saved file: 1/3 on 02.00.002 → 5/5 fixed; module-column test 2/10 → 10/10 | `qa/needs-entry-2026-10-14.md` |
 
 ## v02.00.002 — Shared MASD engine (2026-10-13)
 
