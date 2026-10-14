@@ -6,7 +6,7 @@ its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 ## What's new in 02.00.002
 - **Shared MASD engine 1.0.0** (`masd-engine.js`) — byte-identical with the **MASD Engineering Toolbox 00.01.000**, which embeds this calculator; results unchanged.
 - **Harmonization rule:** any engine change bumps the engine version and both apps' revisions with matching notes.
-- Project file (`modulaser-project.js` 1.2.0, shared with the Commissioning Report and Toolbox): SHA-256 design/site hashes, pass-through of field changes, approvals, Toolbox config and Performance Criteria.
+- Project file (`modulaser-project.js` 1.3.0, shared with the Commissioning Report and Toolbox): SHA-256 design/site hashes, pass-through of field changes, approvals, Toolbox config and Performance Criteria.
 - QA audit 2026-10-13 ([issue #1](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1)): see [RELEASE_NOTES.md](RELEASE_NOTES.md).
 
 ## What's new in 02.00.000
