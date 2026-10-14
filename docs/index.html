@@ -370,7 +370,7 @@
   .ra-btn.active.ra-auto{ background: var(--good-soft); color: var(--good); }
   .ra-btn.active.ra-off{ background: var(--panel-2); color: var(--text); }
 
-  .devtable{ width:100%; min-width:890px; border-collapse: collapse; margin-bottom: 6px; table-layout: fixed; }
+  .devtable{ width:100%; min-width:956px; border-collapse: collapse; margin-bottom: 6px; table-layout: fixed; }
   /* 02.00.003: module table cells never truncate or wrap; the table scrolls sideways when the sheet is narrower */
   .devtable td.model-cell, .devtable .calc-select-btn, .devtable .cluster-label, .devtable .fan-na{ white-space:nowrap; }
   .devtable td{ overflow:visible; }
@@ -3136,7 +3136,7 @@ function locationTemplate(loc){
         <p class="section-note">Up to eight (8) ModuLaser Detector Modules can be assigned to a single ModuLaser Display Module (FHSD8310-ULF or FHSD8300-ULF). Detector Modules cannot be assigned to a Command Display Module (FHSD8320-ULF) — it does not support detectors at the cluster level apart from a resident Standard or Minimum Display Module. Zone descriptions may be edited, up to 16 characters.</p>
         <table class="devtable">
           <thead>
-            <tr><th style="width:76px">Address</th><th style="width:170px">Zone</th><th style="width:112px">Module Type</th><th style="width:108px">Model</th><th style="width:72px">Cluster</th><th style="width:150px">Power</th><th style="width:84px">Fan Speed</th><th style="width:76px; text-align:right">Current</th><th style="width:44px"></th></tr>
+            <tr><th style="width:108px">Address</th><th style="width:160px">Zone</th><th style="width:112px">Module Type</th><th style="width:108px">Model</th><th style="width:72px">Cluster</th><th style="width:146px">Power</th><th style="width:88px">Fan Speed</th><th style="width:118px; text-align:right">Current</th><th style="width:44px"></th></tr>
           </thead>
           <tbody class="devices-body">
             ${buildModuleRow(loc, 1, "Standard Display", "", "")}
