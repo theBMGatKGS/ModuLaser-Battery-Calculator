@@ -1656,7 +1656,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">19</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-menubar">Find commands in the menu bar and quick row</div>
-            <p>The menu bar at the top holds every command. <b>File</b>: New…, Open / Import Calc…, Import .pl…, Linked .pl files…, Save As…, Export to Excel, Print / Export… (Ctrl+P) and the <b>Print BOM</b> switch. <b>Edit</b>: + Add Location, Clear…, Confirm defaults, Clear saved data. <b>View</b>: Cluster Report, Project Settings bar, Sheet sidebar, Results panel. <b>Help</b>: Help, How Do I…, Revision log. The quick row underneath holds ☰ (sheet sidebar), <b>Import .pl</b>, <b>+ Add Location</b>, <b>Save As…</b>, <b>Print</b>, the Auto-Save indicator and ◧ (results panel). Menus work from the keyboard too: Tab to a menu name, press Enter or ↓ to open it, ↑/↓ to move, ←/→ to switch menus, Esc to close.</p>
+            <p>The menu bar at the top holds every command. <b>File</b>: New…, Open / Import Calc…, Import .pl…, Linked .pl files…, Import project…, Export project…, Save As…, Export to Excel, Print / Export… (Ctrl+P) and the <b>Print BOM</b> switch. <b>Edit</b>: + Add Location, Clear…, Confirm defaults, Clear saved data. <b>View</b>: Cluster Report, Project Settings bar, Sheet sidebar, Results panel. <b>Help</b>: Help, How Do I…, Revision log. The quick row underneath holds ☰ (sheet sidebar), <b>Import .pl</b>, <b>+ Add Location</b>, <b>Save As…</b>, <b>Print</b>, the Auto-Save indicator and ◧ (results panel). Menus work from the keyboard too: Tab to a menu name, press Enter or ↓ to open it, ↑/↓ to move, ←/→ to switch menus, Esc to close.</p>
           </div>
         </div>
         <div class="qs-step">
@@ -1705,6 +1705,13 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-cad-paste">Paste the CAD Schedule onto a drawing</div>
             <p>The Excel workbook's <b>CAD Schedule</b> sheet has one compact table per power supply — Zone, Type, Fan speed, Address, Standby mA, Alarm mA, then Total load and a footer row Required Ah | Battery | PASS/FAIL — with thin plain borders, fixed column widths, no merged cells and no fills. To place one on a drawing: select that table's cells in Excel, copy, then in AutoCAD use <b>Paste Special → AutoCAD Entities</b> (a native table) or <b>Picture (Metafile)</b>. The <b>Detail</b> sheet holds the full calculation at the chosen detail level, grouped per power supply and per step — use Excel's outline buttons (1 / 2 / 3 or + / −) on the left to expand or collapse it.</p>
+          </div>
+        </div>
+        <div class="qs-step">
+          <div class="qs-step-num">25</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-project-file">Share the design with the Field Report (project file)</div>
+            <p><b>File → Export project…</b> downloads a <span class="mono-inline">.mlproj.json</span> ModuLaser project file. It holds the project details, every power supply sheet (name, Area/Group, model, battery model, Ah and quantity, required Ah, standby and alarm time, PASS/FAIL), every detector and display (16-character name, type, address, power supply, fan speed) and, for detectors imported from PipeCAD, the pipe data commissioning needs: each sampling hole's size, flow, transport time and sensitivity, test points, pipe length, total flow, hole balance, fittings, Alarm Factor and design sensitivity, plus the .pl PSU and Battery positions. Open it in the <b>MASD Field Report</b> with <b>File → Import project…</b> and every detector, display and power supply sheet is created for you; nothing is typed twice. Both tools save the same file: the calculator owns the <i>design</i> part and the Field Report owns the <i>site</i> results. <b>File → Import project…</b> here opens a project file; if sheets are already on screen it lists every difference (added, removed or changed devices and power supplies) before replacing them. The Field Report's site results are never edited by the calculator; they are kept and written back unchanged the next time you export. Set addresses here: the Field Report imports them and confirms them on site.</p>
           </div>
         </div>
 
@@ -1837,6 +1844,10 @@ body.v2 .model-cell{ font-size:10.5px; }
 
       <div class="help-section" id="help-faq">
         <h3>FAQs</h3>
+        <div class="help-faq-item">
+          <div class="q">What is the MASD Engineering Toolbox, and is the math the same?</div>
+          <p class="a">The MASD Engineering Toolbox (00.01.000) absorbs this calculator and adds detector/display configuration, legacy-file migration and the field-change approval loop. Both apps run the same <b>MASD engine</b> (shown in Help → Revision Log → Calculation engine) and the same .pl import, so the same inputs give the same Ah, supplies and battery in both. Harmonization rule: any engine change bumps both apps' revisions with matching notes. Projects move between them through the same .mlproj.json file; this calculator keeps the Toolbox's configuration, field changes and approvals unchanged when it exports.</p>
+        </div>
         <div class="help-faq-item">
           <div class="q">What do the sidebar's status dots mean?</div>
           <p class="a">Green: complete — no validation messages and no fields left to enter. Amber: needs entry — blue-outlined fields are still empty or on unconfirmed factory defaults. Red: error — the sheet has an INVALID CALCULATION condition or a Validation Error (the red number is how many). A second, blue dot means the sheet overrides the settings most sheets use (Design Basis, standby, alarm, temperature or margin). The same legend is at the bottom of the sidebar.</p>
@@ -1981,6 +1992,10 @@ body.v2 .model-cell{ font-size:10.5px; }
           <p class="a">Edwards A/BPS applies Edwards/EST's quiescent, AUX, hardware, and battery catalog automatically. Third-party lets you enter your own supply's quiescent/AUX/battery numbers, or skip straight to exporting the ModuLaser-only load (with its own Ah/supplies-required estimate) for use in that manufacturer's own calculator.</p>
         </div>
         <div class="help-faq-item">
+          <div class="q">What is a ModuLaser project file (.mlproj.json)?</div>
+          <p class="a">One file that both ModuLaser tools save. The Battery Calculator writes the <i>design</i>: project details, power supplies and batteries, detectors and displays with their addresses and 16-character names, and the PipeCAD pipe and sampling-hole data. The MASD Field Report writes the <i>site</i> results: inspections, configuration, tests and sign-off. Each tool keeps the other tool's part exactly as it found it, and neither replaces data without first showing you what would change. Use File → Export project… here and File → Import project… in the Field Report. Your normal Save As… calculator file still works the same way.</p>
+        </div>
+        <div class="help-faq-item">
           <div class="q">Will Validation Error flags stop me from finishing?</div>
           <p class="a">No — they don't stop you from editing, and you can keep working with flags showing. What they do withhold is the power supply/battery recommendation section, the multi-supply recommendation, the Recommended Power Supply Arrangement, and the Bill of Materials — all four stay blank until every flag clears. The INVALID CALCULATION banner works the same way but for its own three more severe conditions.</p>
         </div>
@@ -1992,6 +2007,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="help-about-row"><span class="help-about-k">Application</span><span class="help-about-v">ModuLaser Battery Calculator</span></div>
           <div class="help-about-row"><span class="help-about-k">Revision</span><span class="help-about-v mono-inline" id="about-revision-value">—</span></div>
           <div class="help-about-row"><span class="help-about-k">Authored by</span><span class="help-about-v">The BMG</span></div>
+          <div class="help-about-row"><span class="help-about-k">Calculation engine</span><span class="help-about-v mono-inline" id="about-engine-value">MASD engine</span></div>
         </div>
 
         <div class="section-label" style="margin-top:20px;">Amendments</div>
@@ -2003,6 +2019,310 @@ body.v2 .model-cell{ font-size:10.5px; }
     </div>
   </div>
 
+<!--ENGINE-BEGIN--><script id="masd-engine">
+/* =====================================================================
+   MASD ENGINE — shared calculation + PipeCAD .pl import
+   Used byte-for-byte by the ModuLaser Battery Calculator and the
+   MASD Engineering Toolbox. Harmonization rule: any change here bumps
+   MASD_ENGINE_VERSION and the revision of BOTH apps, with matching
+   Revision-log notes that name the engine version.
+   ===================================================================== */
+const MASD_ENGINE_VERSION = '1.0.0';
+const MASD_ENGINE = {
+  version: MASD_ENGINE_VERSION,
+  /* BS 5839-1 Annex E: D = 1 when the battery 20-hour rate (Ah / 20) meets the alarm current, else 1.75. */
+  bs5839D(batteryAh, totalMa){ return (batteryAh > 0 && (batteryAh / 20) >= (totalMa / 1000)) ? 1 : 1.75; },
+  /* NFPA 72 minimum safety margin by edition: 20 % (2019 and earlier) / 25 % (2022 and later). */
+  marginMinimum(edition){ return edition === '2019minus' ? 0.20 : 0.25; },
+  temperatureMultiplier(t){ return TEMPERATURE_MULTIPLIERS[parseInt(t)] || 1.0; },
+  /* Standby Ah = I × T_standby; Alarm Ah = I × T_alarm × D; Required = (Standby + Alarm) × (1 + margin) × temperature. */
+  batteryAh({ standbyHours, alarmMinutes, totalMa, derating = 1, margin = 0, temperatureF = 77 }){
+    const standbyAh = standbyHours * (totalMa / 1000);
+    const alarmAh = ((alarmMinutes / 60) * (totalMa / 1000)) * derating;
+    const initialAh = standbyAh + alarmAh;
+    const tempMultiplier = this.temperatureMultiplier(temperatureF);
+    return { standbyAh, alarmAh, initialAh, marginAh: initialAh * (1 + margin), tempMultiplier, requiredAh: initialAh * (1 + margin) * tempMultiplier };
+  },
+  /* Per-group estimate used by the arrangement suggestions (no derating or temperature, as before). */
+  groupAh({ standbyHours, alarmMinutes, totalMa, margin = 0 }){
+    return ((standbyHours * (totalMa / 1000)) + ((alarmMinutes / 60) * (totalMa / 1000))) * (1 + margin);
+  },
+  suppliesRequired(requiredAh, sizeAh){ return sizeAh > 0 ? Math.max(1, Math.ceil(requiredAh / sizeAh)) : 1; },
+  detectorMa(fan, psuVolts){ return (psuVolts === 18 ? FAN_SPEED_MA_18V : FAN_SPEED_MA)[fan] || 0; }
+};
+
+/* ---------------- reference data ---------------- */
+const MODULE_TYPES = {
+  "Minimum Display":  { model: "FHSD8300-ULF", kind: "display", ma: 210 },
+  "Standard Display": { model: "FHSD8310-ULF", kind: "display", ma: 232 },
+  "Command Display":  { model: "FHSD8320-ULF", kind: "command", ma: 232 },
+  "Detector":         { model: "FHSD8330-ULF", kind: "detector", ma: null }
+};
+const FAN_SPEED_MA = {1:218,2:234,3:255,4:279,5:301,6:330,7:363,8:393,9:431,10:471,11:506,12:552,13:602,14:646,15:712,16:762};
+// 18V reference figures from the manufacturer's current-draw worksheet, for the Help menu's
+// reference table only — not used in any calculation (the calculator's own math always uses
+// FAN_SPEED_MA above). Does not match either the 18.0V or 20.4V rows exactly in every case;
+// see the Help menu's Module Current Draw Reference for the documented sourcing.
+const FAN_SPEED_MA_18V = {1:250,2:279,3:305,4:330,5:358,6:380,7:430,8:465,9:517,10:566,11:615,12:685,13:733,14:786,15:872,16:1021};
+
+const QUIESCENT_MA = 70;
+const AUX_MA_PER_CIRCUIT = 35;
+const MAX_AUX_BUILTIN = 4;
+const CHARGER_MAX_AH = 65;
+const DEFAULT_SAFETY_MARGIN = 0.25;
+const DESIGN_BASIS_PRESETS = {
+  "NFPA 72 Standard": { standby: 24, alarm: 5, formula: "standard",
+    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — secondary power supply capacity for standard (non-voice) protected premises fire alarm systems (10.6.7.2.1: 24-hour minimum standby under quiescent load)." },
+  "NFPA 72 Voice": { standby: 24, alarm: 15, formula: "standard",
+    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — secondary power supply capacity for systems with in-building fire emergency voice/alarm communications (10.6.7.2.1: 24-hour minimum standby under quiescent load)." },
+  "NFPA 72 + NFPA 110 Generator Backup (Non-Voice)": { standby: 4, alarm: 5, formula: "standard",
+    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — 4-hour standby permitted where secondary power is provided by an automatic-starting, engine-driven generator meeting NFPA 110 (Type 10, Class 24, Level 1) with the entire power path qualifying as NFPA 70 Article 700 emergency power. If any part of the downstream distribution does not qualify, the full 24-hour battery standby applies regardless." },
+  "NFPA 72 + NFPA 110 Generator Backup (Voice)": { standby: 4, alarm: 15, formula: "standard",
+    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — 4-hour standby permitted where secondary power is provided by an automatic-starting, engine-driven generator meeting NFPA 110 (Type 10, Class 24, Level 1) with the entire power path qualifying as NFPA 70 Article 700 emergency power. If any part of the downstream distribution does not qualify, the full 24-hour battery standby applies regardless." },
+  "UFC 3-600-01 Hydro (Voice Evacuation)": { standby: 24, alarm: 15, formula: "standard",
+    citation: "UFC 3-600-01, Fire Protection Engineering for Facilities (8 August 2016, w/ Change 6 dated 6 May 2021), Paragraph 4-24.7 — Hydroelectric Power Plant voice evacuation requirements, following NFPA 72 in-building fire alarm voice evacuation secondary power provisions." },
+  "UFC 3-600-01 FA/MNS": { standby: 48, alarm: 15, formula: "standard",
+    citation: "UFC 3-600-01, Fire Protection Engineering for Facilities (8 August 2016, w/ Change 6 dated 6 May 2021), Paragraph 9-18.11.3 — Fire Alarm and Mass Notification System secondary power capacity." },
+  "AWS": { standby: 24, alarm: 120, formula: "standard",
+    citation: "Complies with AWS specification 283116, 25H1B — NFPA 72 (2022 Edition), Section 10.6.7.2 secondary power capacity requirements, with an Owner-specified enhanced 120-minute alarm period in place of the 5/15-minute code minimum. Also compliant with NFPA 855." },
+  "CAN/ULC-S524:2024 Standard": { standby: 24, alarm: 5, formula: "standard", fixedMargin: 0.25,
+    citation: "CAN/ULC-S524:2024, Standard for the Installation of Fire Alarm Systems — secondary (battery) power capacity for 24-hour standby plus 5 minutes of alarm operation, with the 1.25 safety factor introduced in the 2024 edition." },
+  "CAN/ULC-S524:2024 Voice": { standby: 24, alarm: 15, formula: "standard", fixedMargin: 0.25,
+    citation: "CAN/ULC-S524:2024, Standard for the Installation of Fire Alarm Systems — secondary (battery) power capacity for 24-hour standby plus 15 minutes of alarm operation where voice communication is installed, with the 1.25 safety factor introduced in the 2024 edition." },
+  "BS 5839-1 Category M/L": { standby: 24, alarm: 30, formula: "bs5839", derating: 1.75,
+    citation: "BS 5839-1:2025, Annex E — Category M (Manual) or L (Life Safety) system secondary power capacity." },
+  "BS 5839-1 Category M/L + Generator": { standby: 6, alarm: 30, formula: "bs5839", derating: 1.75,
+    citation: "BS 5839-1:2025, Annex E — Category M/L system secondary power capacity where an automatic-starting generator serves as secondary power." },
+  "BS 5839-1 Category P (Staffed)": { standby: 24, alarm: 30, formula: "bs5839", derating: 1.75,
+    citation: "BS 5839-1:2025, Annex E — Category P (staffed / ARC-monitored premises) secondary power capacity." },
+  "BS 5839-1 Category P (Unstaffed)": { standby: 24, alarm: 30, formula: "bs5839", derating: 1.75, editableStandby: true, maxStandby: 72,
+    citation: "BS 5839-1:2025, Annex E — Category P (unstaffed premises) secondary power capacity: 24 hours plus the unoccupied period, up to a maximum of 72 hours total standby." }
+};
+const TEMPERATURE_MULTIPLIERS = { 77: 1.00, 68: 1.04, 50: 1.14, 32: 1.30, 14: 1.61 };
+
+
+const BATTERY_SIZE_OPTIONS = [10, 12, 18, 26, 40, 50, 65];
+const BATTERY_MODELS = [
+  { model: "12V10A", ah: 10.5, supply: "BPS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
+  { model: "12V17A", ah: 18,   supply: "APS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
+  { model: "12V24A", ah: 26,   supply: "APS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
+  { model: "12V40A", ah: 40,   supply: "BPS6A", enclosure: "BC-1", cls: "good" },
+  { model: "12V50A", ah: 50,   supply: "BPS6A", enclosure: "SSU00507", cls: "good",
+    cabinetOptions: [
+      { value: "edwards", label: "Edwards 3-RCC7R", enclosure: "3-RCC7R" },
+      { value: "spaceage", label: "Space Age SSU00507", enclosure: "SSU00507" }
+    ] },
+  { model: "12V65A", ah: 65,   supply: "BPS6A", enclosure: "SSU00507", cls: "good",
+    cabinetOptions: [
+      { value: "edwards", label: "Edwards 3-RCC7R with 3-BATS (battery shelf)", enclosure: "3-RCC7R + 3-BATS (battery shelf)" },
+      { value: "spaceage", label: "Space Age SSU00507", enclosure: "SSU00507" }
+    ] }
+];
+const MAX_DETECTORS_PER_CLUSTER = 8;
+const MAX_COMMAND_DISPLAYS = 2;
+const MAX_MODULES_PER_NETWORK = 127;
+const MAX_DISPLAYS_PER_NETWORK = 63;
+function pad2(n){ return String(n).padStart(2, "0"); }
+
+// Resolves a desired/required Ah value to the next-larger available battery model (never smaller)
+function pickBatteryModel(requiredAh){
+  for (const b of BATTERY_MODELS) if (b.ah >= requiredAh) return b;
+  return null;
+}
+function hardwareFromModel(batteryModel, capacity, cabinetChoice){
+  if (!batteryModel){
+    return { supply: null, enclosure: null, batteryPart: null, cls: "danger", error: `Exceeds largest available battery model (12V65A, 65 Ah) — add power supplies or reduce battery size` };
+  }
+  const supplyName = (capacity === 10) ? batteryModel.supply.replace('6A', '10A') : batteryModel.supply;
+  let enclosureLabel = batteryModel.enclosure;
+  if (batteryModel.cabinetOptions){
+    const chosen = batteryModel.cabinetOptions.find(o => o.value === cabinetChoice) || batteryModel.cabinetOptions[0];
+    enclosureLabel = chosen.enclosure;
+  }
+  return {
+    supply: supplyName,
+    enclosure: enclosureLabel,
+    batteryPart: `2 × ${batteryModel.model} per ${supplyName}${enclosureLabel.indexOf("None") !== 0 ? " (" + enclosureLabel + ")" : ""} — ${batteryModel.ah} Ah rated`,
+    cls: batteryModel.cls,
+    cabinetOptions: batteryModel.cabinetOptions || null
+  };
+}
+
+
+/* ---------- PipeCAD .pl import: constants ---------- */
+const PL_NAME_MAX = 16;
+const PL_CLUSTER_FT = 3;
+const PL_MAX_DET_PER_PSU = 4;
+const PL_MAX_DISP_PER_PSU = 1;
+const PL_DETECTOR_TYPES = { MULTISENSE: 'Detector', MODULASER_DETECTOR: 'Detector' };
+const PL_DISPLAY_PARTS = { '0': 'Standard Display', '1': 'Minimum Display', '2': 'Command Display' };
+const PL_M_TO_FT = 3.28084;
+
+function plKid(el, tag){ if (!el) return null; for (const c of el.children) if (c.tagName === tag) return c; return null; }
+function plTxt(el, tag){ const k = plKid(el, tag); return k ? k.textContent.trim() : ''; }
+function plNum(el, tag){ const v = parseFloat(plTxt(el, tag)); return isFinite(v) ? v : 0; }
+function plFnv(str){ let h = 0x811c9dc5; for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, '0'); }
+async function plSha256(text){
+  try {
+    if (window.crypto && crypto.subtle){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  } catch (e){}
+  return 'fnv-' + plFnv(text);
+}
+
+function plBaseName(n){ return String(n || '').replace(/^.*[\\/]/, '').replace(/\.pl$/i, ''); }
+
+/* ---------- parser ---------- */
+function plParse(text, fileName){
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('Not a valid PipeCAD .pl (XML) file.');
+  const root = doc.documentElement;
+  if (!root || root.tagName !== 'PipeLayout') throw new Error('Not a PipeCAD project (no <PipeLayout> root).');
+  const props = plKid(root, 'properties');
+  const unitRaw = plTxt(root, 'unit');
+  const imperial = unitRaw === '1';
+  const scale = imperial ? 1 : PL_M_TO_FT;
+  const projectName = plTxt(props, 'ProjectName');
+  const out = {
+    fileName, projectName, project: projectName || plBaseName(fileName),
+    projectFromFile: !projectName,
+    unitRaw, unitLabel: imperial ? 'Imperial (ft)' : `Metric (m, unit ${unitRaw || '?'}) — converted to ft`,
+    version: plTxt(root, 'pipecadVersion'), groups: [], skipped: []
+  };
+  const floorDb = plKid(root, 'floorDatabase');
+  const floors = floorDb ? Array.from(floorDb.children).filter(c => c.tagName === 'Floor') : [];
+  floors.forEach((fl, gi) => {
+    const gname = plTxt(fl, 'name') || `Area ${gi + 1}`;
+    const g = { idx: gi, origName: gname, name: gname, include: true, detectors: [], displays: [], psus: [] };
+    const seen = {};
+    const ddb = plKid(fl, 'detectorDatabase');
+    (ddb ? Array.from(ddb.children).filter(c => c.tagName === 'Detector') : []).forEach((d, di) => {
+      const name = plTxt(d, 'name') || `Detector ${di + 1}`;
+      const typeRaw = plTxt(d, 'type');
+      const idTxt = plTxt(d, 'id');
+      let key = `${gname}#${idTxt !== '' ? 'id' + idTxt : 'n' + name}`;
+      if (seen[key]) key += '~' + (++seen[key]); else seen[key] = 1;
+      const fan = parseInt(plTxt(d, 'aspiratorSpeed'), 10);
+      const rec = { key, ord: di, kind: 'detector', origName: name, typeRaw,
+        type: PL_DETECTOR_TYPES[typeRaw], fan: (fan >= 1 && fan <= 16) ? fan : null,
+        address: plTxt(d, 'address'),
+        x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale };
+      rec.fp = plFnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
+      if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
+      g.detectors.push(rec);
+    });
+    const disDb = plKid(fl, 'displayDatabase');
+    (disDb ? Array.from(disDb.children).filter(c => c.tagName === 'Display') : []).forEach((d, i) => {
+      const pn = plTxt(d, 'partNumber');
+      const type = PL_DISPLAY_PARTS[pn];
+      if (!type){ out.skipped.push(`${gname}: display ${i + 1} has unknown partNumber “${pn}” — skipped`); return; }
+      g.displays.push({ key: `${gname}#disp${i}`, ord: i, kind: 'display', origName: `${type} ${i + 1}`, type, partNumber: pn,
+        x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale,
+        fp: plFnv([pn, plNum(d,'startX'), plNum(d,'startY')].join('|')) });
+    });
+    const psuDb = plKid(fl, 'psuDatabase');
+    (psuDb ? Array.from(psuDb.children).filter(c => c.tagName === 'PSU') : []).forEach(p => {
+      g.psus.push({ x: plNum(p, 'startX') * scale, y: plNum(p, 'startY') * scale });
+    });
+    out.groups.push(g);
+  });
+  return out;
+}
+
+/* ---------- battery math (mirrors recalcLocationInner, Edwards A/BPS, 1 AUX circuit) ---------- */
+function plDeviceMa(dev){
+  if (dev.kind === 'display') return (MODULE_TYPES[dev.type] || {}).ma || 0;
+  return FAN_SPEED_MA[dev.fan] || FAN_SPEED_MA[16];
+}
+function plRequiredAh(devices, s){
+  const set = s || plWiz.settings;
+  if (!devices.length) return 0;
+  const preset = DESIGN_BASIS_PRESETS[set.designBasis] || {};
+  const devMa = devices.reduce((a, d) => a + plDeviceMa(d), 0);
+  const totalMa = devMa + (set.mode === 'thirdparty' ? 0 : QUIESCENT_MA + AUX_MA_PER_CIRCUIT);
+  const d = preset.formula === 'bs5839' ? (preset.derating || 1.75) : 1;
+  const margin = preset.formula === 'bs5839' ? 0.25 : (preset.fixedMargin !== undefined ? preset.fixedMargin : parseFloat(set.margin));
+  return MASD_ENGINE.batteryAh({ standbyHours: parseFloat(set.standbyHours) || 0, alarmMinutes: parseFloat(set.alarmMinutes) || 0, totalMa, derating: d, margin, temperatureF: set.temperature }).requiredAh;
+}
+function plPsuCheck(psu){
+  const dets = psu.devices.filter(d => d.kind === 'detector').length;
+  const disp = psu.devices.filter(d => d.kind === 'display').length;
+  const ah = plRequiredAh(psu.devices);
+  const v = [];
+  if (dets > PL_MAX_DET_PER_PSU) v.push(`${dets} detectors — max ${PL_MAX_DET_PER_PSU} per power supply`);
+  if (disp > PL_MAX_DISP_PER_PSU) v.push(`${disp} displays — max ${PL_MAX_DISP_PER_PSU} per power supply`);
+  if (ah > CHARGER_MAX_AH) v.push(`${ah.toFixed(1)} Ah required — over the ${CHARGER_MAX_AH} Ah charger limit`);
+  return { dets, disp, ah, violations: v };
+}
+function plFits(devs){
+  const dets = devs.filter(d => d.kind === 'detector').length, disp = devs.filter(d => d.kind === 'display').length;
+  return dets <= PL_MAX_DET_PER_PSU && disp <= PL_MAX_DISP_PER_PSU && plRequiredAh(devs) <= CHARGER_MAX_AH;
+}
+const plDist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/* ---------- PSU suggestion ---------- */
+function plSplitByDistance(devs){
+  // Greedy: seed with the left-/bottom-most device, grow with nearest-neighbour while rules allow.
+  const rest = devs.slice().sort((a, b) => a.x - b.x || a.y - b.y);
+  const groups = [];
+  while (rest.length){
+    const cur = [rest.shift()];
+    let grew = true;
+    while (grew && rest.length){
+      grew = false;
+      let best = -1, bestD = Infinity;
+      rest.forEach((d, i) => {
+        const dd = Math.min(...cur.map(c => plDist(c, d)));
+        if (dd < bestD && plFits(cur.concat([d]))){ bestD = dd; best = i; }
+      });
+      if (best >= 0){ cur.push(rest.splice(best, 1)[0]); grew = true; }
+    }
+    groups.push(cur);
+  }
+  return groups;
+}
+function plClusterDevices(devs){
+  // Single-linkage clusters of devices within 3 ft (plan view X/Y).
+  const n = devs.length, parent = devs.map((_, i) => i);
+  const find = i => parent[i] === i ? i : (parent[i] = find(parent[i]));
+  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++)
+    if (plDist(devs[i], devs[j]) <= PL_CLUSTER_FT) parent[find(i)] = find(j);
+  const map = {};
+  devs.forEach((d, i) => { (map[find(i)] = map[find(i)] || []).push(d); });
+  const out = [];
+  Object.values(map).forEach(c => { if (plFits(c)) out.push(c); else plSplitByDistance(c).forEach(s => out.push(s)); });
+  return out;
+}
+function plSuggestForGroup(g, devs){
+  const psus = [];
+  let left = devs.slice();
+  if (g.psus.length){
+    g.psus.forEach((p, i) => psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), seed: p, fromFile: true, devices: [] }));
+    const pairs = [];
+    left.forEach(d => psus.forEach(p => pairs.push({ d, p, dist: plDist(d, p.seed) })));
+    pairs.sort((a, b) => a.dist - b.dist);
+    const placed = new Set();
+    pairs.forEach(({ d, p }) => {
+      if (placed.has(d.key)) return;
+      if (plFits(p.devices.concat([d]))){ p.devices.push(d); placed.add(d.key); }
+    });
+    left = left.filter(d => !placed.has(d.key));
+  }
+  // Only real 3 ft clusters (2+ devices) are pre-suggested; lone devices go to the Unassigned tray for the user to group.
+  const unassigned = [];
+  plClusterDevices(left).forEach(c => {
+    if (c.length > 1) psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c });
+    else unassigned.push(...c);
+  });
+  const out = psus.filter(p => p.devices.length || p.fromFile);
+  out.unassigned = unassigned;
+  return out;
+}
+
+
+</script><!--ENGINE-END-->
 <script>
 /* ---------------- app revision tracking ---------------- */
 // Format: MM.mm.rrr_YYMMDD
@@ -2082,6 +2402,8 @@ const AMENDMENTS = [
   { rev: "008", minor: "05", date: "261002", desc: "Sheet header layout: Power Supply Name and Location now occupy a full row above Design Basis / Standby / Alarm / Ambient Temperature (previously side-by-side with those controls, so long PS titles encroached on the Design Basis dropdown). Design Basis control widened (flex min ~400px) so the full selected label shows for every preset — including NFPA 72 + NFPA 110 Generator Backup (Non-Voice/Voice) — without truncating into adjacent fields. Custom calc-selects, needs-entry, save/load, and print unchanged." },
   { rev: "009", minor: "05", date: "261002", desc: "Fixed tall custom calc-select menus (Fan Speed, Addresses, and any other long list) that could not scroll: a capture-phase window scroll listener was closing the menu on the list's own scrollbar drag and mouse-wheel scroll. Listener now ignores scrolls that originate from the open list; outside-click dismiss also treats pointer-down inside the open list's bounding box as inside; option commit moved from mousedown to click and lists use scrollbar-gutter:stable so scrollbar/gutter drags are not stolen by option hit-targets (overlay scrollbars). Also added keyboard navigation while a menu is open — Arrow Up/Down, Page Up/Down, Home/End move the highlight (with scroll-into-view), Enter/Space commit, Escape closes — and stopped ArrowDown on the closed-state button from toggling an already-open menu shut." },
 { rev: "000", major: "02", minor: "00", date: "261013", desc: "Major version 02.00 per Brent; revision counter restarted at 000. Folds in the unreleased 01.06.000 work, so this one entry covers it all. <b>Calculation math unchanged</b>: the same scenarios give identical Ah and BOM results to 01.05.009. <b>New layout</b> in the PipeCAD dark theme: a menu bar (File / Edit / View / Help, keyboard accessible, white-on-black) and a quick-action row (sidebar toggle, Import .pl, + Add Location, Save As…, Print, Auto-Save indicator, results-panel toggle) replace the old toolbar; a collapsible Project Settings bar shows a one-line summary when collapsed and names the sheet settings most sheets use, with an override badge on sheets that differ; a left sidebar lists power supply sheets grouped by Area/Group with status dots (complete, needs entry, error, overridden) and + Add power supply; the center shows one sheet at a time with a compact module table, an n/16 character counter on every zone name (red over 16) and the ModuLaser 16-character note; a pinned right panel shows live results (required Ah against the selected battery and the 65 Ah limit, PASS / FAIL / INCOMPLETE, load breakdown, clusters and the sheet's real validation messages). Panels collapse on narrow screens; View menu toggles them. <b>Import .pl wizard</b> (from 01.06.000): battery settings first, multi-file pick with per-Area/Group selection and metric-to-feet conversion, rename table with {project} {file} {area} {name} {##} pattern (remembered), live 16-character counter, short-name suggestions and duplicate flags, then power-supply assignment (at least one supply per Area/Group, none across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah per supply), seeded from PSU positions in the file or 3 ft plan-view clusters; other devices wait in a per-Area/Group Unassigned tray (drag, Move to…, + Add power supply, or the optional Pack into fewest) and Create sheets stays blocked until it is empty. Step 4 restyled to the new theme, behaviour unchanged. <b>Linked .pl files</b>: name, size, date, SHA-256 and per-device fingerprints saved in the calc, with Check link, a change banner, a diff and a re-import that never changes addresses or hand edits without confirmation. <b>Print / Export</b> (File → Print / Export…, Print in the quick row, Ctrl+P): one dialog with a live 8.5 × 11 preview, sheet scope, detail level (Summary / Standard / Full), summary-page and BOM options, and PDF, Word (.docx), HTML and Excel buttons, all built offline with no CDN. The printout uses the KGS print palette: a project summary page with every PSU's Area/Group, required Ah, battery and PASS/FAIL, then one letter page per PSU with header, capacity gauge (required Ah, selected battery and 65 Ah marks, margin and de-rating shaded), PASS/FAIL stamp, mini cluster diagram, module table, settings used and BOM; Full adds calculation appendix pages after each sheet (formula, values substituted, result, reference). <b>Excel</b>: a CAD Schedule sheet with one compact table per PSU (Zone, Type, Fan speed, Address, Standby mA, Alarm mA, footer Required Ah | Battery | PASS/FAIL; thin borders, fixed widths, no merged cells, no fills) for pasting onto CAD drawings, and a Detail sheet that follows the detail level with outline row groups per PSU and per step. <b>Help</b> rewritten for the new layout: Quick Start, How Do I…, FAQ, tooltips and this log." },
+{ rev: "001", major: "02", minor: "00", date: "261013", desc: "<b>ModuLaser project file</b> (.mlproj.json), shared with the MASD Field Report 02.00.000. <b>File → Export project…</b> saves the project details, every power supply (name, Area/Group, model, battery model, Ah and quantity, required Ah, standby/alarm, result) and every detector and display (16-character name, type, address, power supply, fan speed, linked .pl device) plus the PipeCAD pipe data the Field Report needs: sampling holes (size, flow, transport time, sensitivity), test points, pipe length, total flow, hole balance, fittings, Alarm Factor and design sensitivity, and the .pl PSU/Battery positions. <b>File → Import project…</b> opens one; if sheets are already on screen it first shows the differences. The calculator owns the design section and never edits the Field Report's site results: they are kept and written back unchanged. Imported .pl files now keep their hole and results data in the calc file too. The .pl reading and the file format live in modulaser-project.js, shared by both tools. <b>Calculation math unchanged.</b>" },
+{ rev: "002", major: "02", minor: "00", date: "261013", desc: "<b>Shared MASD engine 1.0.0.</b> The battery math (standby, alarm, BS 5839-1 D factor, NFPA 72 minimum margin, safety margin, temperature multiplier, supplies required, group estimates), the reference data (module currents, fan-speed currents, design-basis presets, battery models) and the PipeCAD .pl import now live in one shared engine (<code>masd-engine.js</code>), used byte-for-byte by this calculator and the MASD Engineering Toolbox 00.01.000, so both produce identical results. Harmonization rule: any engine change bumps the engine version and the revision of both apps, with matching notes here. Results unchanged: the regression scenarios and the full test suite give the same numbers as 02.00.001. <b>Also in 02.00.002:</b> project-file pass-through of field changes, approvals, Toolbox device configuration, the Toolbox Performance Criteria (referenced standard preset, limits, code prescriptions, Area/Group overrides, narrative, Engineer of Record, spec reference; the British Standards presets mirror this calculator's BS 5839-1 Design Basis options) and unknown top-level keys (forward compatibility); a reload no longer loses the linked-site/project extras; Saved-by records the Prepared By name. Shared modulaser-project.js 1.3.0, identical in the Battery Calculator, the MASD Field Report and the MASD Engineering Toolbox (sync test): SHA-256 design hash over the full design plus a separate site hash; metric .pl imports warn that PipeCAD's hole-sensitivity unit is unconfirmed; typical configuration defaults re-cited (flow ±20% and 120 s flow-fault delay, Table 29 p.76; FM/UL hole limits App. A printed p.113, ModuLaser Install Manual 04-4001-501-0803-05; 'Action' is Prealarm; unsourced values labelled typical – unverified). The MASD Engineering Toolbox 00.01.000 embeds this calculator and the same engine; harmonization rule: any engine change bumps both apps' revisions with matching notes and each records the engine version. <b>QA audit</b> — date 2026-10-13; commit audited cc55189 (02.00.001) plus working tree; issue: <a href=\"https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1\" target=\"_blank\" rel=\"noopener\">Calculator issue #1</a>; summary: defaults citations FAIL → fixed; Solano worst-hole rule PASS; audit trail FAIL → fixed (pass-through, hashes); Quick Start version text FAIL → fixed (Export project needs 02.00.001+); test.py fixed 800 ms wait replaced by wait-for-condition. QA re-check 2026-10-13 (8:28–8:45 PM ET): CONDITIONAL PASS. Fixed after the re-check: design hash stable on a no-op Calculator round trip (site and carried data kept out of design; calculator row ids renumbered by position); the mis-cited table number removed from the Report (App. A, printed p.113); UL 268, 7th Edition compliance never auto-confirmed — the engineer must confirm it before \"Complies with UL 268, 7th Edition\" prints; UL thresholds for NFPA presets per Brent: sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft, transport time no more than 60 / 43 / 43 s (UL 268 Special Application Range 1 / Range 2 / Open Area, ModuLaser Install Manual App. A, printed p.113; EWFD 1.5 from NFPA 76); sign-off order technician → designer → QA enforced, no hand-set status, reopening keeps history, real names required, QA overrides logged; Report edits blocked until a technician name is set; the edit log never overwrites entries; ASAG44201 citation replaced by NFPA 76-2024 clauses (Research 2026-10-13); standalone Quick Start says Battery Calculator 02.00.001+; legacy-import tests check required Ah per sheet. Final verdict: QA audit 2026-10-13, final re-check of commit 848e97d (clean tree). PASS. Tests: regress 3/3, test 106/106, calc_project_test 16/16, shared-file and engine parity 2/2. Verified: SHA-256 design hash stable on a no-op round trip (Report → Calculator → Calculator), unknown fields, change log and sign-offs preserved, savedBy name, shared modulaser-project.js 1.3.0 and MASD engine 1.0.0 identical across apps. Known limitation: metric PipeCAD hole sensitivity is shown unconverted with a warning (unit unconfirmed). UL 268 thresholds (shared) are per Brent, not verified by QA. Issue: https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1 QA delta re-check 2026-10-13, commit b1cb13b (clean). PASS. Brent's rule is verified: a hole passes at or below (≤) the class maximum, the more restrictive of UL and NFPA (VEWFD 1.0 %obs/ft / 60 s, EWFD 1.5 / 43 s, SFD/OAP 2.18 / 43 s; targets 1.0 / 1.5 / 2.0). UL projects enforce the ModuLaser UL 268 range lower limits (Install Manual App. A p.113). This supersedes the earlier rule (a hole had to be below the limit). Tests: sens_rule 14/14, regress 3/3, test 106/106, calc_project_test 16/16, parity 2/2; design hash stable on round trip. Per Brent, unverified by QA: the ≤ rule (the manual's FM 3230 rows say \"<\") and EWFD 1.5 (from NFPA 76-2024 8.5.3.2.1.3; UL Range 2 itself is 0.05–2.18). Final pre-tag pass 2026-10-13 (10:02–10:40 PM ET): Calculator 6adde0d / Report 5448488 (release a32d988) / Toolbox 8aa707a — GO; sens_rule 14/14; committed tests pass (release commits differ from these only by this release-note line)..." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -2115,6 +2437,7 @@ function renderRevisionInfo(){
   if (revCell) revCell.textContent = revShort;
   if (dateCell) dateCell.textContent = formatDateYYMMDD(latest.date);
 
+  const aboutEng = document.getElementById('about-engine-value'); if (aboutEng && typeof MASD_ENGINE_VERSION !== 'undefined') aboutEng.textContent = 'MASD engine ' + MASD_ENGINE_VERSION;
   const aboutRev = document.getElementById('about-revision-value');
   if (aboutRev) aboutRev.textContent = fullRev;
 
@@ -2128,55 +2451,6 @@ function renderRevisionInfo(){
     ).join('');
   }
 }
-
-/* ---------------- reference data ---------------- */
-const MODULE_TYPES = {
-  "Minimum Display":  { model: "FHSD8300-ULF", kind: "display", ma: 210 },
-  "Standard Display": { model: "FHSD8310-ULF", kind: "display", ma: 232 },
-  "Command Display":  { model: "FHSD8320-ULF", kind: "command", ma: 232 },
-  "Detector":         { model: "FHSD8330-ULF", kind: "detector", ma: null }
-};
-const FAN_SPEED_MA = {1:218,2:234,3:255,4:279,5:301,6:330,7:363,8:393,9:431,10:471,11:506,12:552,13:602,14:646,15:712,16:762};
-// 18V reference figures from the manufacturer's current-draw worksheet, for the Help menu's
-// reference table only — not used in any calculation (the calculator's own math always uses
-// FAN_SPEED_MA above). Does not match either the 18.0V or 20.4V rows exactly in every case;
-// see the Help menu's Module Current Draw Reference for the documented sourcing.
-const FAN_SPEED_MA_18V = {1:250,2:279,3:305,4:330,5:358,6:380,7:430,8:465,9:517,10:566,11:615,12:685,13:733,14:786,15:872,16:1021};
-
-const QUIESCENT_MA = 70;
-const AUX_MA_PER_CIRCUIT = 35;
-const MAX_AUX_BUILTIN = 4;
-const CHARGER_MAX_AH = 65;
-const DEFAULT_SAFETY_MARGIN = 0.25;
-const DESIGN_BASIS_PRESETS = {
-  "NFPA 72 Standard": { standby: 24, alarm: 5, formula: "standard",
-    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — secondary power supply capacity for standard (non-voice) protected premises fire alarm systems (10.6.7.2.1: 24-hour minimum standby under quiescent load)." },
-  "NFPA 72 Voice": { standby: 24, alarm: 15, formula: "standard",
-    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — secondary power supply capacity for systems with in-building fire emergency voice/alarm communications (10.6.7.2.1: 24-hour minimum standby under quiescent load)." },
-  "NFPA 72 + NFPA 110 Generator Backup (Non-Voice)": { standby: 4, alarm: 5, formula: "standard",
-    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — 4-hour standby permitted where secondary power is provided by an automatic-starting, engine-driven generator meeting NFPA 110 (Type 10, Class 24, Level 1) with the entire power path qualifying as NFPA 70 Article 700 emergency power. If any part of the downstream distribution does not qualify, the full 24-hour battery standby applies regardless." },
-  "NFPA 72 + NFPA 110 Generator Backup (Voice)": { standby: 4, alarm: 15, formula: "standard",
-    citation: "NFPA 72 (2022 Edition), Section 10.6.7.2 — 4-hour standby permitted where secondary power is provided by an automatic-starting, engine-driven generator meeting NFPA 110 (Type 10, Class 24, Level 1) with the entire power path qualifying as NFPA 70 Article 700 emergency power. If any part of the downstream distribution does not qualify, the full 24-hour battery standby applies regardless." },
-  "UFC 3-600-01 Hydro (Voice Evacuation)": { standby: 24, alarm: 15, formula: "standard",
-    citation: "UFC 3-600-01, Fire Protection Engineering for Facilities (8 August 2016, w/ Change 6 dated 6 May 2021), Paragraph 4-24.7 — Hydroelectric Power Plant voice evacuation requirements, following NFPA 72 in-building fire alarm voice evacuation secondary power provisions." },
-  "UFC 3-600-01 FA/MNS": { standby: 48, alarm: 15, formula: "standard",
-    citation: "UFC 3-600-01, Fire Protection Engineering for Facilities (8 August 2016, w/ Change 6 dated 6 May 2021), Paragraph 9-18.11.3 — Fire Alarm and Mass Notification System secondary power capacity." },
-  "AWS": { standby: 24, alarm: 120, formula: "standard",
-    citation: "Complies with AWS specification 283116, 25H1B — NFPA 72 (2022 Edition), Section 10.6.7.2 secondary power capacity requirements, with an Owner-specified enhanced 120-minute alarm period in place of the 5/15-minute code minimum. Also compliant with NFPA 855." },
-  "CAN/ULC-S524:2024 Standard": { standby: 24, alarm: 5, formula: "standard", fixedMargin: 0.25,
-    citation: "CAN/ULC-S524:2024, Standard for the Installation of Fire Alarm Systems — secondary (battery) power capacity for 24-hour standby plus 5 minutes of alarm operation, with the 1.25 safety factor introduced in the 2024 edition." },
-  "CAN/ULC-S524:2024 Voice": { standby: 24, alarm: 15, formula: "standard", fixedMargin: 0.25,
-    citation: "CAN/ULC-S524:2024, Standard for the Installation of Fire Alarm Systems — secondary (battery) power capacity for 24-hour standby plus 15 minutes of alarm operation where voice communication is installed, with the 1.25 safety factor introduced in the 2024 edition." },
-  "BS 5839-1 Category M/L": { standby: 24, alarm: 30, formula: "bs5839", derating: 1.75,
-    citation: "BS 5839-1:2025, Annex E — Category M (Manual) or L (Life Safety) system secondary power capacity." },
-  "BS 5839-1 Category M/L + Generator": { standby: 6, alarm: 30, formula: "bs5839", derating: 1.75,
-    citation: "BS 5839-1:2025, Annex E — Category M/L system secondary power capacity where an automatic-starting generator serves as secondary power." },
-  "BS 5839-1 Category P (Staffed)": { standby: 24, alarm: 30, formula: "bs5839", derating: 1.75,
-    citation: "BS 5839-1:2025, Annex E — Category P (staffed / ARC-monitored premises) secondary power capacity." },
-  "BS 5839-1 Category P (Unstaffed)": { standby: 24, alarm: 30, formula: "bs5839", derating: 1.75, editableStandby: true, maxStandby: 72,
-    citation: "BS 5839-1:2025, Annex E — Category P (unstaffed premises) secondary power capacity: 24 hours plus the unoccupied period, up to a maximum of 72 hours total standby." }
-};
-const TEMPERATURE_MULTIPLIERS = { 77: 1.00, 68: 1.04, 50: 1.14, 32: 1.30, 14: 1.61 };
 
 function applyDesignBasis(loc){
   const locEl = document.getElementById(`location-${loc}`);
@@ -2227,53 +2501,6 @@ function applyDesignBasis(loc){
 
   recalcLocation(loc);
 }
-const BATTERY_SIZE_OPTIONS = [10, 12, 18, 26, 40, 50, 65];
-const BATTERY_MODELS = [
-  { model: "12V10A", ah: 10.5, supply: "BPS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
-  { model: "12V17A", ah: 18,   supply: "APS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
-  { model: "12V24A", ah: 26,   supply: "APS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
-  { model: "12V40A", ah: 40,   supply: "BPS6A", enclosure: "BC-1", cls: "good" },
-  { model: "12V50A", ah: 50,   supply: "BPS6A", enclosure: "SSU00507", cls: "good",
-    cabinetOptions: [
-      { value: "edwards", label: "Edwards 3-RCC7R", enclosure: "3-RCC7R" },
-      { value: "spaceage", label: "Space Age SSU00507", enclosure: "SSU00507" }
-    ] },
-  { model: "12V65A", ah: 65,   supply: "BPS6A", enclosure: "SSU00507", cls: "good",
-    cabinetOptions: [
-      { value: "edwards", label: "Edwards 3-RCC7R with 3-BATS (battery shelf)", enclosure: "3-RCC7R + 3-BATS (battery shelf)" },
-      { value: "spaceage", label: "Space Age SSU00507", enclosure: "SSU00507" }
-    ] }
-];
-const MAX_DETECTORS_PER_CLUSTER = 8;
-const MAX_COMMAND_DISPLAYS = 2;
-const MAX_MODULES_PER_NETWORK = 127;
-const MAX_DISPLAYS_PER_NETWORK = 63;
-function pad2(n){ return String(n).padStart(2, "0"); }
-
-// Resolves a desired/required Ah value to the next-larger available battery model (never smaller)
-function pickBatteryModel(requiredAh){
-  for (const b of BATTERY_MODELS) if (b.ah >= requiredAh) return b;
-  return null;
-}
-function hardwareFromModel(batteryModel, capacity, cabinetChoice){
-  if (!batteryModel){
-    return { supply: null, enclosure: null, batteryPart: null, cls: "danger", error: `Exceeds largest available battery model (12V65A, 65 Ah) — add power supplies or reduce battery size` };
-  }
-  const supplyName = (capacity === 10) ? batteryModel.supply.replace('6A', '10A') : batteryModel.supply;
-  let enclosureLabel = batteryModel.enclosure;
-  if (batteryModel.cabinetOptions){
-    const chosen = batteryModel.cabinetOptions.find(o => o.value === cabinetChoice) || batteryModel.cabinetOptions[0];
-    enclosureLabel = chosen.enclosure;
-  }
-  return {
-    supply: supplyName,
-    enclosure: enclosureLabel,
-    batteryPart: `2 × ${batteryModel.model} per ${supplyName}${enclosureLabel.indexOf("None") !== 0 ? " (" + enclosureLabel + ")" : ""} — ${batteryModel.ah} Ah rated`,
-    cls: batteryModel.cls,
-    cabinetOptions: batteryModel.cabinetOptions || null
-  };
-}
-
 function buildBOM(locEl){
   const rows = []; // {qty, manufacturer, partNumber, description}
   const counts = {};
@@ -4740,7 +4967,7 @@ function recalcLocationInner(loc){
     // current in this calculator's model is the same total system current used for standby.
     const alarmCurrentAmps = totalMa / 1000;
     const battery20HrRateAmps = provisionalBatteryAh / 20;
-    const autoD = (provisionalBatteryAh > 0 && battery20HrRateAmps >= alarmCurrentAmps) ? 1 : 1.75;
+    const autoD = MASD_ENGINE.bs5839D(provisionalBatteryAh, totalMa);
     const floor = autoD;
     deratingInput.min = floor;
     if (deratingInput.dataset.userEdited === '1'){
@@ -4793,7 +5020,7 @@ function recalcLocationInner(loc){
     }
   }
   const nfpa72Edition = editionSelect ? editionSelect.value : '2022plus';
-  const marginMinimum = nfpa72Edition === '2019minus' ? 0.20 : 0.25;
+  const marginMinimum = MASD_ENGINE.marginMinimum(nfpa72Edition);
   const marginVsMinEl = locEl.querySelector('.margin-vs-min');
   let marginBelowMinimum = false;
   if (marginVsMinEl && !noEditionConcept){
@@ -4819,15 +5046,11 @@ function recalcLocationInner(loc){
     locEl.classList.add('recommendations-withheld');
   }
 
-  const standbyAh = standbyHours * (totalMa / 1000);
-  const alarmAh = ((alarmMinutes / 60) * (totalMa / 1000)) * bs5839Derating;
-  const initialAh = standbyAh + alarmAh;
-  let requiredAh = initialAh * (1 + safetyMargin);
-
   const tempSelect = locEl.querySelector('.temperature-select');
   const tempKey = tempSelect ? parseInt(tempSelect.value) : 77;
-  const tempMultiplier = TEMPERATURE_MULTIPLIERS[tempKey] || 1.0;
-  requiredAh = requiredAh * tempMultiplier;
+  const engAh = MASD_ENGINE.batteryAh({ standbyHours, alarmMinutes, totalMa, derating: bs5839Derating, margin: safetyMargin, temperatureF: tempKey });
+  const standbyAh = engAh.standbyAh, alarmAh = engAh.alarmAh, initialAh = engAh.initialAh, tempMultiplier = engAh.tempMultiplier;
+  let requiredAh = engAh.requiredAh;
 
   locEl.querySelector(".standby-ah").innerHTML = `${standbyAh.toFixed(2)} <small>Ah</small>`;
   locEl.querySelector(".alarm-ah").innerHTML = `${alarmAh.toFixed(2)} <small>Ah</small>`;
@@ -4864,7 +5087,7 @@ function recalcLocationInner(loc){
   } else {
     desiredSize = parseFloat(locEl.querySelector(".tp-battery-ah").value) || 0;
   }
-  const psRequired = desiredSize > 0 ? Math.max(1, Math.ceil(requiredAh / desiredSize)) : 1;
+  const psRequired = MASD_ENGINE.suppliesRequired(requiredAh, desiredSize);
   const ahPerSupply = requiredAh / psRequired;
 
   locEl.querySelector(".ps-required").textContent = psRequired;
@@ -4972,9 +5195,7 @@ function recalcLocationInner(loc){
           const auxMaG = auxCountG * auxMaPerCircuit;
           const deviceMaG = g.ma + commandMa;
           const totalMaG = deviceMaG + quiescentMa + auxMaG;
-          const standbyAhG = standbyHours * (totalMaG / 1000);
-          const alarmAhG = (alarmMinutes / 60) * (totalMaG / 1000);
-          return (standbyAhG + alarmAhG) * (1 + safetyMargin);
+          return MASD_ENGINE.groupAh({ standbyHours, alarmMinutes, totalMa: totalMaG, margin: safetyMargin });
         });
         const maxGroupAh = Math.max(...groupAhs);
         if (mode === 'builtin'){
@@ -5060,9 +5281,7 @@ function recalcLocationInner(loc){
       const auxMaG = auxCount * auxMaPerCircuit;
       let deviceMaG = g.ma + (gi === 0 ? commandMa : 0);
       const totalMaG = deviceMaG + quiescentMa + auxMaG;
-      const standbyAhG = standbyHours * (totalMaG / 1000);
-      const alarmAhG = (alarmMinutes / 60) * (totalMaG / 1000);
-      const requiredAhG = (standbyAhG + alarmAhG) * (1 + safetyMargin);
+      const requiredAhG = MASD_ENGINE.groupAh({ standbyHours, alarmMinutes, totalMa: totalMaG, margin: safetyMargin });
       let hwRow = '';
       if (mode === 'builtin'){
         const hwG = hardwareFromModel(resolvedBatteryModel, psCapacity, cabinetChoice);
@@ -6276,6 +6495,14 @@ function wireFeaturePack(){
 /* ===== How Do I… searchable help ===== */
 const HOWDOI_COMMON = [
   {
+    id: 'project-file',
+    title: 'Send the design to the Field Report (project file)',
+    keywords: 'project file mlproj json export import field report commissioning share site design diff',
+    blurb: 'File → Export project… saves a .mlproj.json with every power supply, battery, detector, display, address and the PipeCAD hole data; open it in the MASD Field Report with File → Import project…. File → Import project… here shows the differences before replacing sheets; Field Report results are kept unchanged.',
+    target: 'qs-step-project-file',
+    common: true,
+  },
+  {
     id: 'import-pl',
     title: 'Import PipeCAD .pl files',
     keywords: 'pipecad pl import wizard area group floor detector rename power supply psu cluster 3 ft 65 ah metric',
@@ -6295,7 +6522,7 @@ const HOWDOI_COMMON = [
     id: 'menubar',
     title: 'Find a command (menu bar and quick row)',
     keywords: 'menu bar toolbar file edit view help where button moved quick row',
-    blurb: 'Menu bar: File (New, Open / Import Calc, Import .pl, Linked .pl files, Save As, Export to Excel, Print / Export…, Print BOM), Edit (+ Add Location, Clear, Confirm defaults, Clear saved data), View (Cluster Report, Project Settings bar, Sheet sidebar, Results panel), Help (Help, How Do I…, Revision log). Quick row: ☰ sidebar, Import .pl, + Add Location, Save As…, Print, Auto-Save indicator, ◧ results panel.',
+    blurb: 'Menu bar: File (New, Open / Import Calc, Import .pl, Linked .pl files, Import project, Export project, Save As, Export to Excel, Print / Export…, Print BOM), Edit (+ Add Location, Clear, Confirm defaults, Clear saved data), View (Cluster Report, Project Settings bar, Sheet sidebar, Results panel), Help (Help, How Do I…, Revision log). Quick row: ☰ sidebar, Import .pl, + Add Location, Save As…, Print, Auto-Save indicator, ◧ results panel.',
     target: 'qs-step-menubar',
     common: true,
   },
@@ -6752,180 +6979,10 @@ document.getElementById("saveas-filename-input").addEventListener("keydown", (e)
 /* ===== 01.06.000 — Menu bar, Import .pl wizard, linked .pl tracking ===== */
 const PL_PATTERN_KEY = 'modulaser_pl_rename_pattern';
 const PL_DEFAULT_PATTERN = '{project}-{area}-Det{##}';
-const PL_NAME_MAX = 16;
-const PL_CLUSTER_FT = 3;
-const PL_MAX_DET_PER_PSU = 4;
-const PL_MAX_DISP_PER_PSU = 1;
-const PL_DETECTOR_TYPES = { MULTISENSE: 'Detector', MODULASER_DETECTOR: 'Detector' };
-const PL_DISPLAY_PARTS = { '0': 'Standard Display', '1': 'Minimum Display', '2': 'Command Display' };
-const PL_M_TO_FT = 3.28084;
 let PL_LINKS = [];          // persisted in the calc file (state.plLinks)
 let plSheetSeq = 0;
 
 function plEsc(s){ return escapeAttr(s == null ? '' : s); }
-function plKid(el, tag){ if (!el) return null; for (const c of el.children) if (c.tagName === tag) return c; return null; }
-function plTxt(el, tag){ const k = plKid(el, tag); return k ? k.textContent.trim() : ''; }
-function plNum(el, tag){ const v = parseFloat(plTxt(el, tag)); return isFinite(v) ? v : 0; }
-function plFnv(str){ let h = 0x811c9dc5; for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return h.toString(16).padStart(8, '0'); }
-async function plSha256(text){
-  try {
-    if (window.crypto && crypto.subtle){
-      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
-      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-  } catch (e){}
-  return 'fnv-' + plFnv(text);
-}
-function plBaseName(n){ return String(n || '').replace(/^.*[\\/]/, '').replace(/\.pl$/i, ''); }
-
-/* ---------- parser ---------- */
-function plParse(text, fileName){
-  const doc = new DOMParser().parseFromString(text, 'application/xml');
-  if (doc.getElementsByTagName('parsererror').length) throw new Error('Not a valid PipeCAD .pl (XML) file.');
-  const root = doc.documentElement;
-  if (!root || root.tagName !== 'PipeLayout') throw new Error('Not a PipeCAD project (no <PipeLayout> root).');
-  const props = plKid(root, 'properties');
-  const unitRaw = plTxt(root, 'unit');
-  const imperial = unitRaw === '1';
-  const scale = imperial ? 1 : PL_M_TO_FT;
-  const projectName = plTxt(props, 'ProjectName');
-  const out = {
-    fileName, projectName, project: projectName || plBaseName(fileName),
-    projectFromFile: !projectName,
-    unitRaw, unitLabel: imperial ? 'Imperial (ft)' : `Metric (m, unit ${unitRaw || '?'}) — converted to ft`,
-    version: plTxt(root, 'pipecadVersion'), groups: [], skipped: []
-  };
-  const floorDb = plKid(root, 'floorDatabase');
-  const floors = floorDb ? Array.from(floorDb.children).filter(c => c.tagName === 'Floor') : [];
-  floors.forEach((fl, gi) => {
-    const gname = plTxt(fl, 'name') || `Area ${gi + 1}`;
-    const g = { idx: gi, origName: gname, name: gname, include: true, detectors: [], displays: [], psus: [] };
-    const seen = {};
-    const ddb = plKid(fl, 'detectorDatabase');
-    (ddb ? Array.from(ddb.children).filter(c => c.tagName === 'Detector') : []).forEach((d, di) => {
-      const name = plTxt(d, 'name') || `Detector ${di + 1}`;
-      const typeRaw = plTxt(d, 'type');
-      const idTxt = plTxt(d, 'id');
-      let key = `${gname}#${idTxt !== '' ? 'id' + idTxt : 'n' + name}`;
-      if (seen[key]) key += '~' + (++seen[key]); else seen[key] = 1;
-      const fan = parseInt(plTxt(d, 'aspiratorSpeed'), 10);
-      const rec = { key, ord: di, kind: 'detector', origName: name, typeRaw,
-        type: PL_DETECTOR_TYPES[typeRaw], fan: (fan >= 1 && fan <= 16) ? fan : null,
-        address: plTxt(d, 'address'),
-        x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale };
-      rec.fp = plFnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
-      if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
-      g.detectors.push(rec);
-    });
-    const disDb = plKid(fl, 'displayDatabase');
-    (disDb ? Array.from(disDb.children).filter(c => c.tagName === 'Display') : []).forEach((d, i) => {
-      const pn = plTxt(d, 'partNumber');
-      const type = PL_DISPLAY_PARTS[pn];
-      if (!type){ out.skipped.push(`${gname}: display ${i + 1} has unknown partNumber “${pn}” — skipped`); return; }
-      g.displays.push({ key: `${gname}#disp${i}`, ord: i, kind: 'display', origName: `${type} ${i + 1}`, type, partNumber: pn,
-        x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale,
-        fp: plFnv([pn, plNum(d,'startX'), plNum(d,'startY')].join('|')) });
-    });
-    const psuDb = plKid(fl, 'psuDatabase');
-    (psuDb ? Array.from(psuDb.children).filter(c => c.tagName === 'PSU') : []).forEach(p => {
-      g.psus.push({ x: plNum(p, 'startX') * scale, y: plNum(p, 'startY') * scale });
-    });
-    out.groups.push(g);
-  });
-  return out;
-}
-
-/* ---------- battery math (mirrors recalcLocationInner, Edwards A/BPS, 1 AUX circuit) ---------- */
-function plDeviceMa(dev){
-  if (dev.kind === 'display') return (MODULE_TYPES[dev.type] || {}).ma || 0;
-  return FAN_SPEED_MA[dev.fan] || FAN_SPEED_MA[16];
-}
-function plRequiredAh(devices, s){
-  const set = s || plWiz.settings;
-  if (!devices.length) return 0;
-  const preset = DESIGN_BASIS_PRESETS[set.designBasis] || {};
-  const devMa = devices.reduce((a, d) => a + plDeviceMa(d), 0);
-  const totalMa = devMa + (set.mode === 'thirdparty' ? 0 : QUIESCENT_MA + AUX_MA_PER_CIRCUIT);
-  const d = preset.formula === 'bs5839' ? (preset.derating || 1.75) : 1;
-  const margin = preset.formula === 'bs5839' ? 0.25 : (preset.fixedMargin !== undefined ? preset.fixedMargin : parseFloat(set.margin));
-  const standbyAh = (parseFloat(set.standbyHours) || 0) * totalMa / 1000;
-  const alarmAh = ((parseFloat(set.alarmMinutes) || 0) / 60) * totalMa / 1000 * d;
-  return (standbyAh + alarmAh) * (1 + margin) * (TEMPERATURE_MULTIPLIERS[parseInt(set.temperature)] || 1);
-}
-function plPsuCheck(psu){
-  const dets = psu.devices.filter(d => d.kind === 'detector').length;
-  const disp = psu.devices.filter(d => d.kind === 'display').length;
-  const ah = plRequiredAh(psu.devices);
-  const v = [];
-  if (dets > PL_MAX_DET_PER_PSU) v.push(`${dets} detectors — max ${PL_MAX_DET_PER_PSU} per power supply`);
-  if (disp > PL_MAX_DISP_PER_PSU) v.push(`${disp} displays — max ${PL_MAX_DISP_PER_PSU} per power supply`);
-  if (ah > CHARGER_MAX_AH) v.push(`${ah.toFixed(1)} Ah required — over the ${CHARGER_MAX_AH} Ah charger limit`);
-  return { dets, disp, ah, violations: v };
-}
-function plFits(devs){
-  const dets = devs.filter(d => d.kind === 'detector').length, disp = devs.filter(d => d.kind === 'display').length;
-  return dets <= PL_MAX_DET_PER_PSU && disp <= PL_MAX_DISP_PER_PSU && plRequiredAh(devs) <= CHARGER_MAX_AH;
-}
-const plDist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
-
-/* ---------- PSU suggestion ---------- */
-function plSplitByDistance(devs){
-  // Greedy: seed with the left-/bottom-most device, grow with nearest-neighbour while rules allow.
-  const rest = devs.slice().sort((a, b) => a.x - b.x || a.y - b.y);
-  const groups = [];
-  while (rest.length){
-    const cur = [rest.shift()];
-    let grew = true;
-    while (grew && rest.length){
-      grew = false;
-      let best = -1, bestD = Infinity;
-      rest.forEach((d, i) => {
-        const dd = Math.min(...cur.map(c => plDist(c, d)));
-        if (dd < bestD && plFits(cur.concat([d]))){ bestD = dd; best = i; }
-      });
-      if (best >= 0){ cur.push(rest.splice(best, 1)[0]); grew = true; }
-    }
-    groups.push(cur);
-  }
-  return groups;
-}
-function plClusterDevices(devs){
-  // Single-linkage clusters of devices within 3 ft (plan view X/Y).
-  const n = devs.length, parent = devs.map((_, i) => i);
-  const find = i => parent[i] === i ? i : (parent[i] = find(parent[i]));
-  for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++)
-    if (plDist(devs[i], devs[j]) <= PL_CLUSTER_FT) parent[find(i)] = find(j);
-  const map = {};
-  devs.forEach((d, i) => { (map[find(i)] = map[find(i)] || []).push(d); });
-  const out = [];
-  Object.values(map).forEach(c => { if (plFits(c)) out.push(c); else plSplitByDistance(c).forEach(s => out.push(s)); });
-  return out;
-}
-function plSuggestForGroup(g, devs){
-  const psus = [];
-  let left = devs.slice();
-  if (g.psus.length){
-    g.psus.forEach((p, i) => psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), seed: p, fromFile: true, devices: [] }));
-    const pairs = [];
-    left.forEach(d => psus.forEach(p => pairs.push({ d, p, dist: plDist(d, p.seed) })));
-    pairs.sort((a, b) => a.dist - b.dist);
-    const placed = new Set();
-    pairs.forEach(({ d, p }) => {
-      if (placed.has(d.key)) return;
-      if (plFits(p.devices.concat([d]))){ p.devices.push(d); placed.add(d.key); }
-    });
-    left = left.filter(d => !placed.has(d.key));
-  }
-  // Only real 3 ft clusters (2+ devices) are pre-suggested; lone devices go to the Unassigned tray for the user to group.
-  const unassigned = [];
-  plClusterDevices(left).forEach(c => {
-    if (c.length > 1) psus.push({ id: 'p' + Math.random().toString(36).slice(2, 8), devices: c });
-    else unassigned.push(...c);
-  });
-  const out = psus.filter(p => p.devices.length || p.fromFile);
-  out.unassigned = unassigned;
-  return out;
-}
 
 /* ---------- naming ---------- */
 function plAbbr(s){
@@ -8629,5 +8686,691 @@ updateSaveIndicator();
 wireV2Shell();
 wirePrintDialog();
 </script>
+<!--MLP-BEGIN--><script id="mlp-shared">
+/* ModuLaser project file — shared module (modulaser-project.js)
+   Used by the ModuLaser Battery Calculator and the ModuLaser MASD Field Report.
+   Keep the two repos' copies identical (MLP.VERSION below). No dependencies, no network.
+
+   File: *.mlproj.json  { format:'modulaser-project', schemaVersion:1, ... }
+   Ownership: the Battery Calculator / MASD Engineering Toolbox own `design` (incl. design.devices[].config);
+   the Field Report owns `site`; `changes` (field-change log) and `approvals` are shared: the Report logs,
+   the Toolbox verifies, QA signs off.
+   Each app keeps the other app's section as-is and never overwrites it without a diff prompt. */
+(function (root) {
+'use strict';
+const MLP = {};
+MLP.VERSION = '1.3.0';
+MLP.FORMAT = 'modulaser-project';
+MLP.SCHEMA_VERSION = 1;
+MLP.EXT = '.mlproj.json';
+MLP.NAME_MAX = 16;                 // ModuLaser display shows 16 characters, spaces included
+MLP.M_TO_FT = 3.28084;
+MLP.DETECTOR_TYPES = { MULTISENSE: 'Detector', MODULASER_DETECTOR: 'Detector' };
+MLP.DISPLAY_PARTS = { '0': 'Standard Display', '1': 'Minimum Display', '2': 'Command Display' };
+MLP.DISPLAY_MODELS = { 'Standard Display': 'FHSD8310', 'Minimum Display': 'FHSD8300', 'Command Display': 'FHSD8320' };
+MLP.TT_TO_CLASS = { 60: 'VEWFD', 90: 'EWFD', 120: 'SFD' };
+
+/* Typical starting values by performance class, used ONLY as editable prefills marked
+   "typical — confirm on site". They are not design values; the commissioning engineer confirms them. */
+MLP.TYPICAL_DEFAULTS = {
+  // Manual-sourced (ModuLaser Install Manual 04-4001-501-0803-05): flow High/Low limit 20% and flow-fault delay 120 s (Table 29, p.76).
+  // Fire 1 per class = the FM/UL HOLE-sensitivity limit (App. A, printed p.113) used as a starting point; the manual gives no %obs/ft
+  // alarm default (thresholds come from ClassiFire; Table 24 p.71 factors: Alert 10, Prealarm 6, Alarm 8, Alarm 2 absolute 20).
+  // VEWFD Alert 0.2 = per NFPA 76-2024 8.5.3.1.2.5 (VEWFD Alert 0.2 / Alarm 1.0 %/ft = 0.65 / 3.2 %/m, effective at each port, above ambient). Everything else
+  // (EWFD 0.5 / SFD 1.0 Alert — site/design choice, no code basis; Prealarm, Fire 2, the 5 s delays — site choice, Table 26 range 0–90 s) is 'typical – unverified'.
+  VEWFD: { alert: 0.2, action: 0.5, fire1: 1.0, fire2: 2.0, actionDly: 5, fire1Dly: 5, flowLow: 20, flowHigh: 20, flowDly: 120 },
+  EWFD:  { alert: 0.5, action: 1.0, fire1: 1.5, fire2: 3.0, actionDly: 5, fire1Dly: 5, flowLow: 20, flowHigh: 20, flowDly: 120 },
+  SFD:   { alert: 1.0, action: 1.5, fire1: 2.5, fire2: 5.0, actionDly: 5, fire1Dly: 5, flowLow: 20, flowHigh: 20, flowDly: 120 }
+};
+
+/* ---------------- small helpers ---------------- */
+function kid(el, tag){ if (!el) return null; for (const c of el.children) if (c.localName === tag || c.tagName === tag) return c; return null; }
+function kids(el, tag){ return el ? Array.from(el.children).filter(c => c.localName === tag || c.tagName === tag) : []; }
+function txt(el, tag){ const k = kid(el, tag); return k ? k.textContent.trim() : ''; }
+function num(el, tag){ const t = txt(el, tag); if (t === '') return null; const n = Number(t); return isFinite(n) ? n : null; }
+function num0(el, tag){ const n = num(el, tag); return n == null ? 0 : n; }
+function first(el, tag){ const a = kid(el, tag); const c = a && a.children[0]; if (!c) return null; const n = Number(c.textContent); return isFinite(n) ? n : null; }
+/* synchronous SHA-256 (hex) used for canonical-JSON hashes */
+function sha256hex(str){
+  const K = [0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,0xd807aa98,0x12835b01,0x243185be,0x550c7dc3,0x72be5d74,0x80deb1fe,0x9bdc06a7,0xc19bf174,0xe49b69c1,0xefbe4786,0x0fc19dc6,0x240ca1cc,0x2de92c6f,0x4a7484aa,0x5cb0a9dc,0x76f988da,0x983e5152,0xa831c66d,0xb00327c8,0xbf597fc7,0xc6e00bf3,0xd5a79147,0x06ca6351,0x14292967,0x27b70a85,0x2e1b2138,0x4d2c6dfc,0x53380d13,0x650a7354,0x766a0abb,0x81c2c92e,0x92722c85,0xa2bfe8a1,0xa81a664b,0xc24b8b70,0xc76c51a3,0xd192e819,0xd6990624,0xf40e3585,0x106aa070,0x19a4c116,0x1e376c08,0x2748774c,0x34b0bcb5,0x391c0cb3,0x4ed8aa4a,0x5b9cca4f,0x682e6ff3,0x748f82ee,0x78a5636f,0x84c87814,0x8cc70208,0x90befffa,0xa4506ceb,0xbef9a3f7,0xc67178f2];
+  const b = new TextEncoder().encode(str), l = b.length, n = ((l + 9 + 63) >> 6) << 6, m = new Uint8Array(n);
+  m.set(b); m[l] = 0x80; const dv = new DataView(m.buffer); dv.setUint32(n - 4, (l * 8) >>> 0); dv.setUint32(n - 8, Math.floor(l / 0x20000000));
+  const H = [0x6a09e667,0xbb67ae85,0x3c6ef372,0xa54ff53a,0x510e527f,0x9b05688c,0x1f83d9ab,0x5be0cd19], W = new Uint32Array(64), r = (x, k) => (x >>> k) | (x << (32 - k));
+  for (let o = 0; o < n; o += 64){
+    for (let i = 0; i < 16; i++) W[i] = dv.getUint32(o + i * 4);
+    for (let i = 16; i < 64; i++){ const s0 = r(W[i-15], 7) ^ r(W[i-15], 18) ^ (W[i-15] >>> 3), s1 = r(W[i-2], 17) ^ r(W[i-2], 19) ^ (W[i-2] >>> 10); W[i] = (W[i-16] + s0 + W[i-7] + s1) | 0; }
+    let a = H[0], bb = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7];
+    for (let i = 0; i < 64; i++){ const t1 = (h + (r(e, 6) ^ r(e, 11) ^ r(e, 25)) + ((e & f) ^ (~e & g)) + K[i] + W[i]) | 0, t2 = ((r(a, 2) ^ r(a, 13) ^ r(a, 22)) + ((a & bb) ^ (a & c) ^ (bb & c))) | 0; h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = bb; bb = a; a = (t1 + t2) | 0; }
+    H[0] = (H[0] + a) | 0; H[1] = (H[1] + bb) | 0; H[2] = (H[2] + c) | 0; H[3] = (H[3] + d) | 0; H[4] = (H[4] + e) | 0; H[5] = (H[5] + f) | 0; H[6] = (H[6] + g) | 0; H[7] = (H[7] + h) | 0;
+  }
+  return H.map(x => (x >>> 0).toString(16).padStart(8, '0')).join('');
+}
+/* canonical JSON: keys sorted, listed volatile keys dropped */
+function canon(v, drop){
+  if (Array.isArray(v)) return '[' + v.map(x => canon(x, drop)).join(',') + ']';
+  if (v && typeof v === 'object') return '{' + Object.keys(v).filter(k => !(drop || []).includes(k) && v[k] !== undefined).sort().map(k => JSON.stringify(k) + ':' + canon(v[k], drop)).join(',') + '}';
+  return JSON.stringify(v === undefined ? null : v);
+}
+MLP.sha256Sync = sha256hex; MLP.canon = canon;
+function fnv(str){ let h = 0x811c9dc5; for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193); } return (h >>> 0).toString(16).padStart(8, '0'); }
+MLP.fnv = fnv;
+MLP.baseName = n => String(n || '').replace(/^.*[\\/]/, '').replace(/\.pl$/i, '');
+MLP.sha256 = async function (text){
+  if (!(root.crypto && root.crypto.subtle)) return 'fnv-' + fnv(text);
+  const buf = await root.crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+};
+MLP.nameLen = s => String(s == null ? '' : s).length;
+MLP.nameOk = s => MLP.nameLen(s) <= MLP.NAME_MAX;
+MLP.shortName = function (s){
+  s = String(s || '').replace(/\s+/g, ' ').trim();
+  if (s.length <= MLP.NAME_MAX) return s;
+  const ab = s.replace(/\b(Room|Rm)\b/gi, 'Rm').replace(/\bElectrical\b/gi, 'Elec').replace(/\bMechanical\b/gi, 'Mech').replace(/\bDetector\b/gi, 'Det')
+    .replace(/\bDisplay\b/gi, 'Disp').replace(/\bCommunications?\b/gi, 'Comm').replace(/\bNorth\b/gi, 'N').replace(/\bSouth\b/gi, 'S').replace(/\bEast\b/gi, 'E').replace(/\bWest\b/gi, 'W');
+  return ab.length <= MLP.NAME_MAX ? ab : ab.slice(0, MLP.NAME_MAX).trim();
+};
+
+/* ---------------- PipeCAD .pl parser ----------------
+   Keys and fingerprints match the Battery Calculator's link format:
+   detector key = `${area}#id${id}` (or #n<name>), display key = `${area}#disp${i}`. */
+MLP.parsePl = function (text, fileName){
+  const doc = new DOMParser().parseFromString(text, 'application/xml');
+  if (doc.getElementsByTagName('parsererror').length) throw new Error('Not a valid PipeCAD .pl (XML) file.');
+  const rootEl = doc.documentElement;
+  if (!rootEl || rootEl.localName !== 'PipeLayout') throw new Error('Not a PipeCAD project (no <PipeLayout> root).');
+  const props = kid(rootEl, 'properties');
+  const unitRaw = txt(rootEl, 'unit');
+  const imperial = unitRaw === '1';
+  const scale = imperial ? 1 : MLP.M_TO_FT;
+  // Metric files: PipeCAD's metric hole-sensitivity unit is UNRESOLVED (no metric .pl sample yet). Values are NOT converted;
+  // the parse result carries a warning so every app shows it until a metric sample confirms %obs/m vs %obs/ft.
+  const sensScale = 1;
+  const pipeProps = kid(rootEl, 'pipeType') ? rootEl : null;
+  const projectName = txt(props, 'ProjectName');
+  const results = {};
+  kids(kid(rootEl, 'resultsDatabase'), 'SavedDatabase').forEach(sd => { results[txt(sd, 'detectorId')] = sd; });
+  const out = {
+    fileName: fileName || '', version: txt(rootEl, 'pipecadVersion'), unitRaw, imperial,
+    unitLabel: imperial ? 'Imperial (ft)' : `Metric (m, unit ${unitRaw || '?'}) — lengths converted to ft`, sensWarning: imperial ? '' : 'Metric .pl: hole sensitivity is shown as PipeCAD wrote it. The metric unit (%obs/m or %obs/ft) is not yet confirmed — do not rely on the per-hole PASS/FAIL until a metric sample is verified.',
+    project: { name: projectName || MLP.baseName(fileName), location: txt(props, 'Location'), designer: txt(props, 'Designer'), company: txt(props, 'CompanyName') },
+    projectFromFile: !projectName,
+    pipe: { innerDiameter: num(rootEl, 'innerDiameter'), outerDiameter: num(rootEl, 'outerDiameter'), material: txt(rootEl, 'material') },
+    groups: [], skipped: []
+  };
+  if (!imperial) out.skipped.push(out.sensWarning);
+  kids(kid(rootEl, 'floorDatabase'), 'Floor').forEach((fl, gi) => {
+    const gname = txt(fl, 'name') || `Area ${gi + 1}`;
+    const g = { idx: gi, name: gname, detectors: [], displays: [], psus: [], batteries: [] };
+    const seen = {};
+    kids(kid(fl, 'detectorDatabase'), 'Detector').forEach((d, di) => {
+      const name = txt(d, 'name') || `Detector ${di + 1}`;
+      const typeRaw = txt(d, 'type');
+      const idTxt = txt(d, 'id');
+      let key = `${gname}#${idTxt !== '' ? 'id' + idTxt : 'n' + name}`;
+      if (seen[key]) key += '~' + (++seen[key]); else seen[key] = 1;
+      const fanN = parseInt(txt(d, 'aspiratorSpeed'), 10);
+      const rec = { key, ord: di, kind: 'detector', origName: name, typeRaw, type: MLP.DETECTOR_TYPES[typeRaw],
+        fan: (fanN >= 1 && fanN <= 16) ? fanN : null, address: txt(d, 'address'), partNumber: txt(d, 'partNumber'),
+        x: num0(d, 'startX') * scale, y: num0(d, 'startY') * scale, z: num0(d, 'startZ') * scale };
+      rec.fp = fnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
+      if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
+      // pipe network and PipeCAD results (relevant to commissioning)
+      const runs = kids(kid(d, 'piperunDatabase'), 'Piperun').filter(r => !/^exhaust pipe$/i.test(txt(r, 'name')) && r.getElementsByTagName('Hole').length);
+      let len = 0; const holes = [], testPoints = [];
+      runs.forEach(r => kids(kid(r, 'pipeDatabase'), 'Pipe').forEach(pp => {
+        const c = ['X', 'Y', 'Z'].map(a => [num(pp, 'start' + a), num(pp, 'end' + a)]);
+        if (c.every(([a, b]) => a != null && b != null)) len += Math.hypot(...c.map(([a, b]) => b - a));
+        kids(kid(pp, 'holeDatabase'), 'Hole').forEach(h => {
+          const o = { i: txt(h, 'index'), size: num(h, 'holeSize'), flow: num(h, 'holeFlowRate'), tt: num(h, 'transitTime'), sens: num(h, 'holeSensitivity') == null ? null : num(h, 'holeSensitivity') * sensScale };
+          (txt(h, 'isTestPoint') === 'true' ? testPoints : holes).push(o);
+        });
+      }));
+      const byIdx = (a, b) => (Number(a.i) || 0) - (Number(b.i) || 0);
+      holes.sort(byIdx); testPoints.sort(byIdx);
+      const sd = results[idTxt];
+      rec.pipe = {
+        runs: runs.map(r => txt(r, 'name')).join(', '), lengthFt: +(len * scale).toFixed(2),
+        af: num(d, 'alarmFactor'), afActivated: txt(d, 'alarmFactorActivated') !== 'false',
+        designSens: num(d, 'sensitivity'), maxTransit: num(d, 'maxTransitTime'),
+        temperature: num(d, 'temperature'), pressure: num(d, 'pressure'),
+        holeUnit: imperial ? 'in' : 'mm',
+        flow: sd ? num(sd, 'totalFlow') : null, tt: sd ? first(sd, 'transitTime') : null, balance: sd ? first(sd, 'holeBalance') : null,
+        bends90: sd ? first(sd, 'bends90') : null, sockets: sd ? first(sd, 'sockets') : null, clips: sd ? first(sd, 'clips') : null,
+        hasResults: !!sd, holes, testPoints
+      };
+      if (!rec.pipe.tt && holes.length){ const m = Math.max(...holes.map(h => h.tt || 0)); if (m > 0) rec.pipe.tt = m; }
+      g.detectors.push(rec);
+    });
+    kids(kid(fl, 'displayDatabase'), 'Display').forEach((d, i) => {
+      const pn = txt(d, 'partNumber');
+      const type = MLP.DISPLAY_PARTS[pn];
+      if (!type){ out.skipped.push(`${gname}: display ${i + 1} has unknown partNumber “${pn}” — skipped`); return; }
+      g.displays.push({ key: `${gname}#disp${i}`, ord: i, kind: 'display', origName: `${type} ${i + 1}`, type, partNumber: pn,
+        x: num0(d, 'startX') * scale, y: num0(d, 'startY') * scale, z: num0(d, 'startZ') * scale,
+        fp: fnv([pn, num0(d, 'startX'), num0(d, 'startY')].join('|')) });
+    });
+    kids(kid(fl, 'psuDatabase'), 'PSU').forEach(p => g.psus.push({ x: num0(p, 'startX') * scale, y: num0(p, 'startY') * scale, z: num0(p, 'startZ') * scale }));
+    kids(kid(fl, 'batteryDatabase'), 'Battery').forEach(p => g.batteries.push({ x: num0(p, 'startX') * scale, y: num0(p, 'startY') * scale, z: num0(p, 'startZ') * scale }));
+    out.groups.push(g);
+  });
+  if (!out.groups.some(g => g.detectors.length || g.displays.length)) throw new Error('No detectors or displays found in this PipeCAD file.');
+  return out;
+};
+
+
+/* ---------------- design configuration (MASD Engineering Toolbox, Config mode) ----------------
+   Same keys as the Field Report's Configure tab. src per key: 'manual' (value stated in the ModuLaser manual),
+   'typical' (typical starting point — verify), 'design' (set by the designer). */
+MLP.CONFIG_FIELDS = [
+  { k: 'alert', label: 'Alert level', unit: '%obs/ft', kind: 'num', det: 1 },
+  { k: 'action', label: 'Prealarm level', unit: '%obs/ft', kind: 'num', det: 1 },
+  { k: 'fire1', label: 'Fire 1 level', unit: '%obs/ft', kind: 'num', det: 1 },
+  { k: 'fire2', label: 'Fire 2 level (absolute)', unit: '%obs/ft', kind: 'num', det: 1 },
+  { k: 'actionDly', label: 'Prealarm delay', unit: 's', kind: 'num', min: 0, max: 90, det: 1 },
+  { k: 'fire1Dly', label: 'Fire 1 delay', unit: 's', kind: 'num', min: 0, max: 90, det: 1 },
+  { k: 'cascade', label: 'Cascading alarms', kind: 'yn', det: 1 },
+  { k: 'latchA', label: 'Latching alarms', kind: 'yn', det: 1, disp: 1 },
+  { k: 'latchF', label: 'Latching faults', kind: 'yn', det: 1, disp: 1 },
+  { k: 'flowLow', label: 'Flow low limit', unit: '%', kind: 'num', min: 0, max: 20, det: 1 },
+  { k: 'flowHigh', label: 'Flow high limit', unit: '%', kind: 'num', min: 0, max: 20, det: 1 },
+  { k: 'flowLow2', label: 'Flow low 2 limit', unit: '%', kind: 'num', min: 0, max: 30, det: 1 },
+  { k: 'flowHigh2', label: 'Flow high 2 limit', unit: '%', kind: 'num', min: 0, max: 30, det: 1 },
+  { k: 'flowDly', label: 'Flow fault delay', unit: 's', kind: 'num', min: 0, max: 240, det: 1 },
+  { k: 'dayNight', label: 'Day/Night', kind: 'yn', det: 1 },
+  { k: 'dayStart', label: 'Day start hour', kind: 'num', min: 0, max: 23, det: 1 },
+  { k: 'nightStart', label: 'Night start hour', kind: 'num', min: 0, max: 23, det: 1 },
+  { k: 'ldd', label: 'LDD (Laser Dust Discrimination)', kind: 'yn', det: 1 },
+  { k: 'buzzer', label: 'Display buzzer enabled', kind: 'yn', disp: 1 },
+  { k: 'cdmRole', label: 'Display role', kind: 'sel', opts: ['', 'Primary CDM', 'Backup CDM', 'Local display'], disp: 1 }
+];
+MLP.IO_PORTS = ['in1', 'in2', 'out1', 'out2', 'out3'];
+MLP.IO_FUNCS = { in: ['', 'Remote reset', 'Remote isolate', 'Day/Night switch', 'Standby', 'Other'], out: ['', 'Alert', 'Action', 'Fire 1', 'Fire 2', 'General Fault', 'Urgent Fault', 'Flow Fault', 'Isolated', 'Other'] };
+/* Values the ModuLaser manual states directly. Everything else in TYPICAL_DEFAULTS is a typical starting point. */
+MLP.MANUAL_REF = 'ModuLaser Install Manual 04-4001-501-0803-05';
+MLP.MANUAL_SOURCED = { flowLow: 'Table 29, p.76 (Flow Low Limit default 20%)', flowHigh: 'Table 29, p.76 (Flow High Limit default 20%)', flowDly: 'Table 29, p.76 (Flow Flt. Delay default 120 s, range 0–240)' };
+/* Per-key citation / status text shown in tooltips and reports. */
+MLP.CITES = {
+  fire1: 'Starting point = FM/UL hole-sensitivity limit for the class (ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113: VEWFD ≤1.00, EWFD ≤1.50, SFD ≤2.50 %obs/ft; pass at or below). Design targets: VEWFD 1.0, EWFD 1.5, SFD 2.0 %obs/ft. Not a manual alarm default — Alarm Level is a ClassiFire factor (Table 24, p.71, default 8). Verify.',
+  alert: 'Typical – unverified. Alert Level is a ClassiFire factor (Table 24, p.71, default 10). VEWFD 0.2 %obs/ft: per NFPA 76-2024 8.5.3.1.2.5 (VEWFD Alert 0.2 / Alarm 1.0 %/ft = 0.65 / 3.2 %/m, effective at each port, above ambient). EWFD 0.5 / SFD 1.0: site/design choice, no code basis.',
+  action: 'Typical – unverified. ModuLaser has no "Action" level; this is the Prealarm level (Table 24, p.71: Prealarm factor default 6).',
+  fire2: 'Typical – unverified. Alarm 2 Level is absolute (Table 24, p.71: 0.10–25, default 20; units not stated).',
+  actionDly: 'Typical – unverified site choice. Prealarm Delay range 0–90 s (Table 26, p.73).',
+  fire1Dly: 'Typical – unverified site choice. Alarm Delay range 0–90 s (Table 26, p.73).',
+  flowLow: 'Table 29, p.76: default 20%.', flowHigh: 'Table 29, p.76: default 20%.', flowDly: 'Table 29, p.76: default 120 s (range 0–240).'
+};
+MLP.CLASSIFIRE_FACTORS = { alert: 10, prealarm: 6, alarm: 8, alarm2: 20 };   // Table 24, p.71 (factors / absolute; units not stated for Alarm 2)
+MLP.HOLE_LIMITS = { VEWFD: 1.00, EWFD: 1.50, SFD: 2.50, ref: 'ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113 (FM/UL hole limits) — pass at or below (≤) the limit (Brent 2026-10-13)' };
+MLP.configSeed = function (perfClass, kind){
+  const values = {}, src = {};
+  if (kind === 'display'){
+    values.latchA = 'N'; values.latchF = 'N'; values.buzzer = 'Y'; ['latchA', 'latchF', 'buzzer'].forEach(k => { src[k] = 'typical'; });
+    values.io = { out1: { used: true, fn: 'General Fault', addr: '' } }; src['io.out1'] = 'manual';
+    return { perfClass: '', values, src };
+  }
+  const T = MLP.TYPICAL_DEFAULTS[perfClass];
+  if (T) Object.keys(T).forEach(k => { values[k] = T[k]; src[k] = MLP.MANUAL_SOURCED[k] ? 'manual' : 'typical'; });
+  Object.assign(values, { cascade: 'N', latchA: 'N', latchF: 'N', dayNight: 'N', ldd: 'Y' });
+  ['cascade', 'latchA', 'latchF', 'dayNight', 'ldd'].forEach(k => { src[k] = 'typical'; });
+  values.io = {};
+  return { perfClass: perfClass || '', values, src };
+};
+MLP.srcLabel = s => s === 'manual' ? 'manual' : s === 'typical' ? 'typical – unverified' : s === 'design' ? 'design' : '';
+function cfgFlat(c){ const o = {}; if (!c) return o; const v = c.values || {};
+  o.cfg_perf = c.perfClass || '';
+  MLP.CONFIG_FIELDS.forEach(f => { o['cfg_' + f.k] = v[f.k] == null ? '' : String(v[f.k]); });
+  MLP.IO_PORTS.forEach(p => { const x = (v.io || {})[p]; o['cfg_io_' + p] = x && x.used ? `${x.fn || ''} ${x.addr || ''}`.trim() || 'used' : ''; });
+  return o; }
+const CFG_DIFF_FIELDS = [['cfg_perf', 'Performance class']].concat(MLP.CONFIG_FIELDS.map(f => ['cfg_' + f.k, f.label])).concat(MLP.IO_PORTS.map(p => ['cfg_io_' + p, p.toUpperCase() + ' assignment']));
+
+/* ---------------- field-change loop ----------------
+   doc.changes: [{ id, dev, devName, field, label, design, value, by, at, why, photo, pipecad, status, verify:{ by, at, note }, plCheck:{ state, at, file, found } }]
+   status: logged → verified (designer, Toolbox) | rejected → approved (QA/Auditor).
+   doc.approvals: { technician:{ name, date, status }, designer:{…}, qa:{…} } */
+MLP.CHANGE_STATUS = ['logged', 'verified', 'rejected', 'approved'];
+MLP.APPROVAL_ROLES = [['technician', 'Technician (logged on site)'], ['designer', 'Designer (verified in the Toolbox)'], ['qa', 'QA / Auditor (sign-off)']];
+/* Fields whose change must also be made in the PipeCAD model (PipeCAD has no import). */
+MLP.PIPECAD_FIELDS = { 'cfg.fan': 'Fan speed', 'cfg.af': 'Alarm Factor', desc: 'Detector name', 't.tt.pipecad': 'Transport time', 'perf.holes': 'Sampling holes', 'perf.target': 'Performance class' };
+MLP.changeId = () => 'fc-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
+/* Check logged PipeCAD changes against a freshly parsed .pl (MLP.parsePl result). Returns [{id, state:'match'|'mismatch'|'not-found', found}] */
+MLP.verifyChangesAgainstPl = function (changes, parsed, devices){
+  const byKey = {}, byName = {};
+  (parsed.groups || []).forEach(g => g.detectors.forEach(d => { byKey[d.key] = d; byName[String(d.origName || '').toLowerCase()] = d; }));
+  const devById = {}; (devices || []).forEach(d => { devById[d.id] = d; });
+  return (changes || []).filter(c => c.pipecad).map(c => {
+    const dv = devById[c.dev] || {}; const key = dv.pl && dv.pl.key;
+    let d = (key && byKey[key]) || byName[String(c.field === 'desc' ? c.value : (dv.plName || c.devName || '')).toLowerCase()];
+    if (!d) return { id: c.id, state: 'not-found', found: '' };
+    const p = d.pipe || {};
+    const found = { 'cfg.fan': d.fan, 'cfg.af': p.af, desc: d.origName, 't.tt.pipecad': p.tt == null ? '' : (+p.tt).toFixed(1), 'perf.holes': p.holes ? p.holes.length : '', 'perf.target': MLP.TT_TO_CLASS[p.maxTransit] || '' }[c.field];
+    const eq = (a, b) => { const x = parseFloat(a), y = parseFloat(b); return isFinite(x) && isFinite(y) ? Math.abs(x - y) < 0.051 : String(a).trim().toLowerCase() === String(b).trim().toLowerCase(); };
+    return { id: c.id, state: eq(found, c.value) ? 'match' : 'mismatch', found: found == null ? '' : String(found) };
+  });
+};
+
+/* ---------------- project document ---------------- */
+MLP.blank = function (){
+  return { format: MLP.FORMAT, schemaVersion: MLP.SCHEMA_VERSION, savedAt: '', savedBy: null,
+    project: { name: '', location: '', designer: '', company: '', building: '', networkNumber: '', preparedBy: '', date: '' },
+    design: null, site: null, changes: [], approvals: {} };
+};
+MLP.isProject = o => !!(o && o.format === MLP.FORMAT && typeof o.schemaVersion === 'number');
+MLP.parse = function (text){
+  let o; try { o = JSON.parse(text); } catch (e){ throw new Error('Not a JSON file.'); }
+  if (!MLP.isProject(o)) throw new Error('Not a ModuLaser project file (format must be “modulaser-project”).');
+  if (o.schemaVersion > MLP.SCHEMA_VERSION) throw new Error(`This project file uses schema ${o.schemaVersion}; this app reads up to ${MLP.SCHEMA_VERSION}. Update the app.`);
+  return o;
+};
+MLP.stringify = function (doc, app, rev, user){
+  doc.format = MLP.FORMAT; doc.schemaVersion = MLP.SCHEMA_VERSION; doc.savedAt = new Date().toISOString(); doc.savedBy = Object.assign({ app, rev }, user ? { name: user } : {});
+  if (doc.design){ doc.design.hash = MLP.designHash(doc.design); doc.design.id = MLP.designId(doc.design); }
+  if (doc.site) doc.site.hash = MLP.siteHash(doc.site);
+  return JSON.stringify(doc, null, 1);
+};
+/* SHA-256 over canonical JSON of the whole design (volatile keys excluded): tamper-evident.
+   design.id keeps the old 32-bit FNV identity hash as a short display id only. */
+MLP.HASH_DROP = ['hash', 'id', 'updatedAt', 'importedAt'];
+MLP.designHash = function (design){ return design ? 'sha256:' + sha256hex(canon(design, MLP.HASH_DROP)) : ''; };
+MLP.siteHash = function (site){ return site ? 'sha256:' + sha256hex(canon(site, ['hash', 'updatedAt'])) : ''; };
+MLP.designId = function (design){
+  if (!design) return '';
+  const strip = { psus: (design.psus || []).map(p => [p.id, p.name, p.area, p.location, p.model, p.battery && p.battery.ah, p.battery && p.battery.qty, p.requiredAh]),
+    devices: (design.devices || []).map(d => [d.id, d.name, d.type, d.area, d.address, d.psuId, d.fan, d.pl && d.pl.fp].concat(d.config ? [JSON.stringify(d.config.values || {}), d.config.perfClass || ''] : [])) };
+  return fnv(JSON.stringify(strip));
+};
+
+/* Build a design section straight from parsed .pl files (Field Report without a calc file).
+   PSUs come only from the Battery Calculator; .pl PSU/Battery entries are placement only. */
+MLP.designFromPl = function (parsedList, links){
+  const devices = [], areas = [];
+  parsedList.forEach((pc, fi) => {
+    const link = links[fi];
+    pc.groups.forEach(g => {
+      if (!areas.includes(g.name)) areas.push(g.name);
+      g.displays.concat(g.detectors).forEach(d => devices.push(MLP.deviceFromPl(d, g.name, link)));
+    });
+  });
+  return { owner: 'pl-import', rev: '', updatedAt: new Date().toISOString(), plLinks: links, areas, psus: [], devices,
+    placement: parsedList.map((pc, fi) => ({ link: links[fi].id, groups: pc.groups.map(g => ({ area: g.name, psus: g.psus, batteries: g.batteries })) })) };
+};
+MLP.deviceFromPl = function (d, area, link, extra){
+  const dev = { id: (link ? link.id : 'pl') + '|' + d.key, kind: d.kind, type: d.type, partNumber: d.partNumber || '',
+    model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : 'FHSD8330',
+    name: d.origName, plName: d.origName, area, address: '', psuId: '', fan: d.fan || null, cluster: '',
+    pos: { x: +(d.x || 0).toFixed(2), y: +(d.y || 0).toFixed(2), z: +(d.z || 0).toFixed(2) },
+    pl: link ? { link: link.id, file: link.name, key: d.key, fp: d.fp } : null, pipe: d.pipe || null };
+  return Object.assign(dev, extra || {});
+};
+MLP.linkFromParsed = function (pc, sha, size, lastModified){
+  return { id: 'pl-' + String(sha).slice(0, 12), name: pc.fileName, sha256: sha, size: size || null, lastModified: lastModified || null,
+    version: pc.version, unit: pc.unitLabel, project: pc.project.name, groups: pc.groups.map(g => g.name), importedAt: new Date().toISOString() };
+};
+
+/* ---------------- validation ---------------- */
+MLP.validateDesign = function (design){
+  const issues = [];
+  if (!design) return issues;
+  const byAddr = {};
+  (design.devices || []).forEach(d => {
+    if (!MLP.nameOk(d.name)) issues.push({ id: d.id, level: 'error', msg: `“${d.name}” is ${MLP.nameLen(d.name)} characters — the ModuLaser display shows ${MLP.NAME_MAX}.` });
+    const a = String(d.address == null ? '' : d.address).trim();
+    if (a && a !== '0'){ (byAddr[a] = byAddr[a] || []).push(d); const n = Number(a); if (!(n >= 1 && n <= 127)) issues.push({ id: d.id, level: 'error', msg: `${d.name}: address ${a} is outside 1–127.` }); }
+  });
+  Object.entries(byAddr).forEach(([a, list]) => { if (list.length > 1) list.forEach(d => issues.push({ id: d.id, level: 'error', msg: `Address ${a} is used by ${list.map(x => x.name).join(', ')}.` })); });
+  return issues;
+};
+
+/* ---------------- diff ----------------
+   Compares two design sections. Returns {project:[], psus:{added,removed,changed}, devices:{added,removed,changed}, count}. */
+const DEV_FIELDS = [['name', 'Name'], ['type', 'Type'], ['area', 'Area/Group'], ['address', 'Address'], ['psuId', 'Power supply'], ['fan', 'Fan speed'], ['cluster', 'Cluster'], ['model', 'Model'], ['pipeTT', 'PipeCAD transport time (s)'], ['pipeHoles', 'Sampling holes'], ['pipeLen', 'Pipe length (ft)'], ['af', 'Alarm Factor']];
+const PSU_FIELDS = [['name', 'Name'], ['area', 'Area/Group'], ['location', 'Location'], ['model', 'Model'], ['batteryModel', 'Battery'], ['batteryAh', 'Battery Ah'], ['batteryQty', 'Battery qty'], ['requiredAh', 'Required Ah'], ['standbyHours', 'Standby (h)'], ['alarmMinutes', 'Alarm (min)'], ['status', 'Calculator result']];
+function devFlat(d){ const p = d.pipe || {}; return { name: d.name, type: d.type, area: d.area, address: d.address || '', psuId: d.psuId || '', fan: d.fan == null ? '' : String(d.fan), cluster: d.cluster || '', model: d.model || '',
+  pipeTT: p.tt == null ? '' : (+p.tt).toFixed(1), pipeHoles: p.holes ? String(p.holes.length) : '', pipeLen: p.lengthFt == null ? '' : (+p.lengthFt).toFixed(1), af: p.af == null ? '' : String(p.af) }; }
+function psuFlat(p){ const b = p.battery || {}; return { name: p.name, area: p.area || '', location: p.location || '', model: p.model || '', batteryModel: b.model || '', batteryAh: b.ah == null ? '' : String(b.ah), batteryQty: b.qty == null ? '' : String(b.qty),
+  requiredAh: p.requiredAh == null ? '' : (+p.requiredAh).toFixed(2), standbyHours: p.standbyHours == null ? '' : String(p.standbyHours), alarmMinutes: p.alarmMinutes == null ? '' : String(p.alarmMinutes), status: p.status || '' }; }
+function diffList(oldL, newL, flat, fields){
+  const om = new Map((oldL || []).map(x => [x.id, x])), nm = new Map((newL || []).map(x => [x.id, x]));
+  const res = { added: [], removed: [], changed: [] };
+  nm.forEach((n, id) => {
+    const o = om.get(id);
+    if (!o){ res.added.push(n); return; }
+    const a = flat(o), b = flat(n);
+    const ch = fields.filter(([k]) => String(a[k]) !== String(b[k])).map(([k, l]) => ({ f: k, label: l, old: a[k], new: b[k] }));
+    if (ch.length) res.changed.push({ id, name: n.name, item: n, fields: ch });
+  });
+  om.forEach((o, id) => { if (!nm.has(id)) res.removed.push(o); });
+  return res;
+}
+MLP.diffDesign = function (oldD, newD){
+  const project = [];
+  const devices = diffList(oldD && oldD.devices, newD && newD.devices, d => Object.assign(devFlat(d), cfgFlat(d.config)), DEV_FIELDS.concat(CFG_DIFF_FIELDS));
+  const psus = diffList(oldD && oldD.psus, newD && newD.psus, psuFlat, PSU_FIELDS);
+  const count = devices.added.length + devices.removed.length + devices.changed.length + psus.added.length + psus.removed.length + psus.changed.length;
+  return { project, devices, psus, count };
+};
+MLP.diffProject = function (oldP, newP){
+  const keys = ['name', 'location', 'designer', 'company', 'building', 'networkNumber'];
+  return keys.filter(k => (newP || {})[k] && String((oldP || {})[k] || '') !== String(newP[k])).map(k => ({ f: k, old: (oldP || {})[k] || '', new: newP[k] }));
+};
+MLP.diffHtml = function (diff, esc){
+  esc = esc || (s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])));
+  const sec = (title, r) => {
+    if (!r.added.length && !r.removed.length && !r.changed.length) return '';
+    return `<div class="mlp-diff-sec"><div class="mlp-diff-h">${title}</div><ul>` +
+      r.added.map(x => `<li class="add">+ Added <b>${esc(x.name)}</b>${x.area ? ' · ' + esc(x.area) : ''}</li>`).join('') +
+      r.removed.map(x => `<li class="del">− Removed <b>${esc(x.name)}</b>${x.area ? ' · ' + esc(x.area) : ''}</li>`).join('') +
+      r.changed.map(x => `<li class="chg">~ <b>${esc(x.name)}</b>: ${x.fields.map(f => `${esc(f.label)} <s>${esc(f.old || '—')}</s> → <b>${esc(f.new || '—')}</b>`).join('; ')}</li>`).join('') + '</ul></div>';
+  };
+  return (sec('Devices', diff.devices) + sec('Power supplies', diff.psus)) || '<p>No design changes.</p>';
+};
+
+/* ---------------- Performance Criteria (design.performance) ----------------
+   perf.standard = one 'Referenced standard' preset (project), optional per-Area/Group overrides (perf.areas[a].standard).
+   NFPA presets: UL 268 7th Ed. thresholds (hole sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft;
+   transport time no more than 60 / 43 / 43 s) plus the selected code's prescriptions; printouts state "Complies with UL 268, 7th Edition".
+   FM DS presets: FM requirements only (not UL, no UL 268 statement). BS presets mirror the Battery Calculator's BS design bases.
+   Only cited values are prefilled; the rest are blank ("engineer to define") and must be entered, referenced and confirmed. */
+MLP.PERF_CLASSES = ['VEWFD', 'EWFD', 'SFD'];
+MLP.UL_STATEMENT = 'Complies with UL 268, 7th Edition';
+/* Brent 2026-10-13 (21:10 ET, supersedes strict '<'): sensitivity PASSES when ≤ the class maximum — the more restrictive of UL and NFPA;
+   transport time ≤. UL projects also enforce the ModuLaser UL 268 range lower limits (Install Manual 04-4001-501-0803-05, App. A, printed p.113). */
+MLP.SENS_TARGETS = { VEWFD: 1.0, EWFD: 1.5, SFD: 2.0 };   // design 'Target' values, %obs/ft (Brent 2026-10-13)
+MLP.UL_RANGES = {
+  VEWFD: { name: 'Special Application Range 1', sensMin: 0.05, sensMax: 1.00, ttMin: 3, ttMax: 60, provisional: false },
+  EWFD:  { name: 'Special Application Range 2', sensMin: 0.05, sensMax: 2.18, ttMin: 3, ttMax: 43, provisional: false, note: 'max 1.5 %obs/ft per NFPA 76-2024 8.5.3.2.1.3' },
+  /* Brent 2026-10-13 21:17 ET: SFD/OAP = UL Open Area 1.70–2.18 %obs/ft, 6–43 s (App. A p.113) — final; both bounds enforced. */
+  SFD:   { name: 'Open Area', sensMin: 1.70, sensMax: 2.18, ttMin: 6, ttMax: 43, provisional: false }
+};
+/* NFPA code limits per class (null = the code sets no per-hole value). */
+MLP.NFPA_LIMITS = {
+  VEWFD: { sens: 1.0, tt: 60, ref: 'NFPA 76-2024 8.5.3.1.2.5 (alarm 1.0 %/ft), 8.5.3.1.2.6 (60 s)' },
+  EWFD:  { sens: 1.5, tt: 90, ref: 'NFPA 76-2024 8.5.3.2.1.3 (alarm 1.5 %/ft), 8.5.3.2.1.4 (90 s)' },
+  SFD:   { sens: null, tt: 120, ref: 'NFPA 72 (no per-hole sensitivity; 120 s maximum ASD transport time)' }
+};
+/* the more restrictive of UL (range max) and NFPA, computed — VEWFD 1.0/60, EWFD 1.5/43, SFD 2.18/43; UL range minimums carried as lower bounds */
+MLP.stricterOf = (a, b) => a == null ? b : b == null ? a : Math.min(a, b);
+MLP.UL_LIMITS = {};
+['VEWFD', 'EWFD', 'SFD'].forEach(c => { const r = MLP.UL_RANGES[c], n = MLP.NFPA_LIMITS[c];
+  MLP.UL_LIMITS[c] = { sens: MLP.stricterOf(r.sensMax, n.sens), tt: MLP.stricterOf(r.ttMax, n.tt), sensMin: r.sensMin, ttMin: r.ttMin }; });   // SFD = SFD/OAP
+MLP.ulRangeText = c => { const r = MLP.UL_RANGES[c]; if (!r) return ''; return `UL 268 ${r.name}: ${r.sensMin.toFixed(2)}–${r.sensMax.toFixed(2)} %obs/ft${c === 'EWFD' ? ' (max 1.5 per NFPA 76)' : ''}, ${r.ttMin}–${r.ttMax} s${r.provisional ? ' — provisional' : ''}`; };
+/* pass rules: value ≤ max (and ≥ min when a UL lower limit applies) */
+MLP.sensPass = (v, L) => v != null && L && L.sens != null && v <= L.sens + 1e-9 && (L.sensMin == null || v >= L.sensMin - 1e-9);
+MLP.ttPass = (v, L) => v != null && L && L.tt != null && v <= L.tt + 1e-9 && (L.ttMin == null || v >= L.ttMin - 1e-9);
+MLP.UL_REFS = {
+  VEWFD: 'UL 268, 7th Ed. Special Application Range 1 — ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113; NFPA 76-2024 8.5.3.1.2.5 (1.0 %/ft) and 8.5.3.1.2.6 (60 s)',
+  EWFD: 'UL 268, 7th Ed. Special Application Range 2 — Install Manual App. A, printed p.113; 1.5 %obs/ft from NFPA 76-2024 8.5.3.2.1.3 (maximum permitted threshold based on the UL detector limit and NFPA 76 sensitivity); NFPA 76-2024 8.5.3.2.1.4 allows 90 s but UL governs (43 s)',
+  SFD: 'UL 268, 7th Ed. Open Area (SFD/OAP) — Install Manual App. A, printed p.113' };
+MLP.UL_REF = 'UL 268, 7th Edition ranges per ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113 (EWFD 1.5 %obs/ft from NFPA 76)';
+MLP.FM_REF = 'FM Class 3230 per ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113 (FM/UL hole limits)';
+MLP.FM_LIMITS = { VEWFD: { sens: 1.00, tt: 60 }, EWFD: { sens: 1.50, tt: 90 }, SFD: { sens: 2.50, tt: 120 } };
+/* family NFPA → UL thresholds + code; FM → FM only; BS / Custom → engineer-defined */
+MLP.PERF_PRESETS = [
+  { id: 'VEWFD – NFPA 76/318', cls: 'VEWFD', family: 'NFPA', code: 'NFPA 76 / NFPA 318' },
+  { id: 'EWFD – NFPA 76', cls: 'EWFD', family: 'NFPA', code: 'NFPA 76' },
+  { id: 'EWFD – FM DS 5-32', cls: 'EWFD', family: 'FM', code: 'FM Global Property Loss Prevention Data Sheet 5-32' },
+  { id: 'SFD/OAP – NFPA 72', cls: 'SFD', family: 'NFPA', code: 'NFPA 72' },
+  { id: 'SFD – FM DS 5-48', cls: 'SFD', family: 'FM', code: 'FM Global Property Loss Prevention Data Sheet 5-48' },
+  /* British Standards: exactly the BS options of the Battery Calculator's Design Basis drop-down */
+  { id: 'BS 5839-1 Category M/L', cls: '', family: 'BS', code: 'BS 5839-1 Category M/L' },
+  { id: 'BS 5839-1 Category M/L + Generator', cls: '', family: 'BS', code: 'BS 5839-1 Category M/L + Generator' },
+  { id: 'BS 5839-1 Category P (Staffed)', cls: '', family: 'BS', code: 'BS 5839-1 Category P (Staffed)' },
+  { id: 'BS 5839-1 Category P (Unstaffed)', cls: '', family: 'BS', code: 'BS 5839-1 Category P (Unstaffed)' },
+  { id: 'Custom', cls: '', family: 'Custom', code: '' }
+];
+MLP.perfPreset = id => MLP.PERF_PRESETS.find(p => p.id === id) || null;
+MLP.perfIsUl = id => { const p = MLP.perfPreset(id); return !!(p && p.family === 'NFPA'); };
+/* code prescriptions per preset: cited rows prefilled, everything else 'engineer to define' (value blank). */
+/* Research 2026-10-13 (/workspace/deliverables/ModuLaser-Commissioning-Defaults-Citations-2026-10-13.md): NFPA 76-2024 clauses. */
+MLP.PERF_CODE_CITED = {
+  'VEWFD – NFPA 76/318': [
+    { item: 'NFPA 76 VEWFD sensitivity at each sampling port (effective, above ambient)', value: 'Alert 0.2 %/ft (0.65 %/m); Alarm 1.0 %/ft (3.2 %/m)', ref: 'NFPA 76-2024 8.5.3.1.2.5' },
+    { item: 'NFPA 76 VEWFD coverage area per port / detector', value: 'per NFPA 76-2024 8.5.3.1.2.1–8.5.3.1.2.2 (engineer to apply to this layout)', ref: 'NFPA 76-2024 8.5.3.1.2.1–8.5.3.1.2.2' },
+    { item: 'NFPA 76 VEWFD transport time', value: '≤ 60 s from the most remote port', ref: 'NFPA 76-2024 8.5.3.1.2.6' },
+    { item: 'NFPA 76 VEWFD manufacturer criteria', value: 'Installed per the manufacturer: ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113', ref: 'NFPA 76-2024 8.5.3.1.2.4' },
+    /* Cleanroom / semiconductor path — NFPA 318-2025 §11.1.3 (Research addendum 2, read on NFPA LiNK). 318 does not use the VEWFD/EWFD terms. */
+    { item: 'NFPA 318 cleanroom: listed smoke detection in the return airstream', value: 'Listed system in the cleanroom return airstream, installed per NFPA 72; ASD or spot-type permitted; listed for the cleanroom airflow velocities', ref: 'NFPA 318-2025 11.1.3.1, 11.1.3.1.1, 11.1.3.1.2, 11.1.3.3' },
+    { item: 'NFPA 318 system designation (risk assessment)', value: 'Life safety (evacuation at the 11.1.3.5.2 alarm level) or property protection (ERT investigates on alert; no automatic evacuation) — engineer selects', ref: 'NFPA 318-2025 11.1.3.4' },
+    { item: 'NFPA 318 below the waffle floor', value: '≤ 200 ft² per port; alert ≤ 0.2 %/ft (0.65 %/m); alarm ≤ 1.0 %/ft (3.2 %/m) at the sampling port (hole sensitivity)', ref: 'NFPA 318-2025 11.1.3.5, 11.1.3.5.1, 11.1.3.5.2, A.11.1.3.5.2' },
+    { item: 'NFPA 318 entry to the return air path', value: '≤ 4.3 ft² (0.4 m²) per port absent a performance-based design; alert 0.2 / alarm 1.0 %/ft', ref: 'NFPA 318-2025 11.1.3.6, 11.1.3.6.1, 11.1.3.6.2' },
+    { item: 'NFPA 318 transport time', value: '≤ 60 s from the most remote port', ref: 'NFPA 318-2025 11.1.3.7' }],
+  'EWFD – NFPA 76': [
+    { item: 'NFPA 76 EWFD alarm sensitivity', value: 'Alarm 1.5 %/ft (5.0 %/m)', ref: 'NFPA 76-2024 8.5.3.2.1.3' },
+    { item: 'NFPA 76 EWFD coverage area', value: '400 ft² per port / detector', ref: 'NFPA 76-2024 8.5.3.2.1.2' },
+    { item: 'EWFD transport time', value: '≤ 43 s (UL 268, 7th Ed. Special Application Range 2 governs; NFPA 76 alone allows 90 s)', ref: 'UL 268 Range 2 per Install Manual App. A p.113; NFPA 76-2024 8.5.3.2.1.4 (90 s)' },
+    { item: 'NFPA 76 EWFD manufacturer criteria', value: 'Installed per the manufacturer: ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113', ref: 'NFPA 76-2024 8.5.3.2.1.5' }],
+  'SFD/OAP – NFPA 72': [],
+  'EWFD – FM DS 5-32': [], 'SFD – FM DS 5-48': []
+};
+MLP.perfCodeReqs = function (id){
+  const p = MLP.perfPreset(id); if (!p || p.family === 'Custom') return [];
+  const rows = (MLP.PERF_CODE_CITED[id] || []).map(r => Object.assign({}, r, { src: 'cited', confirmed: false }));
+  rows.push({ item: `${p.code}: further prescriptions for this application (engineer to define)`, value: '', ref: '', src: 'engineer', confirmed: false });
+  return rows;
+};
+MLP.perfLimitBlank = () => ({ sens: null, tt: null, ref: '', confirmed: false, src: '' });
+/* UL 268 compliance is never auto-confirmed: limits carry the scope's ulConfirmed flag (QA re-check 2026-10-13). */
+MLP.perfUlLimits = ulConfirmed => { const o = {}; MLP.PERF_CLASSES.forEach(c => { const U = MLP.UL_LIMITS[c]; o[c] = { sens: U.sens, tt: U.tt, sensMin: U.sensMin, ttMin: U.ttMin, target: MLP.SENS_TARGETS[c], ulRange: MLP.ulRangeText(c), provisional: !!MLP.UL_RANGES[c].provisional, ref: MLP.UL_REFS[c], confirmed: !!ulConfirmed, src: 'UL' }; }); return o; };
+MLP.perfPresetLimits = function (id){
+  const p = MLP.perfPreset(id); const out = {};
+  if (p && p.family === 'NFPA') return MLP.perfUlLimits(false);
+  MLP.PERF_CLASSES.forEach(c => { out[c] = p && p.family === 'FM' ? { sens: MLP.FM_LIMITS[c].sens, tt: MLP.FM_LIMITS[c].tt, target: MLP.SENS_TARGETS[c], ref: MLP.FM_REF, confirmed: false, src: 'prefill' } : MLP.perfLimitBlank(); });
+  return out;
+};
+MLP.perfScopeInit = (o, id) => { o.standard = id; o.ulConfirmed = false; o.limits = MLP.perfPresetLimits(id); o.codeReqs = MLP.perfCodeReqs(id); return o; };
+MLP.perfBlank = () => Object.assign(MLP.perfScopeInit({ standardOther: '', areas: {}, narrative: '', narrativeDraft: '', eorName: '', specRef: '', definedBy: '', definedAt: '' }, 'SFD/OAP – NFPA 72'), { statement: '', market: 'UL' });
+/* migrate 1.2.0 drafts (market/basis) to presets */
+MLP.perfMigrate = function (perf){
+  if (!perf || perf.standard !== undefined) return perf;
+  const map = b => b === 'UL' ? 'SFD/OAP – NFPA 72' : b === 'FM' ? 'EWFD – FM DS 5-32' : b === 'NFPA 76' ? 'EWFD – NFPA 76' : 'Custom';
+  const one = (o, b) => { const keep = o.limits; MLP.perfScopeInit(o, map(b)); if (!MLP.perfIsUl(o.standard) && keep) o.limits = keep; if (o.standard === 'Custom') o.standardOther = o.basisOther || b || ''; };
+  one(perf, perf.market === 'UL' ? 'UL' : perf.basis);
+  Object.values(perf.areas || {}).forEach(o => o && one(o, o.basis));
+  return perf;
+};
+MLP.perfScope = (perf, area) => area && perf.areas && perf.areas[area] && perf.areas[area].enabled ? perf.areas[area] : perf;
+/* effective per-class limits for the project or an Area/Group override */
+MLP.perfLimits = function (perf, area){
+  if (!perf) return null; MLP.perfMigrate(perf);
+  const o = MLP.perfScope(perf, area);
+  return MLP.perfIsUl(o.standard) ? MLP.perfUlLimits(o.ulConfirmed) : (o.limits || null);
+};
+MLP.perfStdName = o => o.standard === 'Custom' ? (o.standardOther || 'Custom') : (o.standard || 'not selected');
+function perfScopeIssues(o, tag, out){
+  if (!o.standard){ out.push(`${tag}Select the referenced standard`); return; }
+  if (o.standard === 'Custom' && !String(o.standardOther || '').trim()) out.push(`${tag}Name the custom standard`);
+  if (MLP.perfIsUl(o.standard) && !o.ulConfirmed) out.push(`${tag}Engineer must confirm compliance with UL 268, 7th Edition before it is stated`);
+  if (!MLP.perfIsUl(o.standard)) MLP.PERF_CLASSES.forEach(c => { const l = (o.limits || {})[c] || {};
+    if (!(Number(l.sens) > 0)) out.push(`${tag}${c}: hole sensitivity limit — engineer to define (%obs/ft)`);
+    if (!(Number(l.tt) > 0)) out.push(`${tag}${c}: transport-time limit — engineer to define (s)`);
+    if (!String(l.ref || '').trim()) out.push(`${tag}${c}: record the reference for these limits`);
+    if (!l.confirmed) out.push(`${tag}${c}: engineer must confirm the limits`); });
+  (o.codeReqs || []).forEach((r, i) => { const n = `${tag}Code prescription ${i + 1}`;
+    if (!String(r.value || '').trim()) out.push(`${n}: engineer to define`);
+    if (!String(r.ref || '').trim()) out.push(`${n}: record the reference`);
+    if (!r.confirmed) out.push(`${n}: engineer must confirm`); });
+}
+MLP.perfIssues = function (perf){
+  const out = [];
+  if (!perf){ out.push('Performance Criteria not defined'); return out; }
+  MLP.perfMigrate(perf);
+  if (!String(perf.narrative || '').trim()) out.push('Performance narrative is required (align it with the Engineer of Record\'s published intent)');
+  else if (!perf.narrativeConfirmed) out.push('Engineer must confirm the performance narrative (auto-drafted from the selections)');
+  perfScopeIssues(perf, '', out);
+  Object.entries(perf.areas || {}).forEach(([a, o]) => { if (o && o.enabled) perfScopeIssues(o, `Area/Group "${a}" override — `, out); });
+  return out;
+};
+MLP.perfDraft = function (perf, classesUsed){
+  if (!perf) return ''; MLP.perfMigrate(perf);
+  const L = MLP.perfLimits(perf) || {}; const cls = (classesUsed && classesUsed.length ? classesUsed : MLP.PERF_CLASSES);
+  const std = MLP.perfStdName(perf); const ul = MLP.perfIsUl(perf.standard); const fm = (MLP.perfPreset(perf.standard) || {}).family === 'FM';
+  const lim = cls.map(c => { const l = L[c] || {}; const t = l.target ?? MLP.SENS_TARGETS[c]; return `${c === 'SFD' ? 'SFD/OAP' : c}: target ${t != null ? t.toFixed(1) : '[engineer to define]'} %obs/ft; every sampling hole at or below ${l.sens ?? '[engineer to define]'} %obs/ft${ul && l.sensMin != null ? ` and not below the UL range lower limit ${l.sensMin} %obs/ft` : ''} with transport time at or below ${l.tt ?? '[engineer to define]'} s${ul && l.ttMin != null ? ` (not below ${l.ttMin} s)` : ''}${ul && l.ulRange ? ` [${l.ulRange}]` : ''}`; }).join('; ');
+  const areas = Object.entries(perf.areas || {}).filter(([, o]) => o && o.enabled).map(([a, o]) => `${a} (${MLP.perfStdName(o)})`);
+  return `The aspirating smoke detection system is designed to the referenced standard ${std}${perf.specRef ? ' as required by ' + perf.specRef : ''}${ul ? ', applying the UL 268, 7th Edition thresholds (Install Manual App. A, printed p.113: VEWFD Special Application Range 1, EWFD Special Application Range 2 with 1.5 %obs/ft from NFPA 76, SFD/OAP Open Area) plus the code\'s prescriptions' : fm ? ', applying FM requirements only' : ''}. Performance classes used: ${cls.join(', ')}. Design limits — ${lim}.${areas.length ? ' Area/Group overrides: ' + areas.join(', ') + '.' : ''} ${ul ? (perf.ulConfirmed ? MLP.UL_STATEMENT + '.' : 'UL 268, 7th Edition compliance to be confirmed by the engineer.') : 'Limits and references are recorded and confirmed by the engineer.'}${perf.eorName ? ' Engineer of Record: ' + perf.eorName + '.' : ''}`;
+};
+MLP.perfStatement = perf => { if (!perf) return ''; MLP.perfMigrate(perf); const std = MLP.perfStdName(perf);
+  return MLP.perfIsUl(perf.standard) ? (perf.ulConfirmed ? `${MLP.UL_STATEMENT} · Referenced standard: ${std}` : `UL 268, 7th Edition compliance NOT YET CONFIRMED by the engineer · Referenced standard: ${std}`) : `Referenced standard: ${std}${(MLP.perfPreset(perf.standard) || {}).family === 'FM' ? ' (FM requirements; not a UL 268 listing statement)' : ' (engineer-defined limits)'}`; };
+root.MLP = MLP;
+if (typeof module !== 'undefined' && module.exports) module.exports = MLP;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+</script><script id="mlp-calc">
+/* ===================== 02.00.001 — ModuLaser project file (.mlproj.json) =====================
+   File → Export project… / Import project…. The calculator owns the `design` section; the Field Report's
+   `site` section is kept exactly as received and written back out unchanged. Calculator math is not touched. */
+const MLP_PIPE_CACHE = {};      // fileName → MLP.parsePl result (pipe/hole data and PSU/Battery placement)
+let MLP_SITE = null;            // Field Report section carried through, never edited here
+let MLP_PROJECT_EXTRA = {};     // project fields the calculator has no inputs for (location, designer, company)
+let MLP_CARRY = {};             // Toolbox-owned parts carried through unchanged: device config, field changes, approvals
+(function hookMlp(){
+  const _parse = plParse;
+  plParse = function(text, fileName){
+    const o = _parse(text, fileName);
+    try { const m = MLP.parsePl(text, fileName); MLP_PIPE_CACHE[fileName] = m;
+      const byKey = {}; m.groups.forEach(g => g.detectors.forEach(d => { byKey[d.key] = d; }));
+      o.groups.forEach(g => g.detectors.forEach(d => { if (byKey[d.key]) d.pipe = byKey[d.key].pipe; }));
+    } catch (e) { /* the calculator's own parser already reported any problem */ }
+    return o;
+  };
+  const _bso = buildStateObject;
+  buildStateObject = function(){
+    mlpAttachPipe();
+    const st = _bso();
+    if (MLP_SITE) st.mlpSite = MLP_SITE;
+    if (Object.keys(MLP_PROJECT_EXTRA).length) st.mlpProject = MLP_PROJECT_EXTRA;
+    if (Object.keys(MLP_CARRY).length) st.mlpCarry = MLP_CARRY;
+    return st;
+  };
+  const _apply = applyLoadedState;
+  applyLoadedState = function(state){ MLP_CARRY = state && state.mlpCarry || {}; MLP_SITE = state && state.mlpSite || null; MLP_PROJECT_EXTRA = state && state.mlpProject || {}; return _apply(state); };
+  const _clr = clearEntireDocument;
+  clearEntireDocument = function(o){ MLP_CARRY = {}; MLP_SITE = null; MLP_PROJECT_EXTRA = {}; return _clr(o); };
+})();
+/* The calculator restores its saved state while its main script loads, before these hooks exist; pick up the
+   carried sections from the same source (embedded state first, then autosave) so they survive a reload. */
+(function restoreMlpExtras(){
+  let st = null;
+  try { const tag = document.getElementById('embedded-state'); if (tag && tag.textContent.trim()) st = JSON.parse(tag.textContent); } catch (e) {}
+  if (!st){ try { st = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch (e) {} }
+  if (st){ MLP_SITE = st.mlpSite || null; MLP_PROJECT_EXTRA = st.mlpProject || {}; MLP_CARRY = st.mlpCarry || {}; }
+})();
+/* Copy pipe/hole results and placement from freshly parsed files into the saved links (keeps them in the calc file). */
+function mlpAttachPipe(){
+  (PL_LINKS || []).forEach(link => {
+    const m = MLP_PIPE_CACHE[link.name]; if (!m) return;
+    const byKey = {}; m.groups.forEach(g => g.detectors.forEach(d => { byKey[d.key] = d; }));
+    Object.entries(link.devices || {}).forEach(([k, d]) => { if (byKey[k] && byKey[k].pipe) d.pipe = byKey[k].pipe; });
+    link.placement = m.groups.map(g => ({ area: g.name, psus: g.psus, batteries: g.batteries }));
+    link.meta = m.project; link.pipeType = m.pipe;
+    if (m.project && m.project.location && !MLP_PROJECT_EXTRA.location) MLP_PROJECT_EXTRA.location = m.project.location;
+    if (m.project && m.project.designer && !MLP_PROJECT_EXTRA.designer) MLP_PROJECT_EXTRA.designer = m.project.designer;
+    if (m.project && m.project.company && !MLP_PROJECT_EXTRA.company) MLP_PROJECT_EXTRA.company = m.project.company;
+  });
+}
+function mlpCalcRev(){ const l = AMENDMENTS[AMENDMENTS.length - 1]; return `${l.major || APP_MAJOR}.${l.minor || APP_MINOR}.${l.rev}_${l.date}`; }
+/* Build the design section from the live sheets (read-only: uses the same sheet model as Print / Export). */
+function mlpBuildDesign(){
+  mlpAttachPipe();
+  const linkById = {}; (PL_LINKS || []).forEach(l => { linkById[l.id] = l; });
+  const psus = [], devices = [], areas = [];
+  Array.from(document.querySelectorAll('.location')).forEach((locEl, i) => {
+    const m = v2SheetModel(locEl);
+    const psuId = locEl.dataset.plSheetId || ('sheet-' + (i + 1));
+    const area = m.area || '';
+    if (area && !areas.includes(area)) areas.push(area);
+    const bat = (m.batteryLabel || m.hwBattery || '').trim();
+    const bomBat = (m.bom || []).find(r => /battery/i.test(r.description || '') && !/enclosure|cabinet/i.test(r.description || ''));
+    const bomQty = bomBat && isFinite(+bomBat.qty) ? +bomBat.qty : null;
+    psus.push({ id: psuId, sheet: i + 1, name: m.psName || ('PS-' + (i + 1)), area, location: area || m.label || '',
+      model: (m.hwSupply || '').trim(), enclosure: (m.hwEnclosure || '').trim(),
+      battery: { model: bat, ah: isFinite(m.batteryAh) ? m.batteryAh : null, qty: bomQty, part: bomBat ? bomBat.partNumber : '' },
+      requiredAh: isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : null,
+      standbyHours: v2Num(v2Val(locEl, '.standby-hours')), alarmMinutes: v2Num(v2Val(locEl, '.alarm-minutes')),
+      designBasis: m.basisKey || '', totalMa: isFinite(m.totalMa) ? m.totalMa : null, status: v2StatusWord(m.status), flags: m.invalidList || [] });
+    const rows = Array.from(locEl.querySelectorAll('[data-role="module"]'));
+    m.modules.forEach((mod, ri) => {
+      const row = rows[ri]; const plKey = row && row.dataset.plKey || '';
+      const [linkId, devKey] = plKey ? [plKey.slice(0, plKey.indexOf('|')), plKey.slice(plKey.indexOf('|') + 1)] : ['', ''];
+      const link = linkById[linkId]; const ld = link && link.devices ? link.devices[devKey] : null;
+      const kind = mod.kind === 'detector' ? 'detector' : 'display';
+      devices.push({ id: plKey || (psuId + ':' + (row && row.id || ri)), kind, type: mod.type, model: mod.model,
+        partNumber: kind === 'display' ? ({ 'Standard Display': '0', 'Minimum Display': '1', 'Command Display': '2' }[mod.type] || '') : '',
+        name: mod.zone, plName: ld ? ld.origName : '', area, address: mod.addr || '', psuId, fan: mod.fan ? +mod.fan : null,
+        cluster: (mod.cluster || '').trim(), ma: mod.ma,
+        pl: ld ? { link: linkId, file: link.name, key: devKey, fp: ld.fp } : null, pipe: ld && ld.pipe || null });
+    });
+  });
+  const links = (PL_LINKS || []).map(l => ({ id: l.id, name: l.name, sha256: l.sha256, size: l.size, lastModified: l.lastModified, version: l.version || '', unit: l.unit, project: l.project, groups: l.groups, importedAt: l.importedAt, placement: l.placement || [] }));
+  const cfg = MLP_CARRY.config || {}; devices.forEach(d => { if (cfg[d.id]) d.config = cfg[d.id]; });
+  return { owner: 'battery-calculator', rev: mlpCalcRev(), engine: typeof MASD_ENGINE_VERSION !== 'undefined' ? MASD_ENGINE_VERSION : '', updatedAt: new Date().toISOString(), plLinks: links, areas, psus, devices, calc: { state: mlpStableCalcState(buildStateObject()) } };
+}
+/* QA re-check 2026-10-13: the design hash must be stable on a no-op round trip. Keep site/carry data out of the
+   design (they travel in doc.site / doc.changes / doc.approvals / design.devices[].config) and renumber the
+   calculator's session row ids (mod-<loc>-<uid>, cluster r:<loc>:<n>) by position so reloading does not change them. */
+function mlpStableCalcState(st){
+  st = JSON.parse(JSON.stringify(st || {})); delete st.mlpSite; delete st.mlpCarry; delete st.mlpProject;
+  const map = {}, locMap = {};
+  (st.locations || []).forEach((l, li) => (l.modules || []).forEach((m, mi) => { const k = /^mod-(\d+)-(\d+)$/.exec(m.rowId || ''); if (k){ map[k[1] + '-' + k[2]] = (li + 1) + '-' + (mi + 1); locMap[k[1]] = String(li + 1); } }));
+  const fix = v => typeof v !== 'string' ? v : v.replace(/mod-(\d+)-(\d+)/g, (x, a, b) => map[a + '-' + b] ? 'mod-' + map[a + '-' + b] : x).replace(/^r:(\d+):/, (x, a) => locMap[a] ? 'r:' + locMap[a] + ':' : x);
+  const walk = o => { if (Array.isArray(o)) return o.map(walk); if (o && typeof o === 'object'){ Object.keys(o).forEach(k => { o[k] = walk(o[k]); }); return o; } return fix(o); };
+  return walk(st);
+}
+function mlpProjectInfo(){
+  const v = id => (document.getElementById(id) || {}).value || '';
+  return Object.assign({ location: '', designer: '', company: '' }, MLP_PROJECT_EXTRA, { name: v('project-name-input'), preparedBy: v('prepared-by-input'), date: v('project-date-input'),
+    networkNumber: v('network-number-input'), building: v('building-input') });
+}
+function mlpExportProject(){
+  const doc = MLP.blank();
+  // forward compatibility: keep top-level keys this app does not know (written by newer apps)
+  Object.entries(MLP_CARRY.extra || {}).forEach(([k, v]) => { if (!(k in doc)) doc[k] = v; });
+  doc.project = mlpProjectInfo();
+  doc.design = mlpBuildDesign();
+  doc.site = MLP_SITE;
+  if (MLP_CARRY.changes) doc.changes = MLP_CARRY.changes;
+  if (MLP_CARRY.approvals) doc.approvals = MLP_CARRY.approvals;
+  if (MLP_CARRY.toolbox) doc.design.toolbox = MLP_CARRY.toolbox;
+  if (MLP_CARRY.performance) doc.design.performance = MLP_CARRY.performance;
+  const text = MLP.stringify(doc, 'ModuLaser Battery Calculator', mlpCalcRev(), ((document.getElementById('prepared-by-input') || {}).value || '').trim());
+  v2Download(new Blob([text], { type: 'application/json' }), v2FileBase() + MLP.EXT);
+  const s = document.getElementById('save-indicator'); if (s) s.title = 'Exported project ' + v2FileBase() + MLP.EXT;
+  return doc;
+}
+function mlpImportProject(){
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = '.json,.mlproj.json,application/json';
+  inp.onchange = async () => { const f = inp.files[0]; if (f) mlpImportProjectText(await f.text(), f.name); };
+  inp.click();
+}
+function mlpEsc(s){ return plEsc(s); }
+function mlpImportProjectText(text, name){
+  let doc;
+  try { doc = MLP.parse(text); } catch (e) { plShowAux('Import project', `<p style="color:#f87171">${mlpEsc(name)}: ${mlpEsc(e.message)}</p>`, ''); return; }
+  const calcState = doc.design && doc.design.calc && doc.design.calc.state;
+  if (!calcState){
+    MLP_SITE = doc.site || MLP_SITE; scheduleSave();
+    plShowAux('Import project', `<p><b>${mlpEsc(name)}</b> has no Battery Calculator design yet${doc.design ? ' (it was started from PipeCAD in the Field Report)' : ''}. Use <b>File → Import .pl…</b> to size its power supplies, then <b>File → Export project…</b> to save the design back into the project file.</p>${doc.site ? '<p>Its Field Report results are kept and will be written back unchanged.</p>' : ''}`, '');
+    return;
+  }
+  const pristine = plIsPristineDoc();
+  const diff = pristine ? null : MLP.diffDesign(mlpBuildDesign(), doc.design);
+  const carry = () => { const c = {}; (doc.design.devices || []).forEach(d => { if (d.config) (c.config = c.config || {})[d.id] = d.config; }); if (doc.changes) c.changes = doc.changes; if (doc.approvals) c.approvals = doc.approvals; if (doc.design.toolbox) c.toolbox = doc.design.toolbox; if (doc.design.performance) c.performance = doc.design.performance; const known = Object.keys(MLP.blank()).concat(['format', 'schemaVersion', 'savedAt', 'savedBy']); Object.keys(doc).forEach(k => { if (!known.includes(k)) (c.extra = c.extra || {})[k] = doc[k]; }); return c; };
+  const apply = () => { applyLoadedState(calcState); MLP_CARRY = carry(); MLP_SITE = doc.site || null; MLP_PROJECT_EXTRA = Object.assign({}, MLP_PROJECT_EXTRA, { location: doc.project.location || '', designer: doc.project.designer || '', company: doc.project.company || '' }); scheduleSave(); closePlWizard(); };
+  if (pristine || !diff.count){ apply(); return; }
+  window.__mlpApply = apply;
+  plShowAux('Import project — review changes', `<p>Opening <b>${mlpEsc(name)}</b> replaces the sheets on screen with the design in the file. Differences from what's on screen now:</p><div class="mlp-diff">${MLP.diffHtml(diff, mlpEsc)}</div><p class="plw-note">Field Report results in the file are kept and written back unchanged on the next Export project.</p>`,
+    `<button class="btn btn-ghost btn-sm" onclick="closePlWizard()">Cancel</button><button class="btn btn-primary btn-sm" onclick="window.__mlpApply()">Replace with file design</button>`);
+}
+(function addMlpMenu(){
+  const after = document.getElementById('linked-pl-btn');
+  if (!after) return;
+  const mk = (id, label, title, fn) => { const b = document.createElement('button'); b.setAttribute('role', 'menuitem'); b.id = id; b.textContent = label; b.title = title; b.addEventListener('click', () => { document.querySelectorAll('.menubar-menu').forEach(m => m.hidden = true); fn(); }); return b; };
+  const hr = document.createElement('hr');
+  const exp = mk('export-project-btn', 'Export project…', 'Save a ModuLaser project file (.mlproj.json) for the Field Report', mlpExportProject);
+  const imp = mk('import-project-btn', 'Import project…', 'Open a ModuLaser project file (.mlproj.json)', mlpImportProject);
+  after.after(hr, imp, exp);
+  const css = document.createElement('style');
+  css.textContent = '.mlp-diff ul{margin:4px 0 8px 18px;padding:0}.mlp-diff li{margin:2px 0}.mlp-diff .add{color:#4ade80}.mlp-diff .del{color:#f87171}.mlp-diff .chg{color:inherit}.mlp-diff-h{font-weight:700;margin-top:6px}.mlp-diff s{opacity:.6}';
+  document.head.appendChild(css);
+})();
+
+</script><!--MLP-END-->
 </body>
 </html>
