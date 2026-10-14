@@ -3,6 +3,12 @@
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
+## What's new in 02.00.003
+- **Needs-entry fields are visible again.** A sheet marked *Needs entry* (amber dot) now outlines every field that needs entry in **amber** (2px), including the custom dropdowns. In 02.00.000–02.00.002 the old 1px soft-blue outline blended into the dark theme, so nothing appeared highlighted.
+- **Show next ›** in the Live Results panel scrolls to and focuses each needs-entry field in turn.
+- Print label grey darkened `#747574` → `#6b6c6b` for WCAG AA contrast.
+- Calculation math unchanged. QA brief: needs-entry 2026-10-14 (see [RELEASE_NOTES.md](RELEASE_NOTES.md)).
+
 ## What's new in 02.00.002
 - **Shared MASD engine 1.0.0** (`masd-engine.js`) — byte-identical with the **MASD Engineering Toolbox 00.01.000**, which embeds this calculator; results unchanged.
 - **Harmonization rule:** any engine change bumps the engine version and both apps' revisions with matching notes.
@@ -80,8 +86,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.000.exe
-npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.000.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.003.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.003.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -104,7 +110,7 @@ on a `macos-latest` runner — happy to help set that up if you want it.
 
 The app has a Help → About menu item (and on macOS, the standard app menu's
 "About ModuLaser Battery Calculator" too) showing the revision and author —
-currently Revision `02.00.000_261013`, authored by The BMG. These are set
+currently Revision `02.00.003_261014`, authored by The BMG. These are set
 as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
 update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section
