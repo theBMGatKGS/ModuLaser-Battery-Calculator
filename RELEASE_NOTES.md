@@ -2,7 +2,20 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
-## v02.00.002 — Shared MASD engine (2026-10-13) · not yet released
+## v02.00.003 — Needs-entry highlight fix (2026-10-14)
+
+### Highlights
+- **Needs entry now shows where.** Sheets with the amber *Needs entry* status outline every field still needing entry with a 2px **amber** outline and tint (inputs, custom dropdowns, radio groups), matching the sidebar dot. Before, the 1px soft-blue outline from 01.05 was indistinguishable from normal borders on the 02.00 dark theme, and the dropdown highlights sat on hidden native selects' visible buttons in the same blue.
+- **Show next ›** button on the Live Results message (*N fields still need entry (amber outline)*) scrolls to and focuses each field in turn.
+- **Print contrast:** KGS label grey `#747574` → `#6b6c6b` (5.0:1 on the info panel, 5.3:1 on white).
+- Status logic, counts and calculation math unchanged (regression scenarios identical).
+
+### QA audit
+| Date | Commit audited | Result | Brief |
+|---|---|---|---|
+| 2026-10-14 | branch fix/print-label-contrast (pre-release) | Needs-entry regression on Brent's saved file: 1/3 on 02.00.002 → 5/5 fixed | `qa/needs-entry-2026-10-14.md` |
+
+## v02.00.002 — Shared MASD engine (2026-10-13)
 
 ### Highlights
 - **Shared MASD engine 1.0.0** (`masd-engine.js`): the battery math, reference data and PipeCAD .pl import are byte-identical with the new **MASD Engineering Toolbox 00.01.000**, which embeds this calculator. Results unchanged — regression scenarios give the same numbers as 02.00.001.

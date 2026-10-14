@@ -280,9 +280,10 @@
     box-shadow: 0 0 0 3px var(--accent-soft);
   }
   .calc-select-wrap:has(> select.field-needs) .calc-select-btn{
-    border-color: #5b9bd5 !important;
-    background: rgba(91, 155, 213, 0.12) !important;
-    box-shadow: 0 0 0 1px rgba(91, 155, 213, 0.35);
+    border-color: #d29922 !important;
+    background: rgba(210, 153, 34, 0.16) !important;
+    outline: 2px solid #d29922 !important;
+    outline-offset: 1px;
   }
   .calc-select-list{
     position: fixed;
@@ -717,15 +718,20 @@
   .saveas-actions{ display:flex; justify-content:flex-end; gap:8px; }
   .saveas-actions{ flex-wrap:wrap; }
   .prompt-extra{ margin:0 0 14px; }
-  /* Soft blue needs-entry highlight — distinct from yellow Validation Errors and red Invalid Calculation */
+  /* Amber needs-entry highlight (02.00.003) — matches the amber "Needs entry" sidebar dot; 2px outline so it
+     stands out on the dark theme. Distinct from red Invalid Calculation. */
   .field-needs{
-    border-color: #5b9bd5 !important;
-    background: rgba(91, 155, 213, 0.12) !important;
-    box-shadow: 0 0 0 1px rgba(91, 155, 213, 0.35);
+    border-color: #d29922 !important;
+    background: rgba(210, 153, 34, 0.16) !important;
+    outline: 2px solid #d29922 !important;
+    outline-offset: 1px;
+  }
+  .field-needs-flash, .calc-select-wrap:has(> select.field-needs-flash) .calc-select-btn{
+    box-shadow: 0 0 0 5px rgba(210, 153, 34, 0.45) !important;
   }
   .field-needs-wrap{
-    outline: 1px solid rgba(91, 155, 213, 0.55);
-    background: rgba(91, 155, 213, 0.08);
+    outline: 2px solid #d29922;
+    background: rgba(210, 153, 34, 0.10);
     border-radius: 8px;
     padding: 4px 6px;
   }
@@ -1146,7 +1152,7 @@ body.v2 .location{ border-radius:8px; margin-bottom:14px; }
 .rp-row.tot{ border-top:1px solid var(--line); margin-top:3px; padding-top:5px; } .rp-row.tot span{ color:var(--ink); font-weight:600; }
 .rp-msg{ border-radius:6px; padding:7px 9px; font-size:12px; margin-bottom:6px; border:1px solid; }
 .rp-msg.bad{ background:var(--failbg); color:#ffb4ae; border-color:#6e1f1b; } .rp-msg.warn{ background:var(--incbg); color:#f0c867; border-color:#5e4512; }
-.rp-msg.info{ background:rgba(58,154,214,.12); color:#9fd0f0; border-color:#1d4f75; } .rp-msg.ok{ background:var(--passbg); color:var(--pass); border-color:#1f5f2c; }
+.rp-msg.info{ background:rgba(58,154,214,.12); color:#9fd0f0; border-color:#1d4f75; } .rp-msg.needs{ background:var(--incbg); color:#f0c867; border-color:#d29922; display:flex; align-items:center; gap:8px; } .rp-needs-next{ margin-left:auto; background:#d29922; color:#1a1300; border:0; border-radius:4px; padding:3px 8px; font-weight:700; cursor:pointer; white-space:nowrap; } .rp-msg.ok{ background:var(--passbg); color:var(--pass); border-color:#1f5f2c; }
 .rp-empty{ color:var(--muted); font-size:12.5px; }
 /* sheet: override badge, compact table, 16-char counters */
 .v2-or-badge{ margin-left:auto; font:600 11px/1.6 var(--mono); color:#3a9ad6; background:rgba(58,154,214,.12); border:1px solid #1d4f75; border-radius:4px; padding:1px 8px; white-space:nowrap; }
@@ -1249,7 +1255,7 @@ body.v2 .model-cell{ font-size:10.5px; }
             <button role="menuitem" id="add-location-menu-btn" title="Add another power supply sheet">+ Add Location</button>
             <hr>
             <button role="menuitem" id="clear-calc-btn" title="Clear this sheet or the entire file">Clear…</button>
-            <button role="menuitem" id="confirm-defaults-btn" title="Mark factory-default fields on the project header and current sheet as confirmed (clears blue needs-entry on defaults)">Confirm defaults</button>
+            <button role="menuitem" id="confirm-defaults-btn" title="Mark factory-default fields on the project header and current sheet as confirmed (clears amber needs-entry on defaults)">Confirm defaults</button>
             <hr>
             <button role="menuitem" id="clear-saved-btn" title="Clear all saved entries and start over">Clear saved data</button>
           </div>
@@ -1511,7 +1517,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">3</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-sidebar">Add power supply sheets and use the sidebar</div>
-            <p>Each sheet = one power supply. Add one with <b>+ Add power supply</b> at the bottom of the sidebar, <b>+ Add Location</b> in the quick row, or <b>Edit → + Add Location</b>. Click a sheet in the sidebar to show it. Sheets are grouped by their <b>Location</b> (the Area/Group name; an Import .pl fills it from the PipeCAD floor). Each shows its required Ah and a status dot: <b>green</b> complete, <b>amber</b> needs entry (blue-outlined fields left), <b>red</b> error (an INVALID CALCULATION condition or a Validation Error; the red count shows how many), and an extra <b>blue</b> dot when the sheet overrides the project settings. At the top of the sheet fill in the <b>Power Supply Name</b> (e.g. <span class="mono-inline">PS-1</span>) and <b>Location</b> (e.g. <span class="mono-inline">Riser Closet A</span>); use <b>Remove ⌫</b> on the sheet to delete it.</p>
+            <p>Each sheet = one power supply. Add one with <b>+ Add power supply</b> at the bottom of the sidebar, <b>+ Add Location</b> in the quick row, or <b>Edit → + Add Location</b>. Click a sheet in the sidebar to show it. Sheets are grouped by their <b>Location</b> (the Area/Group name; an Import .pl fills it from the PipeCAD floor). Each shows its required Ah and a status dot: <b>green</b> complete, <b>amber</b> needs entry (amber-outlined fields left), <b>red</b> error (an INVALID CALCULATION condition or a Validation Error; the red count shows how many), and an extra <b>blue</b> dot when the sheet overrides the project settings. At the top of the sheet fill in the <b>Power Supply Name</b> (e.g. <span class="mono-inline">PS-1</span>) and <b>Location</b> (e.g. <span class="mono-inline">Riser Closet A</span>); use <b>Remove ⌫</b> on the sheet to delete it.</p>
             <figure class="qs-figure"><img data-qs-slot="2-add-location" alt="Sidebar"><figcaption>Screenshot: sheet sidebar with status dots and + Add power supply</figcaption></figure>
           </div>
         </div>
@@ -1596,7 +1602,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">12</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-results">Read the live results panel</div>
-            <p>The right-hand panel updates as you type. <b>Required capacity</b> shows the Ah per supply in large type with a gauge: the solid part is the standby + alarm load, the lighter part is the safety margin and temperature de-rating, the blue mark is the selected battery and the dashed red mark is the 65 Ah maximum. Below it a status line reads <b>PASS</b> (valid, no flags, within the selected battery and 65 Ah), <b>FAIL</b> (an INVALID CALCULATION condition, more than one supply needed, or capacity beyond the battery / 65 Ah) or <b>INCOMPLETE</b> (Validation Error flags still open). Then the selected battery and recommended hardware, the load breakdown (modules, power supply quiescent + AUX, total, standby/alarm/required Ah), the clusters on this supply, and the sheet's own validation messages — red for INVALID CALCULATION, yellow for Validation Errors, blue for fields that still need entry. The full calculation, hardware and Bill of Materials stay on the sheet below the module table.</p>
+            <p>The right-hand panel updates as you type. <b>Required capacity</b> shows the Ah per supply in large type with a gauge: the solid part is the standby + alarm load, the lighter part is the safety margin and temperature de-rating, the blue mark is the selected battery and the dashed red mark is the 65 Ah maximum. Below it a status line reads <b>PASS</b> (valid, no flags, within the selected battery and 65 Ah), <b>FAIL</b> (an INVALID CALCULATION condition, more than one supply needed, or capacity beyond the battery / 65 Ah) or <b>INCOMPLETE</b> (Validation Error flags still open). Then the selected battery and recommended hardware, the load breakdown (modules, power supply quiescent + AUX, total, standby/alarm/required Ah), the clusters on this supply, and the sheet's own validation messages — red for INVALID CALCULATION, yellow for Validation Errors, amber for fields that still need entry (with <b>Show next ›</b> to jump to each one). The full calculation, hardware and Bill of Materials stay on the sheet below the module table.</p>
           </div>
         </div>
         <div class="qs-step">
@@ -1619,9 +1625,9 @@ body.v2 .model-cell{ font-size:10.5px; }
         <div class="qs-step">
           <div class="qs-step-num">15</div>
           <div class="qs-step-body">
-            <div class="qs-step-title" id="qs-step-needs-entry">Blue needs-entry highlights</div>
-            <p>Empty editable fields — and fields still sitting on their factory defaults — show a soft <b>blue</b> border and light blue tint so unfinished entry is easy to spot. This is intentionally different from the <b>yellow</b> Validation Error panel and the <b>red</b> INVALID CALCULATION banner. Blue clears when you fill an empty field, or when you change a factory-default value away from its starter setting. <b>Date</b> is excluded: new and cleared documents still initialize Date to today, and you can edit it normally afterward, but it is never blue-highlighted. Project-header fields (Project Name, Prepared By, Network #, Building, CDM locations) use the same empty/default rules as sheet fields.</p>
-            <figure class="qs-figure"><img data-qs-slot="10-needs-entry" alt="Blue needs-entry highlights"><figcaption>Screenshot: blue-highlighted empty/default fields on the project header and current sheet</figcaption></figure>
+            <div class="qs-step-title" id="qs-step-needs-entry">Amber needs-entry highlights</div>
+            <p>Empty editable fields — and fields still sitting on their factory defaults — show a <b>amber</b> (orange) 2px outline and light amber tint so unfinished entry is easy to spot. This is intentionally different from the <b>yellow</b> Validation Error panel and the <b>red</b> INVALID CALCULATION banner. Amber clears when you fill an empty field, or when you change a factory-default value away from its starter setting. <b>Date</b> is excluded: new and cleared documents still initialize Date to today, and you can edit it normally afterward, but it is never amber-highlighted. Project-header fields (Project Name, Prepared By, Network #, Building, CDM locations) use the same empty/default rules as sheet fields.</p>
+            <figure class="qs-figure"><img data-qs-slot="10-needs-entry" alt="Amber needs-entry highlights"><figcaption>Screenshot: amber-highlighted empty/default fields on the project header and current sheet</figcaption></figure>
           </div>
         </div>
 
@@ -1629,8 +1635,8 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">16</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-confirm-defaults">Confirm defaults</div>
-            <p>When factory defaults are intentional (you reviewed them and want to keep them), click <b>Edit → Confirm defaults</b>. That clears blue highlighting on factory-default fields for the <b>project header</b> and the <b>current sheet</b> (the sheet you last clicked or focused — shown with a subtle outline). Empty fields stay blue until you fill them. Confirming does not change any values — it only marks those defaults as reviewed.</p>
-            <figure class="qs-figure"><img data-qs-slot="11-confirm-defaults" alt="Confirm defaults button"><figcaption>Screenshot: Edit → Confirm defaults clearing blue on reviewed factory defaults</figcaption></figure>
+            <p>When factory defaults are intentional (you reviewed them and want to keep them), click <b>Edit → Confirm defaults</b>. That clears amber highlighting on factory-default fields for the <b>project header</b> and the <b>current sheet</b> (the sheet you last clicked or focused — shown with a subtle outline). Empty fields stay amber until you fill them. Confirming does not change any values — it only marks those defaults as reviewed.</p>
+            <figure class="qs-figure"><img data-qs-slot="11-confirm-defaults" alt="Confirm defaults button"><figcaption>Screenshot: Edit → Confirm defaults clearing amber on reviewed factory defaults</figcaption></figure>
           </div>
         </div>
 
@@ -1850,7 +1856,7 @@ body.v2 .model-cell{ font-size:10.5px; }
         </div>
         <div class="help-faq-item">
           <div class="q">What do the sidebar's status dots mean?</div>
-          <p class="a">Green: complete — no validation messages and no fields left to enter. Amber: needs entry — blue-outlined fields are still empty or on unconfirmed factory defaults. Red: error — the sheet has an INVALID CALCULATION condition or a Validation Error (the red number is how many). A second, blue dot means the sheet overrides the settings most sheets use (Design Basis, standby, alarm, temperature or margin). The same legend is at the bottom of the sidebar.</p>
+          <p class="a">Green: complete — no validation messages and no fields left to enter. Amber: needs entry — amber-outlined fields are still empty or on unconfirmed factory defaults; click <b>Show next ›</b> in the Live Results panel to jump to each one. Red: error — the sheet has an INVALID CALCULATION condition or a Validation Error (the red number is how many). A second, blue dot means the sheet overrides the settings most sheets use (Design Basis, standby, alarm, temperature or margin). The same legend is at the bottom of the sidebar.</p>
         </div>
         <div class="help-faq-item">
           <div class="q">How is PASS / FAIL / INCOMPLETE decided?</div>
@@ -2404,6 +2410,7 @@ const AMENDMENTS = [
 { rev: "000", major: "02", minor: "00", date: "261013", desc: "Major version 02.00 per Brent; revision counter restarted at 000. Folds in the unreleased 01.06.000 work, so this one entry covers it all. <b>Calculation math unchanged</b>: the same scenarios give identical Ah and BOM results to 01.05.009. <b>New layout</b> in the PipeCAD dark theme: a menu bar (File / Edit / View / Help, keyboard accessible, white-on-black) and a quick-action row (sidebar toggle, Import .pl, + Add Location, Save As…, Print, Auto-Save indicator, results-panel toggle) replace the old toolbar; a collapsible Project Settings bar shows a one-line summary when collapsed and names the sheet settings most sheets use, with an override badge on sheets that differ; a left sidebar lists power supply sheets grouped by Area/Group with status dots (complete, needs entry, error, overridden) and + Add power supply; the center shows one sheet at a time with a compact module table, an n/16 character counter on every zone name (red over 16) and the ModuLaser 16-character note; a pinned right panel shows live results (required Ah against the selected battery and the 65 Ah limit, PASS / FAIL / INCOMPLETE, load breakdown, clusters and the sheet's real validation messages). Panels collapse on narrow screens; View menu toggles them. <b>Import .pl wizard</b> (from 01.06.000): battery settings first, multi-file pick with per-Area/Group selection and metric-to-feet conversion, rename table with {project} {file} {area} {name} {##} pattern (remembered), live 16-character counter, short-name suggestions and duplicate flags, then power-supply assignment (at least one supply per Area/Group, none across Areas/Groups, max 4 detectors + 1 display and ≤ 65 Ah per supply), seeded from PSU positions in the file or 3 ft plan-view clusters; other devices wait in a per-Area/Group Unassigned tray (drag, Move to…, + Add power supply, or the optional Pack into fewest) and Create sheets stays blocked until it is empty. Step 4 restyled to the new theme, behaviour unchanged. <b>Linked .pl files</b>: name, size, date, SHA-256 and per-device fingerprints saved in the calc, with Check link, a change banner, a diff and a re-import that never changes addresses or hand edits without confirmation. <b>Print / Export</b> (File → Print / Export…, Print in the quick row, Ctrl+P): one dialog with a live 8.5 × 11 preview, sheet scope, detail level (Summary / Standard / Full), summary-page and BOM options, and PDF, Word (.docx), HTML and Excel buttons, all built offline with no CDN. The printout uses the KGS print palette: a project summary page with every PSU's Area/Group, required Ah, battery and PASS/FAIL, then one letter page per PSU with header, capacity gauge (required Ah, selected battery and 65 Ah marks, margin and de-rating shaded), PASS/FAIL stamp, mini cluster diagram, module table, settings used and BOM; Full adds calculation appendix pages after each sheet (formula, values substituted, result, reference). <b>Excel</b>: a CAD Schedule sheet with one compact table per PSU (Zone, Type, Fan speed, Address, Standby mA, Alarm mA, footer Required Ah | Battery | PASS/FAIL; thin borders, fixed widths, no merged cells, no fills) for pasting onto CAD drawings, and a Detail sheet that follows the detail level with outline row groups per PSU and per step. <b>Help</b> rewritten for the new layout: Quick Start, How Do I…, FAQ, tooltips and this log." },
 { rev: "001", major: "02", minor: "00", date: "261013", desc: "<b>ModuLaser project file</b> (.mlproj.json), shared with the MASD Field Report 02.00.000. <b>File → Export project…</b> saves the project details, every power supply (name, Area/Group, model, battery model, Ah and quantity, required Ah, standby/alarm, result) and every detector and display (16-character name, type, address, power supply, fan speed, linked .pl device) plus the PipeCAD pipe data the Field Report needs: sampling holes (size, flow, transport time, sensitivity), test points, pipe length, total flow, hole balance, fittings, Alarm Factor and design sensitivity, and the .pl PSU/Battery positions. <b>File → Import project…</b> opens one; if sheets are already on screen it first shows the differences. The calculator owns the design section and never edits the Field Report's site results: they are kept and written back unchanged. Imported .pl files now keep their hole and results data in the calc file too. The .pl reading and the file format live in modulaser-project.js, shared by both tools. <b>Calculation math unchanged.</b>" },
 { rev: "002", major: "02", minor: "00", date: "261013", desc: "<b>Shared MASD engine 1.0.0.</b> The battery math (standby, alarm, BS 5839-1 D factor, NFPA 72 minimum margin, safety margin, temperature multiplier, supplies required, group estimates), the reference data (module currents, fan-speed currents, design-basis presets, battery models) and the PipeCAD .pl import now live in one shared engine (<code>masd-engine.js</code>), used byte-for-byte by this calculator and the MASD Engineering Toolbox 00.01.000, so both produce identical results. Harmonization rule: any engine change bumps the engine version and the revision of both apps, with matching notes here. Results unchanged: the regression scenarios and the full test suite give the same numbers as 02.00.001. <b>Also in 02.00.002:</b> project-file pass-through of field changes, approvals, Toolbox device configuration, the Toolbox Performance Criteria (referenced standard preset, limits, code prescriptions, Area/Group overrides, narrative, Engineer of Record, spec reference; the British Standards presets mirror this calculator's BS 5839-1 Design Basis options) and unknown top-level keys (forward compatibility); a reload no longer loses the linked-site/project extras; Saved-by records the Prepared By name. Shared modulaser-project.js 1.3.0, identical in the Battery Calculator, the MASD Field Report and the MASD Engineering Toolbox (sync test): SHA-256 design hash over the full design plus a separate site hash; metric .pl imports warn that PipeCAD's hole-sensitivity unit is unconfirmed; typical configuration defaults re-cited (flow ±20% and 120 s flow-fault delay, Table 29 p.76; FM/UL hole limits App. A printed p.113, ModuLaser Install Manual 04-4001-501-0803-05; 'Action' is Prealarm; unsourced values labelled typical – unverified). The MASD Engineering Toolbox 00.01.000 embeds this calculator and the same engine; harmonization rule: any engine change bumps both apps' revisions with matching notes and each records the engine version. <b>QA audit</b> — date 2026-10-13; commit audited cc55189 (02.00.001) plus working tree; issue: <a href=\"https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1\" target=\"_blank\" rel=\"noopener\">Calculator issue #1</a>; summary: defaults citations FAIL → fixed; Solano worst-hole rule PASS; audit trail FAIL → fixed (pass-through, hashes); Quick Start version text FAIL → fixed (Export project needs 02.00.001+); test.py fixed 800 ms wait replaced by wait-for-condition. QA re-check 2026-10-13 (8:28–8:45 PM ET): CONDITIONAL PASS. Fixed after the re-check: design hash stable on a no-op Calculator round trip (site and carried data kept out of design; calculator row ids renumbered by position); the mis-cited table number removed from the Report (App. A, printed p.113); UL 268, 7th Edition compliance never auto-confirmed — the engineer must confirm it before \"Complies with UL 268, 7th Edition\" prints; UL thresholds for NFPA presets per Brent: sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft, transport time no more than 60 / 43 / 43 s (UL 268 Special Application Range 1 / Range 2 / Open Area, ModuLaser Install Manual App. A, printed p.113; EWFD 1.5 from NFPA 76); sign-off order technician → designer → QA enforced, no hand-set status, reopening keeps history, real names required, QA overrides logged; Report edits blocked until a technician name is set; the edit log never overwrites entries; ASAG44201 citation replaced by NFPA 76-2024 clauses (Research 2026-10-13); standalone Quick Start says Battery Calculator 02.00.001+; legacy-import tests check required Ah per sheet. Final verdict: QA audit 2026-10-13, final re-check of commit 848e97d (clean tree). PASS. Tests: regress 3/3, test 106/106, calc_project_test 16/16, shared-file and engine parity 2/2. Verified: SHA-256 design hash stable on a no-op round trip (Report → Calculator → Calculator), unknown fields, change log and sign-offs preserved, savedBy name, shared modulaser-project.js 1.3.0 and MASD engine 1.0.0 identical across apps. Known limitation: metric PipeCAD hole sensitivity is shown unconverted with a warning (unit unconfirmed). UL 268 thresholds (shared) are per Brent, not verified by QA. Issue: https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1 QA delta re-check 2026-10-13, commit b1cb13b (clean). PASS. Brent's rule is verified: a hole passes at or below (≤) the class maximum, the more restrictive of UL and NFPA (VEWFD 1.0 %obs/ft / 60 s, EWFD 1.5 / 43 s, SFD/OAP 2.18 / 43 s; targets 1.0 / 1.5 / 2.0). UL projects enforce the ModuLaser UL 268 range lower limits (Install Manual App. A p.113). This supersedes the earlier rule (a hole had to be below the limit). Tests: sens_rule 14/14, regress 3/3, test 106/106, calc_project_test 16/16, parity 2/2; design hash stable on round trip. Per Brent, unverified by QA: the ≤ rule (the manual's FM 3230 rows say \"<\") and EWFD 1.5 (from NFPA 76-2024 8.5.3.2.1.3; UL Range 2 itself is 0.05–2.18). Final pre-tag pass 2026-10-13 (10:02–10:40 PM ET): Calculator 6adde0d / Report 5448488 (release a32d988) / Toolbox 8aa707a — GO; sens_rule 14/14; committed tests pass (release commits differ from these only by this release-note line)..." },
+{ rev: "003", major: "02", minor: "00", date: "261014", desc: "<b>Needs-entry fix (QA/Auditor).</b> Sheets showed the amber <i>Needs entry</i> status but the fields that needed entry were not visibly marked: the 02.00 dark theme kept the old 1px soft-blue (#5b9bd5) outline, which looked the same as ordinary input borders, so the highlight could not be seen (most of these fields are custom dropdowns over hidden native selects). Needs-entry fields now use a 2px <b>amber</b> outline and tint that match the amber sidebar dot, on inputs, custom dropdown buttons and radio groups. The Live Results message now reads <i>N fields still need entry (amber outline)</i> with a <b>Show next ›</b> button that scrolls to and focuses each field in turn. Status logic, counts and calculation math are unchanged. Help, Quick Start, How Do I and FAQ wording updated from blue to amber. Also: print label grey darkened #747574 → #6b6c6b for WCAG AA contrast (5.0:1 on the info panel). Regression test test_needs_entry.py uses Brent's saved file (5/5 pass; 1/3 on 02.00.002)." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -5755,36 +5762,36 @@ function qsWireframe(slot){
       `<text x="250" y="135" font-size="8" fill="#666">→ each Arrangement becomes its own sheet</text>`);
 
     case '10-needs-entry': return shell(defs +
-      `<text x="10" y="16" font-size="8" fill="#666" text-transform="uppercase" font-weight="600">Needs-entry (soft blue) — not yellow / not red</text>` +
-      `<rect x="10" y="24" width="120" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="18" y="36" font-size="7" fill="#666">Project Name</text><text x="18" y="46" font-size="8" fill="#5b9bd5" font-style="italic">(empty)</text>` +
-      `<rect x="140" y="24" width="90" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="148" y="36" font-size="7" fill="#666">Prepared By</text><text x="148" y="46" font-size="8" fill="#5b9bd5" font-style="italic">(empty)</text>` +
+      `<text x="10" y="16" font-size="8" fill="#666" text-transform="uppercase" font-weight="600">Needs-entry (amber) — not yellow / not red</text>` +
+      `<rect x="10" y="24" width="120" height="28" rx="3" fill="rgba(210,153,34,0.12)" stroke="#d29922"/><text x="18" y="36" font-size="7" fill="#666">Project Name</text><text x="18" y="46" font-size="8" fill="#d29922" font-style="italic">(empty)</text>` +
+      `<rect x="140" y="24" width="90" height="28" rx="3" fill="rgba(210,153,34,0.12)" stroke="#d29922"/><text x="148" y="36" font-size="7" fill="#666">Prepared By</text><text x="148" y="46" font-size="8" fill="#d29922" font-style="italic">(empty)</text>` +
       `<rect x="240" y="24" width="70" height="28" rx="3" fill="#fff" stroke="#333"/><text x="248" y="36" font-size="7" fill="#666">Date</text><text x="248" y="46" font-size="8" fill="#111" font-family="Consolas, monospace">2026-10-02</text>` +
       `<text x="318" y="42" font-size="7.5" fill="#666">← never blue</text>` +
-      `<rect x="10" y="66" width="180" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="18" y="78" font-size="7" fill="#666">Design Basis (factory default)</text><text x="18" y="88" font-size="8" fill="#111">NFPA 72 Voice</text>` +
-      `<rect x="200" y="66" width="90" height="28" rx="3" fill="rgba(91,155,213,0.12)" stroke="#5b9bd5"/><text x="208" y="78" font-size="7" fill="#666">Address</text><text x="208" y="88" font-size="8" fill="#5b9bd5" font-style="italic">— Select —</text>` +
+      `<rect x="10" y="66" width="180" height="28" rx="3" fill="rgba(210,153,34,0.12)" stroke="#d29922"/><text x="18" y="78" font-size="7" fill="#666">Design Basis (factory default)</text><text x="18" y="88" font-size="8" fill="#111">NFPA 72 Voice</text>` +
+      `<rect x="200" y="66" width="90" height="28" rx="3" fill="rgba(210,153,34,0.12)" stroke="#d29922"/><text x="208" y="78" font-size="7" fill="#666">Address</text><text x="208" y="88" font-size="8" fill="#d29922" font-style="italic">— Select —</text>` +
       `<rect x="10" y="108" width="175" height="18" rx="3" fill="#fdf8e3" stroke="#d4b106"/><text x="18" y="120" font-size="7.5" fill="#8f7704">⚠ yellow = Validation Error</text>` +
       `<rect x="200" y="108" width="175" height="18" rx="3" fill="#fdeaea" stroke="#c81e2c"/><text x="208" y="120" font-size="7.5" fill="#c81e2c">red = INVALID CALCULATION</text>` +
-      `<text x="10" y="142" font-size="7.5" fill="#666">Blue clears when filled, changed off factory default, or via Confirm defaults</text>`);
+      `<text x="10" y="142" font-size="7.5" fill="#666">Amber clears when filled, changed off factory default, or via Confirm defaults</text>`);
 
     case '11-confirm-defaults': return shell(defs +
       `<rect x="8" y="10" width="384" height="36" rx="4" fill="#fff" stroke="#666"/>` +
       `<rect x="14" y="18" width="58" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="43" y="32" text-anchor="middle" font-size="8" fill="#333">Save As…</text>` +
       `<rect x="78" y="18" width="70" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="113" y="32" text-anchor="middle" font-size="8" fill="#333">Import Calc</text>` +
       `<rect x="154" y="18" width="48" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="178" y="32" text-anchor="middle" font-size="8" fill="#333">Clear</text>` +
-      `<rect x="208" y="18" width="110" height="20" rx="3" fill="#e8f1fa" stroke="#5b9bd5"/><text x="263" y="32" text-anchor="middle" font-size="8" fill="#2a6aa5" font-weight="600">Confirm defaults</text>` +
+      `<rect x="208" y="18" width="110" height="20" rx="3" fill="#e8f1fa" stroke="#d29922"/><text x="263" y="32" text-anchor="middle" font-size="8" fill="#2a6aa5" font-weight="600">Confirm defaults</text>` +
       `<rect x="324" y="18" width="60" height="20" rx="3" fill="#f0f0ec" stroke="#999"/><text x="354" y="32" text-anchor="middle" font-size="8" fill="#333">Export</text>` +
       `<text x="14" y="68" font-size="9" fill="#111" font-weight="600">Clears blue on:</text>` +
       `<text x="14" y="86" font-size="9" fill="#333">• Project-header factory defaults</text>` +
       `<text x="14" y="102" font-size="9" fill="#333">• Current sheet factory defaults (last focused sheet)</text>` +
-      `<text x="14" y="118" font-size="9" fill="#666">Empty fields stay blue until filled — Confirm does not invent values</text>` +
-      `<text x="14" y="138" font-size="8" fill="#5b9bd5">Reviewed defaults keep their values; only the highlight clears</text>`);
+      `<text x="14" y="118" font-size="9" fill="#666">Empty fields stay amber until filled — Confirm does not invent values</text>` +
+      `<text x="14" y="138" font-size="8" fill="#d29922">Reviewed defaults keep their values; only the highlight clears</text>`);
 
     case '12-clear': return shell(defs +
       `<rect x="60" y="12" width="280" height="126" rx="6" fill="#fff" stroke="#666"/>` +
       `<text x="200" y="34" text-anchor="middle" font-size="12" fill="#111" font-weight="700">Clear</text>` +
       `<text x="200" y="52" text-anchor="middle" font-size="8.5" fill="#666">What would you like to clear?</text>` +
       `<rect x="80" y="64" width="70" height="22" rx="3" fill="#f0f0ec" stroke="#999"/><text x="115" y="79" text-anchor="middle" font-size="8" fill="#333">Cancel</text>` +
-      `<rect x="158" y="64" width="100" height="22" rx="3" fill="#fff" stroke="#5b9bd5"/><text x="208" y="79" text-anchor="middle" font-size="8" fill="#2a6aa5">This sheet only</text>` +
+      `<rect x="158" y="64" width="100" height="22" rx="3" fill="#fff" stroke="#d29922"/><text x="208" y="79" text-anchor="middle" font-size="8" fill="#2a6aa5">This sheet only</text>` +
       `<rect x="266" y="64" width="58" height="22" rx="3" fill="#2a6aa5" stroke="#2a6aa5"/><text x="295" y="79" text-anchor="middle" font-size="8" fill="#fff" font-weight="600">Entire file</text>` +
       `<text x="80" y="106" font-size="7.5" fill="#666">Entire file → keep or clear header fields, then confirm</text>` +
       `<text x="80" y="120" font-size="7.5" fill="#666">This sheet only → confirm, then reset to factory starter</text>`);
@@ -6117,7 +6124,7 @@ function refreshAllAmber(){
   document.querySelectorAll('.location').forEach(refreshAmberForLocation);
 }
 function confirmDefaultsForCurrentSheet(){
-  // Always clear blue on header factory defaults AND current-sheet defaults.
+  // Always clear amber on header factory defaults AND current-sheet defaults.
   confirmHeaderDefaults();
   const locEl = getCurrentLocationEl();
   if (!locEl){
@@ -6601,16 +6608,16 @@ const HOWDOI_COMMON = [
   {
     id: 'confirm-defaults',
     title: 'Confirm defaults',
-    keywords: 'confirm defaults blue needs-entry factory header',
-    blurb: 'Confirm defaults clears blue needs-entry highlighting on factory-default fields for the project header and the current sheet. Empty fields stay blue until filled; values themselves are unchanged.',
+    keywords: 'confirm defaults amber needs-entry factory header',
+    blurb: 'Confirm defaults clears amber needs-entry highlighting on factory-default fields for the project header and the current sheet. Empty fields stay amber until filled; values themselves are unchanged.',
     target: 'qs-step-confirm-defaults',
     common: true,
   },
   {
     id: 'needs-entry',
-    title: 'Blue needs-entry highlights',
-    keywords: 'blue highlight empty factory default date',
-    blurb: 'Soft blue marks empty editable fields and unconfirmed factory defaults (not yellow Validation Errors or red Invalid Calculation). Date is never blue-highlighted but still initializes to today on new/cleared documents.',
+    title: 'Amber needs-entry highlights',
+    keywords: 'amber orange highlight empty factory default date',
+    blurb: 'Amber marks empty editable fields and unconfirmed factory defaults (not yellow Validation Errors or red Invalid Calculation). Date is never amber-highlighted but still initializes to today on new/cleared documents.',
     target: 'qs-step-needs-entry',
     common: true,
   },
@@ -8205,9 +8212,25 @@ function v2RenderResults(m){
     <div class="rp-msgs" id="rp-msgs">
       ${m.invalidList.map(t => `<div class="rp-msg bad">${v2Esc(t)}</div>`).join('')}
       ${m.flags.map(t => `<div class="rp-msg warn">${v2Esc(t)}</div>`).join('')}
-      ${m.needs ? `<div class="rp-msg info">${m.needs} field${m.needs === 1 ? '' : 's'} still need entry (blue outline).</div>` : ''}
+      ${m.needs ? `<div class="rp-msg needs"><span>${m.needs} field${m.needs === 1 ? '' : 's'} still need${m.needs === 1 ? 's' : ''} entry (amber outline).</span><button type="button" class="rp-needs-next" onclick="v2NeedsNext()" title="Scroll to and focus the next field that still needs entry on this sheet">Show next ›</button></div>` : ''}
       ${!m.invalidList.length && !m.flags.length && !m.needs ? '<div class="rp-msg ok">No validation messages on this sheet.</div>' : ''}
     </div>`;
+}
+// Needs entry (02.00.003): jump to the next amber field on the current sheet. Native selects are visually
+// hidden behind custom listboxes, so focus the visible .calc-select-btn instead.
+let v2NeedsIdx = -1;
+function v2NeedsNext(){
+  const l = document.querySelector('.location-current'); if (!l) return;
+  const list = Array.from(l.querySelectorAll('.field-needs')).filter(e => !e.closest('[hidden]'));
+  if (!list.length) return;
+  v2NeedsIdx = (v2NeedsIdx + 1) % list.length;
+  const el = list[v2NeedsIdx];
+  const w = el.closest('.calc-select-wrap');
+  const target = (w && w.querySelector('.calc-select-btn')) || el;
+  target.scrollIntoView({ behavior: 'auto', block: 'center' });
+  try { target.focus({ preventScroll: true }); } catch (e) {}
+  el.classList.add('field-needs-flash');
+  setTimeout(() => el.classList.remove('field-needs-flash'), 1600);
 }
 function v2RenderSettingsSummary(models, basis){
   const s = document.getElementById('proj-settings-summary'); if (!s) return;
