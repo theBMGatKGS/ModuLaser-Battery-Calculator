@@ -8298,7 +8298,7 @@ td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
 tfoot td{background:#f7f8f9;font-weight:700}
 .head{display:grid;grid-template-columns:1fr 1.55in;gap:10px;margin-top:8px;align-items:stretch}
 .info{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 10px;border:1px solid #e2e2e2;background:#f7f8f9;padding:6px 8px}
-.info div span{display:block;font-size:6.8pt;color:#747574;text-transform:uppercase;letter-spacing:.05em}
+.info div span{display:block;font-size:6.8pt;color:#6b6c6b;text-transform:uppercase;letter-spacing:.05em}
 .info div b{font-size:9.5pt;color:#102645;word-break:break-word}
 .stamp{border:3px solid;border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:4px;transform:none}
 .stamp b{font-size:21pt;letter-spacing:.08em;line-height:1}.stamp span{font-size:7pt;margin-top:3px}
@@ -8306,17 +8306,17 @@ tfoot td{background:#f7f8f9;font-weight:700}
 .gauge{margin-top:4px}
 .two{display:grid;grid-template-columns:2.9in 1fr;gap:10px}
 .diagram{border:1px solid #e2e2e2;padding:4px}
-.kv td:first-child{color:#747574;width:44%}
+.kv td:first-child{color:#6b6c6b;width:44%}
 .msgs div{border-left:4px solid;padding:2px 6px;margin:2px 0;font-size:8pt}
 .msgs .bad{border-color:#ac242a;background:#fbe9ea}.msgs .warn{border-color:#b07a10;background:#fdf3dc}
 .cite{border-left:4px solid #1b7a3a;background:#e2f3e7;padding:3px 7px;font-size:7.8pt;margin-top:6px}
-.foot{margin-top:auto;padding-top:5px;border-top:1px solid #e2e2e2;font-size:7pt;color:#747574;display:flex;justify-content:space-between}
+.foot{margin-top:auto;padding-top:5px;border-top:1px solid #e2e2e2;font-size:7pt;color:#6b6c6b;display:flex;justify-content:space-between}
 .tiles{display:flex;gap:6px;margin:8px 0 2px}.tile{flex:1;border:1px solid #e2e2e2;border-top:3px solid #0c77bc;background:#f7f8f9;padding:5px 7px}
-.tile b{display:block;font-size:15pt;color:#102645;line-height:1.1}.tile span{font-size:7pt;color:#747574;text-transform:uppercase}
+.tile b{display:block;font-size:15pt;color:#102645;line-height:1.1}.tile span{font-size:7pt;color:#6b6c6b;text-transform:uppercase}
 .tile.pass{border-top-color:#1b7a3a}.tile.pass b{color:#1b7a3a}.tile.fail{border-top-color:#ac242a}.tile.fail b{color:#ac242a}.tile.incomplete{border-top-color:#b07a10}.tile.incomplete b{color:#8a5a00}
 .st{font-weight:700}.st.pass{color:#1b7a3a}.st.fail{color:#ac242a}.st.incomplete{color:#8a5a00}
 .math td{font-size:8pt}.math .sym{font-family:Consolas,Menlo,monospace;font-size:7.6pt;color:#102645}.math .sub{font-family:Consolas,Menlo,monospace;font-size:7.6pt}
-.math .res{font-weight:700;white-space:nowrap}.math .ref{font-size:7pt;color:#747574}
+.math .res{font-weight:700;white-space:nowrap}.math .ref{font-size:7pt;color:#6b6c6b}
 .math tr.step td{background:#102645;color:#fff;font-weight:700;font-size:8pt}
 details.math-x{margin-top:6px}details.math-x summary{cursor:pointer;color:#0c77bc;font-weight:700;font-size:8.5pt}
 .dense{font-size:8.6pt}.dense th,.dense td{padding:1.5px 4px}.dense .diagram svg{max-height:1.7in}
@@ -8342,7 +8342,7 @@ function v2GaugeSvgPrint(m){
   const per = isFinite(m.ahPerSupply) ? m.ahPerSupply : 0, bat = m.batteryAh || 0, init = isFinite(m.initialAh) ? m.initialAh / (m.psRequired || 1) : 0;
   const max = Math.ceil(Math.max(CHARGER_MAX_AH, per, bat) * 1.08 / 10) * 10, W = 700, L = 10, R = W - 10, x = v => L + (R - L) * Math.min(Math.max(v, 0), max) / max;
   const fill = m.status === 'pass' ? '#1b7a3a' : m.status === 'fail' ? '#ac242a' : '#b07a10';
-  let ticks = ''; for (let t = 0; t <= max; t += 10) ticks += `<line x1="${x(t)}" x2="${x(t)}" y1="52" y2="56" stroke="#999"/><text x="${x(t)}" y="65" font-size="9" fill="#747574" text-anchor="middle">${t}</text>`;
+  let ticks = ''; for (let t = 0; t <= max; t += 10) ticks += `<line x1="${x(t)}" x2="${x(t)}" y1="52" y2="56" stroke="#999"/><text x="${x(t)}" y="65" font-size="9" fill="#6b6c6b" text-anchor="middle">${t}</text>`;
   const lbl = (v, y, txt, col, anchor) => `<text x="${x(v)}" y="${y}" font-size="10" font-weight="700" fill="${col}" text-anchor="${anchor || 'middle'}">${v2Esc(txt)}</text>`;
   const reqAnchor = x(per) > R - 60 ? 'end' : (x(per) < L + 60 ? 'start' : 'middle');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 92" width="100%" font-family="Segoe UI,Arial,sans-serif">
@@ -8379,8 +8379,8 @@ function v2ClusterSvg(m){
       : `<rect x="${x - 4}" y="${y - 7}" width="16" height="14" fill="#0c77bc"/><text x="${x + 4}" y="${y + 3}" font-size="7.5" text-anchor="middle" fill="#fff">D</text>`;
     s += `<text x="${x + 15}" y="${y + 3}" font-size="7.5" fill="#1a1a1a">${v2Esc((d.zone || d.type).slice(0, 13))}</text>`;
   });
-  if (m.modules.length > 16) s += `<text x="${W - 4}" y="${H - 4}" font-size="8" text-anchor="end" fill="#747574">+${m.modules.length - 16} more</text>`;
-  return s + `<text x="4" y="${H - 4}" font-size="7.5" fill="#747574">○ detector (fan speed) · ■ display</text></svg>`;
+  if (m.modules.length > 16) s += `<text x="${W - 4}" y="${H - 4}" font-size="8" text-anchor="end" fill="#6b6c6b">+${m.modules.length - 16} more</text>`;
+  return s + `<text x="4" y="${H - 4}" font-size="7.5" fill="#6b6c6b">○ detector (fan speed) · ■ display</text></svg>`;
 }
 function v2Header(){
   const v = id => (document.getElementById(id) || {}).value || '';
@@ -8399,7 +8399,7 @@ function v2ModTable(m){
     <tr><td colspan="2">Required Ah: ${v2Fmt(m.requiredAh)} Ah${m.psRequired > 1 ? ` (${m.psRequired} supplies, ${v2Fmt(m.ahPerSupply)} Ah each)` : ''}</td><td colspan="3">Battery: ${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr></tfoot></table>`;
 }
 function v2BomTable(m){
-  if (!m.bom) return '<p style="font-size:8pt;color:#747574;margin:2px 0">Bill of Materials withheld until every validation issue on this sheet is resolved.</p>';
+  if (!m.bom) return '<p style="font-size:8pt;color:#6b6c6b;margin:2px 0">Bill of Materials withheld until every validation issue on this sheet is resolved.</p>';
   return `<table><thead><tr><th class="n">Qty</th><th>Manufacturer</th><th>Part number</th><th>Description</th></tr></thead><tbody>${m.bom.map(r => `<tr><td class="n">${v2Esc(r.qty)}</td><td>${v2Esc(r.manufacturer)}</td><td>${v2Esc(r.partNumber)}</td><td>${v2Esc(r.description)}</td></tr>`).join('')}</tbody></table>`;
 }
 function v2SummaryPages(models, H, level){
@@ -8412,7 +8412,7 @@ function v2SummaryPages(models, H, level){
     <h2>Power supplies</h2>
     <table><thead><tr><th>Sheet</th><th>PSU</th><th>Area/Group</th><th>Design basis</th><th class="n">Required Ah</th><th>Battery</th><th>Status</th></tr></thead><tbody>
     ${ch.map(m => `<tr><td>${m.idx}</td><td>${v2Esc(v2PsTag(m))}</td><td>${v2Esc(m.area || '—')}</td><td>${v2Esc(m.settings[0][1])}</td><td class="n">${v2Fmt(m.requiredAh)}</td><td>${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr>`).join('')}</tbody></table>
-    ${ci === chunks.length - 1 ? '<p style="font-size:7.5pt;color:#747574;margin-top:6px">PASS: the calculation is valid, every validation check is clear and the required Ah per supply is within the selected battery and the 65 Ah maximum. FAIL: an INVALID CALCULATION condition, more than one supply needed, or capacity over the selected battery / 65 Ah. INCOMPLETE: validation flags still open (recommendations and BOM withheld).</p>' : ''}
+    ${ci === chunks.length - 1 ? '<p style="font-size:7.5pt;color:#6b6c6b;margin-top:6px">PASS: the calculation is valid, every validation check is clear and the required Ah per supply is within the selected battery and the 65 Ah maximum. FAIL: an INVALID CALCULATION condition, more than one supply needed, or capacity over the selected battery / 65 Ah. INCOMPLETE: validation flags still open (recommendations and BOM withheld).</p>' : ''}
     <div class="foot"><span>${v2Esc(H.project)} · ModuLaser Battery Calculator ${v2Esc(H.rev)}</span><span class="pgno"></span></div></section>`).join('');
 }
 function v2PsuPage(m, H, opts){
@@ -8426,7 +8426,7 @@ function v2PsuPage(m, H, opts){
     <div class="head"><div class="info">${info.map(([k, v]) => `<div><span>${k}</span><b>${v2Esc(v || '—')}</b></div>`).join('')}</div>
       <div class="stamp ${m.status}"><b>${v2StatusWord(m.status)}</b><span>${m.status === 'pass' ? 'Within battery &amp; 65 Ah' : m.status === 'fail' ? 'Correction required' : 'Validation open'}</span></div></div>
     <h2>Capacity</h2><div class="gauge">${v2GaugeSvgPrint(m)}</div>
-    <div class="two"><div><h2>Cluster diagram</h2><div class="diagram">${v2ClusterSvg(m)}</div><div style="font-size:7.5pt;color:#747574">Clusters: ${m.clusters.length ? m.clusters.map(pad2).join(', ') : '—'}</div></div>
+    <div class="two"><div><h2>Cluster diagram</h2><div class="diagram">${v2ClusterSvg(m)}</div><div style="font-size:7.5pt;color:#6b6c6b">Clusters: ${m.clusters.length ? m.clusters.map(pad2).join(', ') : '—'}</div></div>
       <div><h2>Settings used</h2><table class="kv">${m.settings.map(([k, v]) => `<tr><td>${v2Esc(k)}</td><td>${v2Esc(v)}</td></tr>`).join('')}
       ${m.mode === 'builtin' ? `<tr><td>Recommended supply</td><td>${v2Esc(m.hwSupply || '—')}</td></tr><tr><td>Enclosure</td><td>${v2Esc(m.hwEnclosure || '—')}</td></tr>` : ''}</table></div></div>
     <h2>Modules</h2>${v2ModTable(m)}
@@ -8645,8 +8645,8 @@ async function v2BuildDocx(opts){
     const col = m.status === 'pass' ? '1B7A3A' : m.status === 'fail' ? 'AC242A' : '8A5A00', fill = m.status === 'pass' ? 'E2F3E7' : m.status === 'fail' ? 'FBE9EA' : 'FDF3DC';
     body += band('Power Supply ' + v2PsTag(m), `${H.project}${H.network ? ' · ' + H.network : ''} · Calculator rev ${H.rev}`);
     body += `<w:tbl><w:tblPr><w:tblW w:w="${W}" w:type="dxa"/><w:tblBorders>${['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(s => `<w:${s} w:val="single" w:sz="4" w:color="BFC4CA"/>`).join('')}</w:tblBorders></w:tblPr><w:tblGrid><w:gridCol w:w="2200"/><w:gridCol w:w="3000"/><w:gridCol w:w="2200"/><w:gridCol w:w="3400"/></w:tblGrid>`
-      + `<w:tr>${[['PSU tag', v2PsTag(m)], ['Location / Area-Group', m.area || '—']].map(([k, v]) => `<w:tc><w:tcPr><w:tcW w:w="${k === 'PSU tag' ? 2200 : 3000}" w:type="dxa"/></w:tcPr>${v2DocxP(k, { sz: 13, color: '747574', after: 0 })}${v2DocxP(v, { b: true, color: '102645', after: 0 })}</w:tc>`).join('')}`
-      + `<w:tc><w:tcPr><w:tcW w:w="2200" w:type="dxa"/></w:tcPr>${v2DocxP('Sheet', { sz: 13, color: '747574', after: 0 })}${v2DocxP(m.idx + (m.label ? ' · ' + m.label : ''), { b: true, color: '102645', after: 0 })}</w:tc>`
+      + `<w:tr>${[['PSU tag', v2PsTag(m)], ['Location / Area-Group', m.area || '—']].map(([k, v]) => `<w:tc><w:tcPr><w:tcW w:w="${k === 'PSU tag' ? 2200 : 3000}" w:type="dxa"/></w:tcPr>${v2DocxP(k, { sz: 13, color: '6b6c6b', after: 0 })}${v2DocxP(v, { b: true, color: '102645', after: 0 })}</w:tc>`).join('')}`
+      + `<w:tc><w:tcPr><w:tcW w:w="2200" w:type="dxa"/></w:tcPr>${v2DocxP('Sheet', { sz: 13, color: '6b6c6b', after: 0 })}${v2DocxP(m.idx + (m.label ? ' · ' + m.label : ''), { b: true, color: '102645', after: 0 })}</w:tc>`
       + `<w:tc><w:tcPr><w:tcW w:w="3400" w:type="dxa"/><w:shd w:val="clear" w:color="auto" w:fill="${fill}"/><w:tcBorders>${['top', 'left', 'bottom', 'right'].map(s => `<w:${s} w:val="single" w:sz="24" w:color="${col}"/>`).join('')}</w:tcBorders><w:vAlign w:val="center"/></w:tcPr>${v2DocxP(v2StatusWord(m.status), { b: true, color: col, sz: 40, jc: 'center', after: 0 })}</w:tc></w:tr></w:tbl>` + v2DocxP('', { after: 20 });
     body += v2DocxH('Capacity') + await addImg(v2GaugeSvgPrint(m), 7.4, 0.98);
     body += v2DocxH('Cluster diagram') + await addImg(v2ClusterSvg(m), 3.6, 1.6);
@@ -8659,16 +8659,16 @@ async function v2BuildDocx(opts){
     const steps = v2CalcSteps(m, opts.level);
     const mathRows = steps.flatMap(st => [{ cells: [st.title, '', '', '', ''], b: true, fill: 'DCE6F0' }].concat(st.rows.map(r => [r.label, r.sym, r.sub, r.res, r.ref])));
     if (opts.level === 'standard') body += v2DocxH('Calculation (formulas with values)') + v2DocxTable(['Step', 'Formula', 'Values substituted', 'Result', 'Reference'], mathRows, [1900, 2600, 3200, 1100, 2000], { right: [3], mono: [1, 2] });
-    if (opts.bom && opts.level !== 'full') body += v2DocxH('Bill of Materials') + (m.bom ? v2DocxTable(['Qty', 'Manufacturer', 'Part number', 'Description'], m.bom.map(r => [String(r.qty), r.manufacturer, r.partNumber, r.description]), [800, 2000, 2200, 5800], { right: [0] }) : v2DocxP('Bill of Materials withheld until every validation issue on this sheet is resolved.', { color: '747574' }));
+    if (opts.bom && opts.level !== 'full') body += v2DocxH('Bill of Materials') + (m.bom ? v2DocxTable(['Qty', 'Manufacturer', 'Part number', 'Description'], m.bom.map(r => [String(r.qty), r.manufacturer, r.partNumber, r.description]), [800, 2000, 2200, 5800], { right: [0] }) : v2DocxP('Bill of Materials withheld until every validation issue on this sheet is resolved.', { color: '6b6c6b' }));
     if (m.citation) body += v2DocxP('✓ ' + m.citation, { color: '1B7A3A', sz: 15, shade: 'E2F3E7' });
     if (opts.level === 'full'){
       body += V2_PB + band('Full calculation — ' + v2PsTag(m), `Formula, values substituted, result, reference · Design Basis: ${m.settings[0][1]} (${m.codeRef})`);
       body += v2DocxTable(['Step', 'Formula', 'Values substituted', 'Result', 'Reference'], mathRows, [1900, 2600, 3200, 1100, 2000], { right: [3], mono: [1, 2] });
-      if (opts.bom) body += v2DocxH('Bill of Materials') + (m.bom ? v2DocxTable(['Qty', 'Manufacturer', 'Part number', 'Description'], m.bom.map(r => [String(r.qty), r.manufacturer, r.partNumber, r.description]), [800, 2000, 2200, 5800], { right: [0] }) : v2DocxP('Bill of Materials withheld until every validation issue on this sheet is resolved.', { color: '747574' }));
+      if (opts.bom) body += v2DocxH('Bill of Materials') + (m.bom ? v2DocxTable(['Qty', 'Manufacturer', 'Part number', 'Description'], m.bom.map(r => [String(r.qty), r.manufacturer, r.partNumber, r.description]), [800, 2000, 2200, 5800], { right: [0] }) : v2DocxP('Bill of Materials withheld until every validation issue on this sheet is resolved.', { color: '6b6c6b' }));
     }
   }
   const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><w:body>${body}<w:sectPr><w:footerReference w:type="default" r:id="rIdFtr"/><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="360" w:footer="360" w:gutter="0"/></w:sectPr></w:body></w:document>`;
-  const footer = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:jc w:val="right"/></w:pPr>${v2DocxRun(H.project + ' · ModuLaser Battery Calculator ' + H.rev + ' · Page ', { sz: 14, color: '747574' })}<w:r><w:rPr><w:sz w:val="14"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText>PAGE</w:instrText></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>`;
+  const footer = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:p><w:pPr><w:jc w:val="right"/></w:pPr>${v2DocxRun(H.project + ' · ModuLaser Battery Calculator ' + H.rev + ' · Page ', { sz: 14, color: '6b6c6b' })}<w:r><w:rPr><w:sz w:val="14"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText>PAGE</w:instrText></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>`;
   const files = [
     { name: '[Content_Types].xml', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/></Types>` },
     { name: '_rels/.rels', data: `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>` },
