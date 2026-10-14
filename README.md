@@ -8,6 +8,7 @@ its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 - **Show next ›** in the Live Results panel scrolls to and focuses each needs-entry field in turn.
 - Print label grey darkened `#747574` → `#6b6c6b` for WCAG AA contrast.
 - **Module table fits without truncation or wrap:** Module Type shows DISP-MIN / DISP-STD / DISP-CMD / DETECTOR, Cluster shows the 2-digit number (01), Power shows Own circuit or **Ribbon Path**. Print/Export and Word module tables add Model, Cluster and Power with the same labels.
+- QA 2026-10-14 final: Calculator d34555b / Toolbox 209f54f GO.
 - QA 2026-10-14: Calculator 43d5a23 / Toolbox 7d1cfec GO-conditional; Word header wrap fixed in final (see [RELEASE_NOTES.md](RELEASE_NOTES.md)).
 - Already-saved .html files keep their own code; open them in 02.00.003 via **File → Import Calc** to get these fixes.
 - Calculation math unchanged. QA brief: needs-entry 2026-10-14 (see [RELEASE_NOTES.md](RELEASE_NOTES.md)).
