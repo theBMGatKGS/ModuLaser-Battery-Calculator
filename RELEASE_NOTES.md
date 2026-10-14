@@ -10,11 +10,14 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 - **Print contrast:** KGS label grey `#747574` → `#6b6c6b` (5.0:1 on the info panel, 5.3:1 on white).
 - **Module table columns (per Brent):** Module Type labels DISP-MIN / DISP-STD / DISP-CMD / DETECTOR; Cluster shows the 2-digit number only (01); Power shows *Own circuit* or *Ribbon Path*. Fixed column widths so nothing truncates or wraps; the table scrolls sideways on narrow windows. Print/Export and Word module tables gain Model, Cluster and Power columns, single-line. Saved files are unaffected (stored values unchanged).
 - Status logic, counts and calculation math unchanged (regression scenarios identical).
+- **Already-saved .html files keep the code they were saved with.** Opening one of them directly still shows the old look. To get these fixes, open 02.00.003 and bring the data in with **File → Import Calc** (or Import project).
 
 ### QA audit
-| Date | Commit audited | Result | Brief |
+| Date | Commits audited | Result | Report |
 |---|---|---|---|
-| 2026-10-14 | branch fix/print-label-contrast (pre-release) | Needs-entry regression on Brent's saved file: 1/3 on 02.00.002 → 5/5 fixed; module-column test 2/10 → 10/10 | `qa/needs-entry-2026-10-14.md` |
+| 2026-10-14 | Calculator 3757dd8 · Toolbox ff61dc5 | **Calculator GO / Toolbox re-check pending** | `qa/qa-needs-entry-2026-10-14.md` |
+
+QA findings fixed after that audit: Toolbox false "Older revision" warning when re-importing its own saved file (F1); cross-sheet Cluster hint overflow (F2); "No cluster display" button text (F3); Word default font, fixed table layout and spanned summary rows (F4); a hidden field counted on new sheets, 19 instead of 18 (F5); stale lineage/docs (F6); tests extended to every sheet, imported through the app, Word render checked (F7).
 
 ## v02.00.002 — Shared MASD engine (2026-10-13)
 

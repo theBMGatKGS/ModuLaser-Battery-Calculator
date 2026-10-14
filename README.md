@@ -8,6 +8,7 @@ its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 - **Show next ›** in the Live Results panel scrolls to and focuses each needs-entry field in turn.
 - Print label grey darkened `#747574` → `#6b6c6b` for WCAG AA contrast.
 - **Module table fits without truncation or wrap:** Module Type shows DISP-MIN / DISP-STD / DISP-CMD / DETECTOR, Cluster shows the 2-digit number (01), Power shows Own circuit or **Ribbon Path**. Print/Export and Word module tables add Model, Cluster and Power with the same labels.
+- Already-saved .html files keep their own code; open them in 02.00.003 via **File → Import Calc** to get these fixes.
 - Calculation math unchanged. QA brief: needs-entry 2026-10-14 (see [RELEASE_NOTES.md](RELEASE_NOTES.md)).
 
 ## What's new in 02.00.002
@@ -63,7 +64,7 @@ Calculator revision **02.00.000_261013**. Major version 02.00 folds in the unrel
 - Dropdown scroll + keyboard navigation (01.05.009)
 - Sheet header layout: PS Name/Location on its own row; wider Design Basis (01.05.008)
 - White-on-black custom dropdowns (01.05.007)
-- Import Calc (replace/merge), Clear (sheet or file), Confirm defaults, blue needs-entry highlighting
+- Import Calc (replace/merge), Clear (sheet or file), Confirm defaults, needs-entry highlighting (amber since 02.00.003)
 - Searchable How Do I… help
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) and Help → Revision Log in the app.
