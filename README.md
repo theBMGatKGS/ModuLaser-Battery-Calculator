@@ -7,6 +7,7 @@ its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 - **Needs-entry fields are visible again.** A sheet marked *Needs entry* (amber dot) now outlines every field that needs entry in **amber** (2px), including the custom dropdowns. In 02.00.000–02.00.002 the old 1px soft-blue outline blended into the dark theme, so nothing appeared highlighted.
 - **Show next ›** in the Live Results panel scrolls to and focuses each needs-entry field in turn.
 - Print label grey darkened `#747574` → `#6b6c6b` for WCAG AA contrast.
+- **Module table fits without truncation or wrap:** Module Type shows DISP-MIN / DISP-STD / DISP-CMD / DETECTOR, Cluster shows the 2-digit number (01), Power shows Own circuit or **Ribbon Path**. Print/Export and Word module tables add Model, Cluster and Power with the same labels.
 - Calculation math unchanged. QA brief: needs-entry 2026-10-14 (see [RELEASE_NOTES.md](RELEASE_NOTES.md)).
 
 ## What's new in 02.00.002
