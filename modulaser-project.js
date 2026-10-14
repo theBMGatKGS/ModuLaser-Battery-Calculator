@@ -391,7 +391,17 @@ MLP.UL_RANGES = {
   /* Brent 2026-10-13 21:17 ET: SFD/OAP = UL Open Area 1.70–2.18 %obs/ft, 6–43 s (App. A p.113) — final; both bounds enforced. */
   SFD:   { name: 'Open Area', sensMin: 1.70, sensMax: 2.18, ttMin: 6, ttMax: 43, provisional: false }
 };
-MLP.UL_LIMITS = { VEWFD: { sens: 1.0, tt: 60, sensMin: 0.05, ttMin: 3 }, EWFD: { sens: 1.5, tt: 43, sensMin: 0.05, ttMin: 3 }, SFD: { sens: 2.18, tt: 43, sensMin: 1.70, ttMin: 6 } };   // SFD = SFD/OAP
+/* NFPA code limits per class (null = the code sets no per-hole value). */
+MLP.NFPA_LIMITS = {
+  VEWFD: { sens: 1.0, tt: 60, ref: 'NFPA 76-2024 8.5.3.1.2.5 (alarm 1.0 %/ft), 8.5.3.1.2.6 (60 s)' },
+  EWFD:  { sens: 1.5, tt: 90, ref: 'NFPA 76-2024 8.5.3.2.1.3 (alarm 1.5 %/ft), 8.5.3.2.1.4 (90 s)' },
+  SFD:   { sens: null, tt: 120, ref: 'NFPA 72 (no per-hole sensitivity; 120 s maximum ASD transport time)' }
+};
+/* the more restrictive of UL (range max) and NFPA, computed — VEWFD 1.0/60, EWFD 1.5/43, SFD 2.18/43; UL range minimums carried as lower bounds */
+MLP.stricterOf = (a, b) => a == null ? b : b == null ? a : Math.min(a, b);
+MLP.UL_LIMITS = {};
+['VEWFD', 'EWFD', 'SFD'].forEach(c => { const r = MLP.UL_RANGES[c], n = MLP.NFPA_LIMITS[c];
+  MLP.UL_LIMITS[c] = { sens: MLP.stricterOf(r.sensMax, n.sens), tt: MLP.stricterOf(r.ttMax, n.tt), sensMin: r.sensMin, ttMin: r.ttMin }; });   // SFD = SFD/OAP
 MLP.ulRangeText = c => { const r = MLP.UL_RANGES[c]; if (!r) return ''; return `UL 268 ${r.name}: ${r.sensMin.toFixed(2)}–${r.sensMax.toFixed(2)} %obs/ft${c === 'EWFD' ? ' (max 1.5 per NFPA 76)' : ''}, ${r.ttMin}–${r.ttMax} s${r.provisional ? ' — provisional' : ''}`; };
 /* pass rules: value ≤ max (and ≥ min when a UL lower limit applies) */
 MLP.sensPass = (v, L) => v != null && L && L.sens != null && v <= L.sens + 1e-9 && (L.sensMin == null || v >= L.sensMin - 1e-9);

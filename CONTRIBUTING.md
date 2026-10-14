@@ -57,9 +57,11 @@ propagate to all three:
 1. `modulaser_battery_calculator.html` (primary)
 2. `pwa/index.html` (copy of the above, wrapped with manifest/service worker)
    — bump the service worker's `CACHE_VERSION` constant on every content change
-3. `electron-app/app/modulaser_battery_calculator.html` (copy of the above) —
-   also update `APP_REVISION` in `electron-app/main.js` and `"revision"` in
-   `electron-app/package.json`
+3. `app/modulaser_battery_calculator.html` (copy of the above; the Windows
+   installer is built from the repo root: `package.json` + `main.js` + `app/`,
+   `npx electron-builder --win`) — also update `APP_REVISION` in `main.js` and
+   `"revision"`/`artifactName` in `package.json`. (The legacy
+   `modulaser_calculator_electron/electron-app` scaffold was removed in 02.00.002.)
 
 ## Versioning
 
