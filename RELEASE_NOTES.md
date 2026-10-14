@@ -18,7 +18,12 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 
 **Fixes included:** citations (App. A p.113 hole limits, Table 29 p.76 flow, Prealarm), unsourced defaults labelled typical – unverified, pass-through of changes/approvals/unknown keys, SHA-256 hashes, Saved-by name, Quick Start version text, test wait-for-condition.
 **QA re-check (2026-10-13):** CONDITIONAL PASS; post-re-check fixes listed above and in the revision log.
-**Final verdict:** [PENDING RE-CHECK — placeholder]
+**Final verdict:**
+
+QA audit 2026-10-13, final re-check of commit 848e97d (clean tree). **PASS.** Tests: regress 3/3, test 106/106, calc_project_test 16/16, shared-file and engine parity 2/2. Verified: SHA-256 design hash stable on a no-op round trip (Report → Calculator → Calculator), unknown fields, change log and sign-offs preserved, savedBy name, shared modulaser-project.js 1.3.0 and MASD engine 1.0.0 identical across apps. Known limitation: metric PipeCAD hole sensitivity is shown unconverted with a warning (unit unconfirmed). UL 268 thresholds (shared) are per Brent, not verified by QA. Issue: https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1
+
+Post-QA changes (2026-10-13, 9:08–9:10 PM ET; not yet re-checked by QA): Brent changed the sensitivity rule for all apps and the shared module — a hole PASSES at or below (≤) the class maximum, taking the more restrictive of UL and NFPA (supersedes the strict < rule); transport stays ≤. Target values VEWFD 1.0 / EWFD 1.5 / SFD 2.0 %obs/ft are shown in the UI, printouts, narrative and Report. UL projects also show the ModuLaser UL 268 range per class and enforce its lower limit (Install Manual App. A, printed p.113): VEWFD Special Application Range 1 0.05–1.00 %obs/ft, 3–60 s; EWFD Range 2 0.05–2.18 (max 1.5 per NFPA 76), 3–43 s; SFD Open Area 1.70–2.18, 6–43 s (Brent confirmed 9:17 PM ET; final). Both bounds enforced on UL projects; SFD target 2.0. NFPA 318-2025 §11.1.3 cited for the cleanroom (VEWFD – NFPA 76/318) path. Help states that the NFPA presets carry a UL 268 claim and that EWFD 1.5 comes from NFPA 76 (UL Range 2 transport 43 s), recorded per Brent.
+
 
 ## v02.00.001 — ModuLaser project file (2026-10-13)
 - File → Export / Import project (`.mlproj.json`) shared with the Commissioning Report.
