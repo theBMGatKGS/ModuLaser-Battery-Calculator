@@ -143,6 +143,11 @@
     padding: 8px 20px; background: var(--panel-3); border-bottom:1px solid var(--border-soft);
     display:flex; gap:12px; align-items:center; flex-wrap:wrap;
   }
+  .sn-wrap{ display:inline-flex; flex:0 0 auto; align-items:center; gap:6px; margin-left:auto; font-size:11.5px; color: var(--text-dim, #b9c7d8); white-space:nowrap; }
+  .sn-wrap select{ width:auto; min-width:64px; padding:2px 6px; font-family: var(--mono); }
+  .sn-wrap .calc-select-wrap{ min-width:72px; } .sn-wrap .calc-select-btn{ min-width:72px; white-space:nowrap; }
+  .location:has(.addr-scheme-radio[value="standalone"]:checked) .sn-wrap{ display:none; }
+  .sb-net{ font-family: var(--mono); font-size:9.5px; color:#8b98a8; border:1px solid #3a4656; border-radius:3px; padding:0 3px; margin-left:4px; }
   .addr-scheme-label{ color: var(--text-faint); font-size:10.5px; text-transform:uppercase; letter-spacing:0.5px; font-weight:600; }
   .mode-opt-sm{ padding:5px 10px; font-size:11.5px; }
   .location-name{
@@ -404,7 +409,12 @@
 
   .add-zone-row{ margin: 8px 0 4px; display:flex; gap:8px; }
   .addr-mix-banner{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 8px; padding:8px 12px; border:1px solid #d29922; border-left-width:4px; border-radius:6px; background:#2a2312; color:#e6edf3; font-size:12.5px; }
-  .addr-mix-banner[hidden]{ display:none; }
+  .addr-mix-banner[hidden], .addr-undo-bar[hidden]{ display:none; }
+  .addr-undo-bar{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 8px; padding:6px 12px; border:1px solid #3a4656; border-left:4px solid #3a9ad6; border-radius:6px; background:#141c26; color:#e6edf3; font-size:12.5px; }
+  .addr-undo-bar .aub-act{ display:flex; gap:6px; margin-left:auto; }
+  .adl{ max-height:60vh; overflow:auto; } .adl-e{ margin:0 0 10px; } .adl-h{ font-size:12px; margin-bottom:4px; }
+  .adl-t{ border-collapse:collapse; font-size:11.5px; width:100%; } .adl-t th, .adl-t td{ border:1px solid #2a3441; padding:2px 6px; text-align:left; white-space:nowrap; }
+  @media print{ .addr-undo-bar{ display:none !important; } }
   .addr-mix-banner .amb-act{ display:flex; gap:6px; }
   .amb-re{ display:flex; gap:8px; align-items:flex-start; font-size:12.5px; margin-top:6px; }
   @media print{ .addr-mix-banner{ display:none !important; } }
@@ -1277,6 +1287,7 @@ body.v2 .model-cell{ font-size:10.5px; }
             <hr>
             <button role="menuitem" id="clear-calc-btn" title="Clear this sheet or the entire file">Clear…</button>
             <button role="menuitem" id="confirm-defaults-btn" title="Marks the current sheet's settings as reviewed. Since 02.00.004 valid defaults are never amber-flagged, so this changes nothing on screen; kept for older habits and files.">Confirm defaults</button>
+            <button role="menuitem" id="addr-log-btn" title="Address changes from unify / re-address, SenseNET network moves and Standalone clears (saved with the project); Undo the last one">Address change log…</button>
             <hr>
             <button role="menuitem" id="clear-saved-btn" title="Clear all saved entries and start over">Clear saved data</button>
           </div>
@@ -1576,6 +1587,7 @@ body.v2 .model-cell{ font-size:10.5px; }
             <div class="qs-step-title" id="qs-step-addressing">Choose Networked or Standalone addressing</div>
             <p>Just below "Clusters supported" is a per-sheet <b>Networked / Standalone</b> toggle. <b>Networked</b> is the default (unchanged for every existing project) — Address is the 1–127 dropdown, unique across <b>every Networked sheet</b> (one SenseNET network). <b>Standalone</b> is for a sheet with no SenseNET pathway connecting it to anything else: Address becomes a 1–9 dropdown and is unique <b>within that sheet only</b> (02.00.004) — a Standalone sheet may reuse addresses used on any other sheet, Networked or Standalone, and is never flagged for that; two modules on the same Standalone sheet with one address are still flagged. Cluster identification is still required either way, and cross-sheet cluster referencing keeps working. Switching a sheet to Standalone clears any of its addresses above 9.</p>
             <p><b>Mixed sheets.</b> When a project has both Networked and Standalone sheets, an amber <b>Mixed addressing</b> banner appears above the sheet with <b>Make all Networked…</b> and <b>Make all Standalone…</b>. Each asks for confirmation first (Cancel changes nothing) and offers <b>Also re-address all modules</b>: Networked numbers every module 1, 2, 3… starting on the first sheet and continuing through every sheet in order; Standalone starts at 1 on every sheet. Module order, displays/detectors, ribbon (Power) links, AUX circuits and cluster assignments are not changed — only the Address values. Without re-addressing, addresses are kept (Standalone still clears any above 9). Imported designs (Import Calc, Import project, .pl re-import) keep their addresses; if they contain duplicates under these rules, a notice lists them right after the import.</p>
+            <p> <b>SenseNET networks</b>: one network holds up to 127 modules. Each Networked sheet has a <b>SenseNET network</b> selector (1, 2, …) on its Addressing row, and the sidebar tags each sheet SN1, SN2…; a sheet always stays on one network. Addresses must be unique within a network, so different networks may reuse 1–127. When the networked modules pass 127 (adding modules, or <b>Also re-address</b>), whole sheets — last in sheet order first — move to the next network (2, 3…) and are addressed from 1 there, and you are told that a new network was added and to make sure the design includes the infrastructure for it (its own SenseNET wiring/pathway and connection to the command display/FACP). Re-addressing as Networked numbers 1–127 on SenseNET 1 in sheet order and continues from 1 on SenseNET 2. Imports keep each sheet's network (older files: network 1) and never move sheets on their own; an import over 127 offers <b>Move overflow to a new SenseNET network</b>. Print, Word and Excel settings show <i>Networked · SenseNET n</i>. <b>Logged and undoable:</b> every unify / re-address, SenseNET network move and Standalone clear is written to <b>Edit → Address change log…</b> (saved with the project, including .mlproj.json) with each module's address and network before and after, and can be undone in one step with the <b>Undo</b> bar that appears above the sheet or <b>Ctrl+Z</b> (outside text fields). Switching to Standalone lists any addresses above 9 that will be cleared before you confirm, and tells you which were cleared afterwards.</p>
           </div>
         </div>
 
@@ -2006,7 +2018,11 @@ body.v2 .model-cell{ font-size:10.5px; }
         </div>
         <div class="help-faq-item">
           <div class="q">My project mixes Networked and Standalone sheets — what should I do?</div>
-          <p class="a">The amber <b>Mixed addressing</b> banner warns you. If it's intended (for example a standalone cluster in an outbuilding), leave it. Otherwise click <b>Make all Networked…</b> or <b>Make all Standalone…</b>; the confirm dialog offers <b>Also re-address all modules</b> (Networked: 1…N across all sheets in sheet order; Standalone: 1…n on each sheet). Only Address values change — module order, ribbon links, AUX and cluster assignments stay the same. Cancel changes nothing.</p>
+          <p class="a">The amber <b>Mixed addressing</b> banner warns you. If it's intended (for example a standalone cluster in an outbuilding), leave it. Otherwise click <b>Make all Networked…</b> or <b>Make all Standalone…</b>; the confirm dialog offers <b>Also re-address all modules</b> (Networked: 1…N across all sheets in sheet order; Standalone: 1…n on each sheet). Only Address values (and, for Networked, each sheet's SenseNET network) change — module order, ribbon links, AUX and cluster assignments stay the same. Cancel changes nothing.</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">What happens when a design has more than 127 networked modules?</div>
+          <p class="a">One SenseNET network supports 127 modules. The calculator adds SenseNET network 2 (then 3…) and moves whole sheets onto it — the last sheets in sheet order — addressing them from 1. A sheet never spans two networks. You're told a new network was added: make sure the design includes the infrastructure for it (its own SenseNET wiring/pathway and connection to the command display/FACP). Addresses only have to be unique within a network. Change a sheet's network by hand with the <b>SenseNET network</b> selector on its Addressing row.</p>
         </div>
         <div class="help-faq-item">
           <div class="q">What is "Show granular calculation detail," and where do I find it?</div>
@@ -2438,7 +2454,7 @@ const AMENDMENTS = [
 { rev: "001", major: "02", minor: "00", date: "261013", desc: "<b>ModuLaser project file</b> (.mlproj.json), shared with the MASD Field Report 02.00.000. <b>File → Export project…</b> saves the project details, every power supply (name, Area/Group, model, battery model, Ah and quantity, required Ah, standby/alarm, result) and every detector and display (16-character name, type, address, power supply, fan speed, linked .pl device) plus the PipeCAD pipe data the Field Report needs: sampling holes (size, flow, transport time, sensitivity), test points, pipe length, total flow, hole balance, fittings, Alarm Factor and design sensitivity, and the .pl PSU/Battery positions. <b>File → Import project…</b> opens one; if sheets are already on screen it first shows the differences. The calculator owns the design section and never edits the Field Report's site results: they are kept and written back unchanged. Imported .pl files now keep their hole and results data in the calc file too. The .pl reading and the file format live in modulaser-project.js, shared by both tools. <b>Calculation math unchanged.</b>" },
 { rev: "002", major: "02", minor: "00", date: "261013", desc: "<b>Shared MASD engine 1.0.0.</b> The battery math (standby, alarm, BS 5839-1 D factor, NFPA 72 minimum margin, safety margin, temperature multiplier, supplies required, group estimates), the reference data (module currents, fan-speed currents, design-basis presets, battery models) and the PipeCAD .pl import now live in one shared engine (<code>masd-engine.js</code>), used byte-for-byte by this calculator and the MASD Engineering Toolbox 00.01.000, so both produce identical results. Harmonization rule: any engine change bumps the engine version and the revision of both apps, with matching notes here. Results unchanged: the regression scenarios and the full test suite give the same numbers as 02.00.001. <b>Also in 02.00.002:</b> project-file pass-through of field changes, approvals, Toolbox device configuration, the Toolbox Performance Criteria (referenced standard preset, limits, code prescriptions, Area/Group overrides, narrative, Engineer of Record, spec reference; the British Standards presets mirror this calculator's BS 5839-1 Design Basis options) and unknown top-level keys (forward compatibility); a reload no longer loses the linked-site/project extras; Saved-by records the Prepared By name. Shared modulaser-project.js 1.3.0, identical in the Battery Calculator, the MASD Field Report and the MASD Engineering Toolbox (sync test): SHA-256 design hash over the full design plus a separate site hash; metric .pl imports warn that PipeCAD's hole-sensitivity unit is unconfirmed; typical configuration defaults re-cited (flow ±20% and 120 s flow-fault delay, Table 29 p.76; FM/UL hole limits App. A printed p.113, ModuLaser Install Manual 04-4001-501-0803-05; 'Action' is Prealarm; unsourced values labelled typical – unverified). The MASD Engineering Toolbox 00.01.000 embeds this calculator and the same engine; harmonization rule: any engine change bumps both apps' revisions with matching notes and each records the engine version. <b>QA audit</b> — date 2026-10-13; commit audited cc55189 (02.00.001) plus working tree; issue: <a href=\"https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1\" target=\"_blank\" rel=\"noopener\">Calculator issue #1</a>; summary: defaults citations FAIL → fixed; Example Project worst-hole rule PASS; audit trail FAIL → fixed (pass-through, hashes); Quick Start version text FAIL → fixed (Export project needs 02.00.001+); test.py fixed 800 ms wait replaced by wait-for-condition. QA re-check 2026-10-13 (8:28–8:45 PM ET): CONDITIONAL PASS. Fixed after the re-check: design hash stable on a no-op Calculator round trip (site and carried data kept out of design; calculator row ids renumbered by position); the mis-cited table number removed from the Report (App. A, printed p.113); UL 268, 7th Edition compliance never auto-confirmed — the engineer must confirm it before \"Complies with UL 268, 7th Edition\" prints; UL thresholds for NFPA presets per Brent: sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft, transport time no more than 60 / 43 / 43 s (UL 268 Special Application Range 1 / Range 2 / Open Area, ModuLaser Install Manual App. A, printed p.113; EWFD 1.5 from NFPA 76); sign-off order technician → designer → QA enforced, no hand-set status, reopening keeps history, real names required, QA overrides logged; Report edits blocked until a technician name is set; the edit log never overwrites entries; ASAG44201 citation replaced by NFPA 76-2024 clauses (Research 2026-10-13); standalone Quick Start says Battery Calculator 02.00.001+; legacy-import tests check required Ah per sheet. Final verdict: QA audit 2026-10-13, final re-check of commit 848e97d (clean tree). PASS. Tests: regress 3/3, test 106/106, calc_project_test 16/16, shared-file and engine parity 2/2. Verified: SHA-256 design hash stable on a no-op round trip (Report → Calculator → Calculator), unknown fields, change log and sign-offs preserved, savedBy name, shared modulaser-project.js 1.3.0 and MASD engine 1.0.0 identical across apps. Known limitation: metric PipeCAD hole sensitivity is shown unconverted with a warning (unit unconfirmed). UL 268 thresholds (shared) are per Brent, not verified by QA. Issue: https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1 QA delta re-check 2026-10-13, commit b1cb13b (clean). PASS. Brent's rule is verified: a hole passes at or below (≤) the class maximum, the more restrictive of UL and NFPA (VEWFD 1.0 %obs/ft / 60 s, EWFD 1.5 / 43 s, SFD/OAP 2.18 / 43 s; targets 1.0 / 1.5 / 2.0). UL projects enforce the ModuLaser UL 268 range lower limits (Install Manual App. A p.113). This supersedes the earlier rule (a hole had to be below the limit). Tests: sens_rule 14/14, regress 3/3, test 106/106, calc_project_test 16/16, parity 2/2; design hash stable on round trip. Per Brent, unverified by QA: the ≤ rule (the manual's FM 3230 rows say \"<\") and EWFD 1.5 (from NFPA 76-2024 8.5.3.2.1.3; UL Range 2 itself is 0.05–2.18). Final pre-tag pass 2026-10-13 (10:02–10:40 PM ET): Calculator 6adde0d / Report 5448488 (release a32d988) / Toolbox 8aa707a — GO; sens_rule 14/14; committed tests pass (release commits differ from these only by this release-note line)..." },
 { rev: "003", major: "02", minor: "00", date: "261014", desc: "<b>Needs-entry fix (QA/Auditor).</b> Sheets showed the amber <i>Needs entry</i> status but the fields that needed entry were not visibly marked: the 02.00 dark theme kept the old 1px soft-blue (#5b9bd5) outline, which looked the same as ordinary input borders, so the highlight could not be seen (most of these fields are custom dropdowns over hidden native selects). Needs-entry fields now use a 2px <b>amber</b> outline and tint that match the amber sidebar dot, on inputs, custom dropdown buttons and radio groups. The Live Results message now reads <i>N fields still need entry (amber outline)</i> with a <b>Show next ›</b> button that scrolls to and focuses each field in turn. Status logic, counts and calculation math are unchanged. Help, Quick Start, How Do I and FAQ wording updated from blue to amber. Also: print label grey darkened #747574 → #6b6c6b for WCAG AA contrast (5.0:1 on the info panel). Regression test test_needs_entry.py uses Brent's saved file (5/5 pass; 1/3 on 02.00.002). <b>Module table columns (02.00.003, per Brent):</b> Module Type shows DISP-MIN / DISP-STD / DISP-CMD / DETECTOR (stored values unchanged, so saved files and imports are unaffected); Cluster shows the 2-digit number only (01); Power shows <i>Own circuit</i> or <i>Ribbon Path</i> (the dropdown list still names the entry point). Fixed pixel column widths (Superdesign layout suggestion: Model wide enough for FHSD83x0-ULF, narrow Cluster) with no truncation or wrap; the table scrolls sideways on narrow windows. Print/Export and Word module tables gain Model, Cluster and Power columns with the same labels, single-line cells (Word no-wrap). Test test_module_columns.py 10/10 on Brent\'s file (2/10 on 02.00.002). **QA follow-up (2026-10-14):** cross-sheet Cluster hint clipped with ellipsis and full text on hover; 'No cluster display defined on any page' shows '—' on the button (full text on hover); needs-entry count and Show next skip CSS-hidden fields (a new sheet shows 18, not 19) and Show next starts from the first field on each sheet; Word export has an Arial 9 pt default font (styles.xml), fixed-layout tables and summary rows spanning the descriptive columns so nothing wraps or is clipped. Saved .html files keep their own code: re-open data via File \u2192 Import Calc. Final (QA re-check): Word module table Standby mA / Alarm mA columns 1100 twips (header no longer wraps), summary row shows 'Status:' again; offline cache renamed." },
-{ rev: "004", major: "02", minor: "00", date: "261015", desc: "Per Brent. <b>Valid defaults are no longer amber-flagged</b>: Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet <i>Needs entry</i>; only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are flagged. Edit → Confirm defaults is kept but no longer needed (harmless). <b>New sheets start with no modules</b>: an empty-state guide offers Import .pl… or + Add Display / + Add Detector; the last module can now be removed (the guide returns); an empty sheet shows Needs entry and INCOMPLETE. <b>Standby (h) / Alarm (min)</b> boxes no longer shrink and cut values off on screens ≤ 1366 px (the settings row wraps instead). <b>Addressing</b>: duplicate addresses are checked per mode — Networked sheets share one SenseNET pool; a Standalone sheet is its own 1–9 pool (scoped per sheet, previously per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside a Standalone sheet are still flagged. Projects mixing Networked and Standalone sheets show a <b>Mixed addressing</b> banner with Make all Networked… / Make all Standalone… and an optional <i>Also re-address all modules</i> (Networked 1…N across all sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged; confirm first). Imports (Import Calc, Import project, .pl re-import) keep addresses and list any per-mode conflicts right after import. Calculation math, the shared engine (masd-engine.js 1.0.0) and project format (modulaser-project.js 1.3.0) are unchanged." },
+{ rev: "004", major: "02", minor: "00", date: "261015", desc: "Per Brent. <b>Valid defaults are no longer amber-flagged</b>: Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet <i>Needs entry</i>; only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are flagged. Edit → Confirm defaults is kept but no longer needed (harmless). <b>New sheets start with no modules</b>: an empty-state guide offers Import .pl… or + Add Display / + Add Detector; the last module can now be removed (the guide returns); an empty sheet shows Needs entry and INCOMPLETE. <b>Standby (h) / Alarm (min)</b> boxes no longer shrink and cut values off on screens ≤ 1366 px (the settings row wraps instead). <b>Addressing</b>: duplicate addresses are checked per mode — Networked sheets share one SenseNET pool; a Standalone sheet is its own 1–9 pool (scoped per sheet, previously per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside a Standalone sheet are still flagged. Projects mixing Networked and Standalone sheets show a <b>Mixed addressing</b> banner with Make all Networked… / Make all Standalone… and an optional <i>Also re-address all modules</i> (Networked 1…N across all sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged; confirm first). Imports (Import Calc, Import project, .pl re-import) keep addresses and list any per-mode conflicts right after import. <b>SenseNET networks</b> (per Brent): one network holds up to 127 modules; each Networked sheet has a SenseNET network number (selector on the Addressing row, SN tag in the sidebar, <i>Networked · SenseNET n</i> in print/Word/Excel settings, saved per sheet; older files default to network 1). Past 127, whole sheets (last in sheet order first) move to SenseNET 2, 3… and are addressed from 1, with a notice that a new network was added and the design must include its infrastructure; a sheet never spans networks. Duplicates are checked per network. Networked re-address numbers 1–127 on SenseNET 1 in sheet order and continues 1–127 on SenseNET 2. Imports keep networks and never move sheets on their own; an import over 127 offers Move overflow to a new SenseNET network. <b>Address change log + Undo</b> (QA F1/F2): unify / re-address, SenseNET moves and Standalone clears are logged (Edit → Address change log…, saved with the project) with before/after address and network per module, and undo in one step (Undo bar or Ctrl+Z); Make all Standalone lists the addresses above 9 it will clear and reports them afterwards. Calculation math, the shared engine (masd-engine.js 1.0.0) and project format (modulaser-project.js 1.3.0) are unchanged." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -2650,6 +2666,7 @@ function serializeLocation(locEl){
     derating: g('.derating-input') ? g('.derating-input').value : '1.75',
     showCalcDetail: g('.show-calc-detail-checkbox') ? g('.show-calc-detail-checkbox').checked : false,
     addrScheme: g('.addr-scheme-radio[value="standalone"]:checked') ? 'standalone' : 'networked',
+    senseNet: sheetSenseNet(locEl),
     mode: g('.mode-radio:checked') ? g('.mode-radio:checked').value : 'builtin',
     submode: g('.submode-radio:checked') ? g('.submode-radio:checked').value : 'custom',
     customQuiescent: g('.custom-quiescent').value,
@@ -2682,7 +2699,8 @@ function buildStateObject(){
     primaryCdmLocation: document.getElementById('primary-cdm-location-input').value,
     backupCdmLocation: document.getElementById('backup-cdm-location-input').value,
     printBom: document.getElementById('print-bom-toggle') ? document.getElementById('print-bom-toggle').checked : true,
-    locations: Array.from(document.querySelectorAll('.location')).map(serializeLocation)
+    locations: Array.from(document.querySelectorAll('.location')).map(serializeLocation),
+    addrLog: ADDR_LOG
   };
 }
 
@@ -2768,6 +2786,7 @@ function restoreLocation(saved){
   const addrSchemeVal = saved.addrScheme === 'standalone' ? 'standalone' : 'networked';
   const addrSchemeRadio = locEl.querySelector(`.addr-scheme-radio[value="${addrSchemeVal}"]`);
   if (addrSchemeRadio) addrSchemeRadio.checked = true;
+  locEl.dataset.senseNet = String(parseInt(saved.senseNet) >= 1 ? parseInt(saved.senseNet) : 1);   // 02.00.004; older files: network 1
   if (saved.mode) locEl.querySelector(`.mode-radio[value="${saved.mode}"]`).checked = true;
   if (saved.submode) {
     const sub = locEl.querySelector(`.submode-radio[value="${saved.submode}"]`);
@@ -2830,6 +2849,8 @@ function restoreLocation(saved){
 }
 
 function applyLoadedState(state){
+  window.__importing = true;
+  ADDR_LOG = Array.isArray(state.addrLog) ? state.addrLog.slice() : []; ADDR_UNDO = null; if (typeof renderAddrUndoBar === 'function') renderAddrUndoBar(null);
   document.getElementById('locations-container').innerHTML = '';
   locationCounter = 0;
   document.getElementById('project-name-input').value = state.projectName || "";
@@ -2872,18 +2893,23 @@ function applyLoadedState(state){
   // 02.00.004: imports (Import Calc, Import project, legacy files) keep their addresses; after the
   // app has started, report any duplicates per addressing mode so the user can fix or re-address.
   if (window.__appBooted) setTimeout(reportAddrConflictsAfterImport, 60);
+  window.__importing = false;
 }
 function reportAddrConflictsAfterImport(){
   const c = addrConflicts();
   const name = l => { const n = (l.querySelector('.ps-name') || {}).value || ''; return n.trim() || ('Sheet ' + l.getAttribute('data-loc')); };
   const items = [];
-  if (c.network.size) items.push(`<li>Networked sheets (one SenseNET network): address${c.network.size === 1 ? '' : 'es'} <b>${Array.from(c.network).join(', ')}</b> used more than once.</li>`);
+  Object.keys(c.over).forEach(n => items.push(`<li>SenseNET ${n}: <b>${c.over[n]} modules</b> — more than the ${MAX_MODULES_PER_NETWORK} one network supports.</li>`));
+  Object.keys(c.network).forEach(n => items.push(`<li>Networked sheets on SenseNET ${n}: address${c.network[n].size === 1 ? '' : 'es'} <b>${Array.from(c.network[n]).join(', ')}</b> used more than once.</li>`));
   document.querySelectorAll('.location').forEach(l => { const d = c.standalone[l.getAttribute('data-loc')]; if (d && d.size) items.push(`<li>Standalone sheet <b>${v2Esc(name(l))}</b>: address${d.size === 1 ? '' : 'es'} <b>${Array.from(d).join(', ')}</b> repeated on the sheet.</li>`); });
   if (!items.length) return;
   const mixed = new Set(Array.from(document.querySelectorAll('.location')).map(addrSchemeOf)).size > 1;
+  const over = Object.keys(c.over).length > 0;
+  const buttons = [{ label: 'OK', value: 'ok', primary: !over }];
+  if (over) buttons.unshift({ label: 'Move overflow to a new SenseNET network', value: 'split', primary: true });
   showPromptModal({ title: 'Address conflicts in the imported design',
-    desc: `<p>Imported addresses were kept as they were in the file. These duplicates are flagged on their sheets:</p><ul>${items.join('')}</ul><p>Standalone sheets may reuse addresses used on other sheets. Fix the addresses on the flagged sheets${mixed ? ', or use <b>Make all Networked…</b> / <b>Make all Standalone…</b> in the mixed-addressing banner with <b>Also re-address</b>' : ''}.</p>`,
-    buttons: [{ label: 'OK', value: true, primary: true }] });
+    desc: `<p>Imported addresses and SenseNET networks were kept as they were in the file. These are flagged on their sheets:</p><ul>${items.join('')}</ul><p>Standalone sheets may reuse addresses used on other sheets, and different SenseNET networks may reuse each other's addresses. Fix the addresses on the flagged sheets${mixed ? ', or use <b>Make all Networked…</b> / <b>Make all Standalone…</b> in the mixed-addressing banner with <b>Also re-address</b>' : ''}${over ? '. <b>Move overflow</b> moves whole sheets (last first) onto a new SenseNET network and re-addresses them from 1' : ''}.</p>`,
+    buttons }).then(v => { if (v === 'split') senseNetAddedNotice(senseNetSplitOverflow()); });
 }
 
 // A file that was produced via "Save As" carries its data (and activation status) baked
@@ -3160,6 +3186,7 @@ function locationTemplate(loc){
       <span class="addr-scheme-label">Addressing:</span>
       <label class="mode-opt mode-opt-sm"><input type="radio" class="addr-scheme-radio" name="addrscheme-${loc}" value="networked" checked onchange="onAddrSchemeChange('${loc}')"> Networked (SenseNET, 1–127 network-wide)</label>
       <label class="mode-opt mode-opt-sm"><input type="radio" class="addr-scheme-radio" name="addrscheme-${loc}" value="standalone" onchange="onAddrSchemeChange('${loc}')"> Standalone (no SenseNET pathway, 1–9 per sheet)</label>
+      <label class="sn-wrap" title="SenseNET network this sheet's modules are on (up to ${MAX_MODULES_PER_NETWORK} modules per network; a sheet stays on one network)">SenseNET network <select class="sensenet-select" onchange="onSenseNetChange('${loc}')"><option value="1">1</option></select></label>
     </div>
     <div class="location-body">
       <div class="col-devices">
@@ -3692,6 +3719,7 @@ function buildLocationRows(locEl, projectName, preparedBy, dateLabel){
   rows.push([]);
   rows.push(['Design Basis', selectedText(locEl.querySelector('.design-basis-select'))]);
   rows.push(['Standby (h)', getVal(locEl.querySelector('.standby-hours')), 'Alarm (min)', getVal(locEl.querySelector('.alarm-minutes'))]);
+  rows.push(['Addressing', addrSchemeOf(locEl) === 'standalone' ? 'Standalone' : 'Networked · SenseNET ' + sheetSenseNet(locEl)]);   // 02.00.004
   const tempSel = locEl.querySelector('.temperature-select');
   if (tempSel) rows.push(['Ambient Temperature', selectedText(tempSel)]);
   const basisKeyXl = locEl.querySelector('.design-basis-select').value;
@@ -4875,8 +4903,10 @@ function recalcLocationInner(loc){
   const ownScheme = (locEl.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone' ? 'standalone' : 'networked';
   const ownAddrs = new Set(Array.from(locEl.querySelectorAll('[data-role="module"] .module-address')).map(sel => sel.value.trim()).filter(Boolean));
   if (ownScheme === 'networked'){
-    const d = Array.from(addrC.network).filter(a => ownAddrs.has(a));
-    if (d.length) flags.push(`Duplicate module address(es) across the network: ${d.join(', ')} — each module on Networked sheets (one SenseNET network) needs a unique address.`);
+    const myNet = sheetSenseNet(locEl);
+    const d = Array.from(addrC.network[myNet] || []).filter(a => ownAddrs.has(a));
+    if (d.length) flags.push(`Duplicate module address(es) on SenseNET ${myNet}: ${d.join(', ')} — each module on one SenseNET network needs a unique address (other networks may reuse it).`);
+    if (addrC.over[myNet]) flags.push(`SenseNET ${myNet} has ${addrC.over[myNet]} modules — exceeds the ${MAX_MODULES_PER_NETWORK}-module network limit. Move sheets to a new SenseNET network (Network selector on the sheet, or re-address via Make all Networked…).`);
   } else {
     const d = Array.from(addrC.standalone[loc] || []);
     if (d.length) flags.push(`Duplicate module address(es) on this Standalone sheet: ${d.join(', ')} — each module on a Standalone sheet needs a unique address (other sheets may reuse them).`);
@@ -5563,6 +5593,15 @@ function recalcLocation(loc){
     }
     window.__inCascade = false;
     updateNetworkAddressAvailability();
+    // 02.00.004: editing past 127 networked modules starts the next SenseNET network (not on import/boot)
+    if (window.__appBooted && !window.__importing && !window.__splitting){
+      const c = senseNetCounts();
+      if (Object.keys(c).some(k => c[k] > MAX_MODULES_PER_NETWORK)){
+        window.__splitting = true; let nets = [];
+        try { nets = senseNetSplitOverflow(); } finally { window.__splitting = false; }
+        senseNetAddedNotice(nets);
+      }
+    }
     refreshAllClusterSummaries();
     scheduleSave();
   }
@@ -5572,7 +5611,11 @@ function onAddrSchemeChange(loc){
   const locEl = document.getElementById(`location-${loc}`);
   if (!locEl) return;
   const scheme = locEl.querySelector('.addr-scheme-radio:checked').value;
+  let before = null, cleared = [];
   if (scheme === 'standalone'){
+    before = addrSnapshot(); const me = before.find(x => String(x.loc) === String(loc)); if (me) me.scheme = 'networked';
+    const ps = ((locEl.querySelector('.ps-name') || {}).value || '').trim() || ('Sheet ' + String(loc).padStart(2, '0'));
+    locEl.querySelectorAll('[data-role="module"]').forEach((r, i) => { const a = r.querySelector('.module-address').value; if (parseInt(a) > 9) cleared.push({ ps, row: i + 1, zone: r.querySelector('.zone-name').value.trim(), addr: a }); });
     // Addresses above 9 are out of range for standalone — clear them rather than leave an
     // invalid, no-longer-selectable value sitting in the field.
     Array.from(locEl.querySelectorAll('[data-role="module"]')).forEach(row => {
@@ -5581,6 +5624,10 @@ function onAddrSchemeChange(loc){
     });
   }
   recalcLocation(loc);
+  if (cleared.length){   // 02.00.004 QA F1/F2: say what was cleared, log it, allow Undo
+    addrLogCommit(`${cleared[0].ps} → Standalone`, before);
+    alert(`${cleared.length} address${cleared.length === 1 ? ' was' : 'es were'} above 9 and cleared (Standalone allows 1–9):\n${addrRowsText(cleared)}\n\nUndo restores them (Ctrl+Z or the Undo bar).`);
+  }
 }
 
 function rowAddressScheme(row){
@@ -5590,50 +5637,42 @@ function rowAddressScheme(row){
 }
 
 function updateNetworkAddressAvailability(){
-  // Networked (default, unchanged): address is unique across the whole document — every
-  // sheet shares one 1-127 pool. Standalone (no SenseNET pathway): address is only unique
-  // within its own cluster (1-9), scoped by cluster NUMBER rather than by sheet, since a
-  // cluster's devices can span multiple sheets via cross-sheet cluster referencing.
-  const networkedUsage = {};
-  const standaloneUsageByCluster = {};
+  // Networked: address is unique within its SenseNET network (1-127; sheets choose network 1, 2, …).
+  // Standalone (no SenseNET pathway): unique within its own sheet (1-9), 02.00.004.
+  const usage = {};
   const allAddrSelects = [];
   document.querySelectorAll('[data-role="module"]').forEach(row => {
     const sel = row.querySelector('.module-address');
     if (!sel) return;
     const scheme = rowAddressScheme(row);
-    allAddrSelects.push({ sel, row, scheme });
+    const key = scheme === 'standalone' ? 'sa:' + addrSheetKey(row) : 'net:' + sheetSenseNet(row.closest('.location'));
+    allAddrSelects.push({ sel, key, scheme });
     if (!sel.value) return;
-    if (scheme === 'standalone'){
-      const key = addrSheetKey(row);   // 02.00.004: a Standalone sheet is its own address pool
-      standaloneUsageByCluster[key] = standaloneUsageByCluster[key] || {};
-      (standaloneUsageByCluster[key][sel.value] = standaloneUsageByCluster[key][sel.value] || []).push(sel);
-    } else {
-      (networkedUsage[sel.value] = networkedUsage[sel.value] || []).push(sel);
-    }
+    usage[key] = usage[key] || {};
+    (usage[key][sel.value] = usage[key][sel.value] || []).push(sel);
   });
-  allAddrSelects.forEach(({ sel, row, scheme }) => {
+  allAddrSelects.forEach(({ sel, key, scheme }) => {
     const current = sel.value || sel.dataset.desiredValue || '';
     delete sel.dataset.desiredValue;
     const max = scheme === 'standalone' ? 9 : MAX_MODULES_PER_NETWORK;
-    let usageForThisRow = networkedUsage;
-    if (scheme === 'standalone'){
-      usageForThisRow = standaloneUsageByCluster[addrSheetKey(row)] || {};
-    }
+    const u = usage[key] || {};
     let opts = '<option value="">— Select —</option>';
     for (let i = 1; i <= max; i++){
       const v = String(i);
-      const takenByOther = usageForThisRow[v] && usageForThisRow[v].some(s => s !== sel);
+      const takenByOther = u[v] && u[v].some(x => x !== sel);
       opts += `<option value="${v}"${takenByOther ? ' disabled' : ''}>${v}${takenByOther ? ' (taken)' : ''}</option>`;
     }
     sel.innerHTML = opts;
     sel.value = current;
   });
+  refreshSenseNetSelects();
 }
 
 function addrConflictSig(){
   const c = addrConflicts();
   const schemes = Array.from(document.querySelectorAll('.location')).map(l => (l.querySelector('.addr-scheme-radio:checked') || {}).value).join(',');
-  return schemes + '|' + Array.from(c.network).sort().join(',') + '|' + Object.keys(c.standalone).sort().map(k => k + ':' + Array.from(c.standalone[k]).sort().join(',')).join(';');
+  const nets = Array.from(document.querySelectorAll('.location')).map(sheetSenseNet).join(',');
+  return schemes + '|' + nets + '|' + JSON.stringify(Object.keys(c.network).map(k => k + ':' + Array.from(c.network[k]).sort())) + JSON.stringify(c.over) + '|' + Object.keys(c.standalone).sort().map(k => k + ':' + Array.from(c.standalone[k]).sort().join(',')).join(';');
 }
 // 02.00.004: mixed Networked + Standalone sheets — warn and offer to unify (optionally re-address).
 function addrSchemeOf(l){ return (l.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone' ? 'standalone' : 'networked'; }
@@ -5652,15 +5691,23 @@ function refreshAddrMixBanner(){
   b.innerHTML = `<span class="amb-txt"><b>Mixed addressing:</b> ${nNet} Networked and ${nSa} Standalone sheet${nSa === 1 ? '' : 's'}. Standalone sheets may reuse addresses from other sheets; Networked sheets share one SenseNET address pool. If that isn't intended, make them all the same.</span>
     <span class="amb-act"><button type="button" class="btn btn-sm" data-mode="networked" onclick="unifyAddressing('networked')">Make all Networked…</button><button type="button" class="btn btn-sm" data-mode="standalone" onclick="unifyAddressing('standalone')">Make all Standalone…</button></span>`;
 }
+function addrRowsAbove9(){
+  const out = [];
+  document.querySelectorAll('.location').forEach(l => { const ps = ((l.querySelector('.ps-name') || {}).value || '').trim() || ('Sheet ' + String(l.getAttribute('data-loc')).padStart(2, '0'));
+    l.querySelectorAll('[data-role="module"]').forEach((r, i) => { const a = r.querySelector('.module-address').value; if (parseInt(a) > 9) out.push({ ps, row: i + 1, zone: r.querySelector('.zone-name').value.trim(), addr: a }); }); });
+  return out;
+}
+function addrRowsText(list){ return list.map(x => `${x.ps} row ${x.row}${x.zone ? ' (' + x.zone + ')' : ''}: ${x.addr}`).join('\n'); }
 async function unifyAddressing(mode){
   window.__ambRe = false;
   const isNet = mode === 'networked';
+  const above9 = isNet ? [] : addrRowsAbove9();
   const choice = await showPromptModal({
     title: isNet ? 'Make all sheets Networked?' : 'Make all sheets Standalone?',
     desc: isNet
       ? 'Every sheet joins one SenseNET network: addresses 1–127, unique across all sheets.'
       : 'Every sheet becomes its own Standalone pool: addresses 1–9, unique within each sheet; addresses above 9 are cleared unless you re-address.',
-    extraHtml: `<label class="amb-re"><input type="checkbox" id="amb-readdress" onchange="window.__ambRe = this.checked"> Also re-address all modules — ${isNet ? 'start at 1 on the first sheet and number every module on every sheet in order' : 'start at 1 on every sheet and number its modules in order'} (module order, ribbon, AUX and cluster assignments are unchanged)</label>`,
+    extraHtml: `<label class="amb-re"><input type="checkbox" id="amb-readdress" onchange="window.__ambRe = this.checked"> Also re-address all modules — ${isNet ? 'start at 1 on the first sheet and number every module on every sheet in order' : 'start at 1 on every sheet and number its modules in order'} (module order, ribbon, AUX and cluster assignments are unchanged)</label>${above9.length ? `<div class="amb-clear"><b>Without re-addressing, these ${above9.length} address${above9.length === 1 ? '' : 'es'} above 9 will be cleared</b> (Standalone allows 1–9):<ul>${above9.map(x => `<li>${v2Esc(x.ps)} row ${x.row}${x.zone ? ' (' + v2Esc(x.zone) + ')' : ''}: <b>${v2Esc(x.addr)}</b></li>`).join('')}</ul></div>` : ''}<p class="amb-undo-note">The change is logged (Edit → Address change log) and can be undone in one step (Undo, or Ctrl+Z).</p>`,
     buttons: [{ label: 'Cancel', value: null }, { label: isNet ? 'Make all Networked' : 'Make all Standalone', value: 'go', primary: true }]
   });
   const readdress = !!window.__ambRe; window.__ambRe = false;
@@ -5669,12 +5716,23 @@ async function unifyAddressing(mode){
 }
 // mode: 'networked' | 'standalone'; readdress: renumber modules (sheet order, then row order)
 function applyUnifiedAddressing(mode, readdress){
+  const before = addrSnapshot();
+  const cleared = (mode === 'standalone' && !readdress) ? addrRowsAbove9() : [];
   const locs = Array.from(document.querySelectorAll('.location'));
   locs.forEach(l => { const r = l.querySelector(`.addr-scheme-radio[value="${mode}"]`); if (r) r.checked = true; });
   const max = mode === 'standalone' ? 9 : MAX_MODULES_PER_NETWORK;
-  let n = 0, skipped = 0;
+  let n = 0, skipped = 0, net = 1;
+  const netsBefore = new Set(locs.filter(l => addrSchemeOf(l) === 'networked').map(sheetSenseNet));
+  const added = new Set();
   locs.forEach(l => {
     if (mode === 'standalone') n = 0;
+    else if (readdress){
+      // a sheet stays on one SenseNET network: start the next network when this sheet would pass 127
+      const k = l.querySelectorAll('[data-role="module"]').length;
+      if (n > 0 && n + k > max){ net++; n = 0; }
+      l.dataset.senseNet = String(net);
+      if (net > 1 && !netsBefore.has(net)) added.add(net);
+    }
     l.querySelectorAll('[data-role="module"] .module-address').forEach(sel => {
       if (readdress){
         n++; sel.value = ''; if (n <= max) sel.dataset.desiredValue = String(n); else { delete sel.dataset.desiredValue; skipped++; }
@@ -5691,24 +5749,175 @@ function applyUnifiedAddressing(mode, readdress){
   if (typeof v2Refresh === 'function') v2Refresh();
   scheduleSave();
   if (skipped) alert(`${skipped} module(s) were left without an address: ${mode === 'standalone' ? 'a Standalone sheet allows addresses 1–9' : 'a network allows 1–' + MAX_MODULES_PER_NETWORK}.`);
+  addrLogCommit((mode === 'standalone' ? 'Make all Standalone' : 'Make all Networked') + (readdress ? ' + re-address' : ''), before);
+  if (cleared.length) alert(`${cleared.length} address${cleared.length === 1 ? ' was' : 'es were'} above 9 and cleared (Standalone allows 1–9):\n${addrRowsText(cleared)}\n\nUndo restores them (Ctrl+Z or the Undo bar).`);
+  if (added.size) senseNetAddedNotice(Array.from(added).sort((a, b) => a - b));
 }
+// 02.00.004 (QA F2): address operations (unify, re-address, SenseNET moves, sheet → Standalone clears)
+// are written to an address change log (saved with the project) and can be undone in one step.
+let ADDR_LOG = [];            // [{ at, by, action, modeFrom, modeTo, rows:[{ sheet, ps, zone, row, before:{addr,net,scheme}, after:{…} }] }]
+let ADDR_UNDO = null;         // { action, snap }
+function addrSnapshot(){
+  return Array.from(document.querySelectorAll('.location')).map(l => ({ loc: l.getAttribute('data-loc'), scheme: addrSchemeOf(l), net: sheetSenseNet(l),
+    rows: Array.from(l.querySelectorAll('[data-role="module"]')).map(r => ({ id: r.id, addr: r.querySelector('.module-address').value })) }));
+}
+function addrSnapRestore(snap){
+  snap.forEach(sl => {
+    const l = document.getElementById('location-' + sl.loc); if (!l) return;
+    const radio = l.querySelector(`.addr-scheme-radio[value="${sl.scheme}"]`); if (radio) radio.checked = true;
+    l.dataset.senseNet = String(sl.net);
+    sl.rows.forEach(r => { const row = document.getElementById(r.id); if (!row) return; const sel = row.querySelector('.module-address'); sel.value = ''; if (r.addr) sel.dataset.desiredValue = r.addr; else delete sel.dataset.desiredValue; });
+  });
+  updateNetworkAddressAvailability();
+  window.__addrSig = null;
+  document.querySelectorAll('.location').forEach(l => recalcLocationInner(l.getAttribute('data-loc')));
+  window.__addrSig = addrConflictSig();
+  updateNetworkAddressAvailability();
+  if (typeof refreshAllClusterSummaries === 'function') refreshAllClusterSummaries();
+  if (typeof refreshAllAmber === 'function') refreshAllAmber();
+  if (typeof v2Refresh === 'function') v2Refresh();
+  scheduleSave();
+}
+function addrModeSummary(snap){ const m = new Set(snap.map(x => x.scheme)); return m.size === 1 ? Array.from(m)[0] : 'mixed'; }
+// Compare a "before" snapshot with the document now; log the differences and arm Undo. Returns the entry (or null).
+function addrLogCommit(action, before){
+  const after = addrSnapshot(); const rows = [];
+  before.forEach(b => {
+    const a = after.find(x => x.loc === b.loc); if (!a) return;
+    const l = document.getElementById('location-' + b.loc);
+    const ps = l ? ((l.querySelector('.ps-name') || {}).value || '').trim() : '';
+    b.rows.forEach((br, i) => {
+      const ar = a.rows.find(x => x.id === br.id); if (!ar) return;
+      if (ar.addr !== br.addr || a.net !== b.net || a.scheme !== b.scheme){
+        const row = document.getElementById(br.id);
+        rows.push({ sheet: b.loc, ps: ps || ('Sheet ' + String(b.loc).padStart(2, '0')), row: i + 1, zone: row ? row.querySelector('.zone-name').value.trim() : '',
+          before: { addr: br.addr, net: b.net, scheme: b.scheme }, after: { addr: ar.addr, net: a.net, scheme: a.scheme } });
+      }
+    });
+  });
+  if (!rows.length) return null;
+  const by = ((document.getElementById('prepared-by-input') || {}).value || '').trim();
+  const entry = { at: new Date().toISOString(), by, action, modeFrom: addrModeSummary(before), modeTo: addrModeSummary(after), rows };
+  ADDR_LOG.push(entry);
+  ADDR_UNDO = { action, snap: before };
+  renderAddrUndoBar(entry);
+  scheduleSave();
+  return entry;
+}
+function addrUndo(){
+  if (!ADDR_UNDO) return false;
+  const u = ADDR_UNDO; ADDR_UNDO = null;
+  const before = addrSnapshot();
+  addrSnapRestore(u.snap);
+  addrLogCommit('Undo: ' + u.action, before);
+  ADDR_UNDO = null; renderAddrUndoBar(null);
+  return true;
+}
+function renderAddrUndoBar(entry){
+  const host = document.getElementById('locations-container'); if (!host) return;
+  let b = document.getElementById('addr-undo-bar');
+  if (!b){ b = document.createElement('div'); b.id = 'addr-undo-bar'; b.className = 'addr-undo-bar'; b.setAttribute('role', 'status'); host.parentNode.insertBefore(b, host); }
+  if (!entry || !ADDR_UNDO){ b.hidden = true; b.innerHTML = ''; return; }
+  b.hidden = false;
+  b.innerHTML = `<span><b>${v2Esc(entry.action)}</b> — ${entry.rows.length} module${entry.rows.length === 1 ? '' : 's'} changed (logged).</span><span class="aub-act"><button type="button" class="btn btn-sm" data-act="undo" onclick="addrUndo()" title="Undo this whole change (Ctrl+Z)">Undo</button><button type="button" class="btn btn-ghost btn-sm" data-act="log" onclick="openAddrLog()">View log</button><button type="button" class="btn btn-ghost btn-sm" data-act="close" onclick="document.getElementById('addr-undo-bar').hidden=true" title="Hide (the change stays logged)">✕</button></span>`;
+}
+function openAddrLog(){
+  const fmt = x => x.scheme === 'standalone' ? `${x.addr || '—'} (Standalone)` : `${x.addr || '—'} (SN${x.net})`;
+  const body = ADDR_LOG.length ? ADDR_LOG.slice().reverse().map(e => `<div class="adl-e"><div class="adl-h"><b>${v2Esc(e.action)}</b> · ${v2Esc(new Date(e.at).toLocaleString())}${e.by ? ' · ' + v2Esc(e.by) : ''} · ${v2Esc(e.modeFrom)} → ${v2Esc(e.modeTo)}</div><table class="adl-t"><tr><th>Sheet</th><th>Row</th><th>Zone</th><th>Before</th><th>After</th></tr>${e.rows.map(r => `<tr><td>${v2Esc(r.ps)}</td><td>${r.row}</td><td>${v2Esc(r.zone || '—')}</td><td>${v2Esc(fmt(r.before))}</td><td>${r.before.addr || '—'} → ${v2Esc(fmt(r.after))}</td></tr>`).join('')}</table></div>`).join('')
+    : '<p>No address changes logged yet. Unify / re-address, SenseNET network moves and Standalone clears are logged here.</p>';
+  showPromptModal({ title: 'Address change log', desc: `<div class="adl">${body}</div>`, buttons: [{ label: 'Close', value: true, primary: true }] });
+}
+document.addEventListener('keydown', ev => {
+  if (!(ev.ctrlKey || ev.metaKey) || ev.shiftKey || ev.key.toLowerCase() !== 'z' || !ADDR_UNDO) return;
+  const t = ev.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;   // keep native text undo
+  ev.preventDefault(); addrUndo();
+});
 function addrSheetKey(row){
   const l = row.closest('.location'); return l ? l.getAttribute('data-loc') : '__none__';
 }
 // 02.00.004: duplicate addresses per addressing mode. network = Set of addresses used more than once
 // across all Networked sheets; standalone = { sheetLoc: Set } of addresses repeated within that sheet.
 function addrConflicts(){
-  const net = {}, sa = {}, out = { network: new Set(), standalone: {} };
+  // network: { netNo: Set(dup addresses) } over Networked sheets; standalone: { sheetLoc: Set };
+  // over: { netNo: moduleCount } for networks above the 127-module SenseNET limit.
+  const net = {}, sa = {}, counts = {}, out = { network: {}, standalone: {}, over: {} };
   document.querySelectorAll('.location').forEach(l => {
     const loc = l.getAttribute('data-loc');
-    const standalone = (l.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone';
-    l.querySelectorAll('[data-role="module"] .module-address').forEach(sel => {
+    const standalone = addrSchemeOf(l) === 'standalone';
+    const n = sheetSenseNet(l);
+    const rows = l.querySelectorAll('[data-role="module"] .module-address');
+    if (!standalone) counts[n] = (counts[n] || 0) + rows.length;
+    rows.forEach(sel => {
       const a = sel.value.trim(); if (!a) return;
       if (standalone){ sa[loc] = sa[loc] || {}; if (sa[loc][a]) (out.standalone[loc] = out.standalone[loc] || new Set()).add(a); sa[loc][a] = true; }
-      else { if (net[a]) out.network.add(a); net[a] = true; }
+      else { net[n] = net[n] || {}; if (net[n][a]) (out.network[n] = out.network[n] || new Set()).add(a); net[n][a] = true; }
     });
   });
+  Object.keys(counts).forEach(n => { if (counts[n] > MAX_MODULES_PER_NETWORK) out.over[n] = counts[n]; });
   return out;
+}
+// 02.00.004: SenseNET network number per sheet (Networked sheets only; a sheet never spans networks)
+function sheetSenseNet(l){ const n = parseInt(l && l.dataset ? l.dataset.senseNet : ''); return n >= 1 ? n : 1; }
+function senseNetCounts(){
+  const c = {}; document.querySelectorAll('.location').forEach(l => { if (addrSchemeOf(l) === 'networked'){ const n = sheetSenseNet(l); c[n] = (c[n] || 0) + l.querySelectorAll('[data-role="module"]').length; } }); return c;
+}
+function refreshSenseNetSelects(){
+  const locs = Array.from(document.querySelectorAll('.location'));
+  const maxNet = Math.max(1, ...locs.map(sheetSenseNet));
+  locs.forEach(l => {
+    const sel = l.querySelector('.sensenet-select'); if (!sel) return;
+    const v = String(sheetSenseNet(l)); let o = '';
+    for (let i = 1; i <= maxNet + 1; i++) o += `<option value="${i}">${i}${i === maxNet + 1 ? ' (new)' : ''}</option>`;
+    if (sel.innerHTML !== o) sel.innerHTML = o;
+    sel.value = v;
+  });
+}
+function onSenseNetChange(loc){
+  const l = document.getElementById(`location-${loc}`); if (!l) return;
+  l.dataset.senseNet = String(parseInt(l.querySelector('.sensenet-select').value) || 1);
+  window.__addrSig = null; recalcLocation(loc); scheduleSave();
+}
+// Move whole sheets (last in sheet order first) from any network above 127 modules onto the next network,
+// re-addressing each moved sheet from the next free address there. Returns the networks that were added.
+function senseNetSplitOverflow(){
+  const added = new Set(); let guard = 0; const snapBefore = addrSnapshot();
+  const netsBefore = new Set(Object.keys(senseNetCounts()).map(Number));
+  for (;;){
+    if (++guard > 500) break;
+    const c = senseNetCounts();
+    const over = Object.keys(c).map(Number).sort((a, b) => a - b).find(n => c[n] > MAX_MODULES_PER_NETWORK);
+    if (over === undefined) break;
+    const sheets = Array.from(document.querySelectorAll('.location')).filter(l => addrSchemeOf(l) === 'networked' && sheetSenseNet(l) === over);
+    if (sheets.length < 2) break;          // one sheet alone above 127 cannot be split (flagged instead)
+    const mv = sheets[sheets.length - 1];
+    mv.dataset.senseNet = String(over + 1);
+    const used = new Set();
+    document.querySelectorAll('.location').forEach(l => { if (l !== mv && addrSchemeOf(l) === 'networked' && sheetSenseNet(l) === over + 1) l.querySelectorAll('[data-role="module"] .module-address').forEach(x => { if (x.value) used.add(x.value); }); });
+    let next = 1;
+    mv.querySelectorAll('[data-role="module"] .module-address').forEach(sel => {
+      while (used.has(String(next))) next++;
+      sel.value = ''; if (next <= MAX_MODULES_PER_NETWORK){ sel.dataset.desiredValue = String(next); used.add(String(next)); next++; }
+    });
+    if (!netsBefore.has(over + 1)) added.add(over + 1);
+  }
+  if (guard > 1){
+    updateNetworkAddressAvailability();
+    window.__addrSig = null;
+    document.querySelectorAll('.location').forEach(l => recalcLocationInner(l.getAttribute('data-loc')));
+    window.__addrSig = addrConflictSig();
+    if (typeof refreshAllAmber === 'function') refreshAllAmber();
+    if (typeof v2Refresh === 'function') v2Refresh();
+    addrLogCommit('New SenseNET network: sheets moved past 127 modules', snapBefore);
+    scheduleSave();
+  }
+  return Array.from(added).sort((a, b) => a - b);
+}
+function senseNetAddedNotice(nets){
+  if (!nets.length) return;
+  const names = nets.map(n => 'SenseNET network ' + n).join(', ');
+  showPromptModal({ title: nets.length > 1 ? 'New SenseNET networks added' : 'New SenseNET network added',
+    desc: `<p>The design has more than ${MAX_MODULES_PER_NETWORK} networked modules, the most one SenseNET network supports. <b>${names}</b> ${nets.length > 1 ? 'were' : 'was'} added to capture the additional modules; addressing restarts at 1 on each new network (whole sheets move, in sheet order).</p><p><b>Make sure the design includes the infrastructure needed to support ${nets.length > 1 ? 'these networks' : 'this new network'}</b> (its own SenseNET wiring/pathway and network connection to the command display/FACP).</p>`,
+    buttons: [{ label: 'OK', value: true, primary: true }] });
 }
 function resolveRowClusterNumber(row){
   const type = row.querySelector('.type-select').value;
@@ -6519,6 +6728,8 @@ function wireFeaturePack(){
   }
   if (clearBtn) clearBtn.addEventListener('click', () => { handleClearClick(); });
   if (confirmBtn) confirmBtn.addEventListener('click', () => { confirmDefaultsForCurrentSheet(); });
+  const addrLogBtn = document.getElementById('addr-log-btn');
+  if (addrLogBtn) addrLogBtn.addEventListener('click', () => { document.querySelectorAll('.menubar-menu').forEach(m => m.hidden = true); openAddrLog(); });
 
   document.addEventListener('focusin', (e) => {
     const loc = e.target.closest('.location');
@@ -6621,6 +6832,20 @@ const HOWDOI_COMMON = [
     title: 'Make all sheets Networked or Standalone (re-address)',
     keywords: 'mixed addressing networked standalone re-address readdress renumber duplicate address banner',
     blurb: 'When Networked and Standalone sheets are mixed, the banner above the sheet offers Make all Networked… / Make all Standalone… with an optional Also re-address all modules (Networked 1…N across sheets; Standalone 1…n per sheet). Confirm first; Cancel changes nothing.',
+    target: 'qs-step-addressing',
+  },
+  {
+    id: 'addr-log-undo',
+    title: 'Undo a re-address / see the address change log',
+    keywords: 'undo re-address readdress ctrl+z log audit address change history standalone cleared',
+    blurb: 'Unify / re-address, SenseNET moves and Standalone clears are logged in Edit → Address change log… (before/after per module, saved with the project). Undo the last one with the Undo bar above the sheet or Ctrl+Z.',
+    target: 'qs-step-addressing',
+  },
+  {
+    id: 'sensenet-networks',
+    title: 'More than 127 modules: SenseNET network 2, 3…',
+    keywords: 'sensenet network 127 modules overflow network 2 new network infrastructure',
+    blurb: 'One SenseNET network holds 127 modules. Past that, whole sheets (last first) move to SenseNET 2, 3… and are addressed from 1; you are told to include the infrastructure for the new network. Each Networked sheet shows its network (selector on the Addressing row; SN1/SN2 in the sidebar); duplicates are checked per network.',
     target: 'qs-step-addressing',
   },
   {
@@ -8167,7 +8392,7 @@ function v2SheetModel(locEl){
   if (bs) settings.push(['De-rating factor (D)', v2Val(locEl, '.derating-input')]);
   settings.push(['Power supply mode', mode === 'builtin' ? 'Edwards A/BPS' : (exportMode ? 'Third-party (export loads)' : 'Third-party (custom loads)')]);
   if (mode === 'builtin') settings.push(['Power supply capacity', v2SelText(locEl, '.ps-capacity-select')]);
-  settings.push(['Addressing', (locEl.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone' ? 'Standalone' : 'Networked']);
+  settings.push(['Addressing', (locEl.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone' ? 'Standalone' : 'Networked · SenseNET ' + sheetSenseNet(locEl)]);
   const modules = Array.from(locEl.querySelectorAll('[data-role="module"]')).map(r => {
     const type = r.querySelector('.type-select').value;
     const isDet = (MODULE_TYPES[type] || {}).kind === 'detector';
@@ -8299,7 +8524,7 @@ function v2RenderSidebar(models, cur){
   list.innerHTML = models.length ? groups.map(gname => `<div class="sb-group"><div class="sb-gh" title="Area/Group (Power Supply Location)">${v2Esc(gname)}</div>${byName[gname].map(m =>
     `<button type="button" class="sb-item${m.el === cur ? ' current' : ''}" data-loc="${m.loc}" title="${v2Esc(v2PsTag(m) + ' — ' + dotTitle[m.dot] + (m.overrides.length ? ' · overrides: ' + m.overrides.join(', ') : ''))}">
       <span class="dot st-${m.dot}" aria-label="${dotTitle[m.dot]}"></span>${m.overrides.length ? '<span class="dot st-overridden" aria-label="Overridden"></span>' : ''}
-      <span class="sb-name">${v2Esc(v2PsTag(m))}</span>
+      <span class="sb-name">${v2Esc(v2PsTag(m))}${addrSchemeOf(m.el) === 'networked' ? `<span class="sb-net" title="SenseNET network ${sheetSenseNet(m.el)}">SN${sheetSenseNet(m.el)}</span>` : ''}</span>
       ${m.flags.length + m.invalidList.length ? `<span class="sb-cnt">${m.flags.length + m.invalidList.length}</span>` : ''}
       <span class="sb-ah">${isFinite(m.requiredAh) ? v2Fmt(m.requiredAh, 1) + ' Ah' : ''}</span></button>`).join('')}</div>`).join('')
     : '<p class="sb-empty">No power supply sheets yet. Click <b>+ Add power supply</b> or <b>Import .pl</b>.</p>';
@@ -8719,7 +8944,7 @@ function v2DetailRows(models, level){
   models.forEach(m => {
     rows.push({ style: 3, cells: [`${v2PsTag(m)} — ${m.area || 'No Area/Group'}`, 'Required Ah', isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : '—', 'Status', v2StatusWord(m.status)] });
     if (level === 'summary'){
-      rows.push({ level: 1, cells: ['Battery', m.batteryLabel] }, { level: 1, cells: ['Design Basis', m.settings[0][1]] }, { level: 1, cells: ['Total load (mA)', m.totalMa] });
+      rows.push({ level: 1, cells: ['Battery', m.batteryLabel] }, { level: 1, cells: ['Design Basis', m.settings[0][1]] }, { level: 1, cells: ['Addressing', (m.settings.find(x => x[0] === 'Addressing') || [])[1] || ''] }, { level: 1, cells: ['Total load (mA)', m.totalMa] });
     } else {
       // existing per-sheet detail rows (same content as the 01.x Excel export), grouped under the PSU
       const dl = buildLocationRows(m.el, H.project, H.preparedBy, H.date);
