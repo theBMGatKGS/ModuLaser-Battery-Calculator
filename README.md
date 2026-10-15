@@ -3,6 +3,16 @@
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
+## What's new in 02.00.004 (local, pending QA)
+- **Valid defaults are no longer flagged.** Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet *Needs entry*. Only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are amber. **Edit → Confirm defaults** is kept but no longer needed (harmless).
+- **New sheets start with no modules.** An empty sheet shows a guide: **Import .pl…** (from PipeCAD) or **+ Add Display / + Add Detector** (by hand). The last module can be removed (the guide returns). An empty sheet is *Needs entry* / INCOMPLETE.
+- **Standby (h) / Alarm (min)** no longer cut values off on screens ≤ 1366 px (boxes keep 92 px; the settings row wraps).
+- **Addressing per mode.** Networked sheets share one SenseNET address pool (1–127). A Standalone sheet is its own pool (1–9, now scoped per sheet instead of per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside one Standalone sheet are still flagged.
+- **Mixed Networked + Standalone** projects show a *Mixed addressing* banner: **Make all Networked…** / **Make all Standalone…**, confirm first, optional **Also re-address all modules** (Networked 1…N across sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged).
+- **Imports keep addresses** (Import Calc, Import project, .pl re-import) and list any per-mode conflicts right after import.
+- Calculation math, `masd-engine.js` 1.0.0 and `modulaser-project.js` 1.3.0 unchanged (no engine bump).
+- QA: pending (brief `qa/brief-02.00.004.md`).
+
 ## What's new in 02.00.003
 - **Needs-entry fields are visible again.** A sheet marked *Needs entry* (amber dot) now outlines every field that needs entry in **amber** (2px), including the custom dropdowns. In 02.00.000–02.00.002 the old 1px soft-blue outline blended into the dark theme, so nothing appeared highlighted.
 - **Show next ›** in the Live Results panel scrolls to and focuses each needs-entry field in turn.
@@ -66,7 +76,7 @@ Calculator revision **02.00.000_261013**. Major version 02.00 folds in the unrel
 - Dropdown scroll + keyboard navigation (01.05.009)
 - Sheet header layout: PS Name/Location on its own row; wider Design Basis (01.05.008)
 - White-on-black custom dropdowns (01.05.007)
-- Import Calc (replace/merge), Clear (sheet or file), Confirm defaults, needs-entry highlighting (amber since 02.00.003)
+- Import Calc (replace/merge), Clear (sheet or file), Confirm defaults (no longer needed since 02.00.004), needs-entry highlighting (amber since 02.00.003; empty required fields only since 02.00.004)
 - Searchable How Do I… help
 
 Full history: [`CHANGELOG.md`](CHANGELOG.md) and Help → Revision Log in the app.
@@ -90,8 +100,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.003.exe
-npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.003.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.004.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.004.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -114,7 +124,7 @@ on a `macos-latest` runner — happy to help set that up if you want it.
 
 The app has a Help → About menu item (and on macOS, the standard app menu's
 "About ModuLaser Battery Calculator" too) showing the revision and author —
-currently Revision `02.00.003_261014`, authored by The BMG. These are set
+currently Revision `02.00.004_261015`, authored by The BMG. These are set
 as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
 update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section
