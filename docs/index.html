@@ -153,7 +153,7 @@
   .location-name-print-text{ display:none; }
   .ps-name-print-text, .ps-location-print-text{ display:none; }
   /* Row 2: Design Basis (wide) + Standby/Alarm + Ambient Temp + Remove */
-  .head-fields{ display:flex; gap:14px; align-items:flex-end; flex-wrap:nowrap; width:100%; }
+  .head-fields{ display:flex; gap:14px; align-items:flex-end; flex-wrap:wrap; row-gap:8px; /* 02.00.004: wrap instead of pushing Ambient Temp. off the sheet on narrow screens */ width:100%; }
   .head-fields > .btn{ flex: 0 0 auto; }
   @media (max-width: 900px){
     .head-fields{ flex-wrap: wrap; }
@@ -161,6 +161,9 @@
   .field-mini{ display:flex; flex-direction:column; gap:4px; }
   .field-mini label{ font-size:10.5px; text-transform:uppercase; letter-spacing:0.6px; color: var(--text-faint); font-weight:600;}
   .field-mini input{ width:74px; }
+  /* 02.00.004: Standby (h) / Alarm (min) never shrink below a readable width (values were cut off at <=1366px) */
+  .field-mini:has(> .standby-hours), .field-mini:has(> .alarm-minutes){ flex:0 0 auto; min-width:92px; }
+  .field-mini input.standby-hours, .field-mini input.alarm-minutes{ width:92px; min-width:92px; box-sizing:border-box; }
   .field-mini.design-basis-field{
     /* Grow into leftover space after Standby/Alarm/Ambient/Remove; basis 0 so
        siblings keep their natural widths and don't wrap under a greedy basis. */
@@ -400,6 +403,21 @@
   .cluster-remote-hint:empty{ display:none; }
 
   .add-zone-row{ margin: 8px 0 4px; display:flex; gap:8px; }
+  .addr-mix-banner{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; margin:0 0 8px; padding:8px 12px; border:1px solid #d29922; border-left-width:4px; border-radius:6px; background:#2a2312; color:#e6edf3; font-size:12.5px; }
+  .addr-mix-banner[hidden]{ display:none; }
+  .addr-mix-banner .amb-act{ display:flex; gap:6px; }
+  .amb-re{ display:flex; gap:8px; align-items:flex-start; font-size:12.5px; margin-top:6px; }
+  @media print{ .addr-mix-banner{ display:none !important; } }
+  /* 02.00.004: empty-state guide when a sheet has no modules */
+  .empty-modules{ display:none; margin:8px 0 10px; padding:12px 14px; border:1px dashed #3a4656; border-radius:6px; background:#151b23; color:#c9d1d9; }
+  .location:not(:has([data-role="module"])) .empty-modules{ display:block; }
+  .location:not(:has([data-role="module"])) .devtable, .location:not(:has([data-role="module"])) .add-zone-row{ display:none; }
+  .empty-modules .em-title{ font-weight:700; color:#e6edf3; margin-bottom:4px; }
+  .empty-modules .em-note{ margin:0 0 6px; color:#8b98a8; font-size:12px; }
+  .empty-modules .em-steps{ margin:0; padding-left:20px; }
+  .empty-modules .em-steps li{ margin:6px 0; font-size:12.5px; }
+  .empty-modules .em-act{ margin-top:5px; display:flex; gap:6px; }
+  @media print{ .empty-modules{ display:none !important; } }
 
   .mode-toggle, .submode-toggle{ display:flex; flex-direction:column; gap:8px; margin-bottom: 4px; }
   .mode-opt{
@@ -1258,7 +1276,7 @@ body.v2 .model-cell{ font-size:10.5px; }
             <button role="menuitem" id="add-location-menu-btn" title="Add another power supply sheet">+ Add Location</button>
             <hr>
             <button role="menuitem" id="clear-calc-btn" title="Clear this sheet or the entire file">Clear…</button>
-            <button role="menuitem" id="confirm-defaults-btn" title="Mark factory-default fields on the project header and current sheet as confirmed (clears amber needs-entry on defaults)">Confirm defaults</button>
+            <button role="menuitem" id="confirm-defaults-btn" title="Marks the current sheet's settings as reviewed. Since 02.00.004 valid defaults are never amber-flagged, so this changes nothing on screen; kept for older habits and files.">Confirm defaults</button>
             <hr>
             <button role="menuitem" id="clear-saved-btn" title="Clear all saved entries and start over">Clear saved data</button>
           </div>
@@ -1520,7 +1538,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">3</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-sidebar">Add power supply sheets and use the sidebar</div>
-            <p>Each sheet = one power supply. Add one with <b>+ Add power supply</b> at the bottom of the sidebar, <b>+ Add Location</b> in the quick row, or <b>Edit → + Add Location</b>. Click a sheet in the sidebar to show it. Sheets are grouped by their <b>Location</b> (the Area/Group name; an Import .pl fills it from the PipeCAD floor). Each shows its required Ah and a status dot: <b>green</b> complete, <b>amber</b> needs entry (amber-outlined fields left), <b>red</b> error (an INVALID CALCULATION condition or a Validation Error; the red count shows how many), and an extra <b>blue</b> dot when the sheet overrides the project settings. At the top of the sheet fill in the <b>Power Supply Name</b> (e.g. <span class="mono-inline">PS-1</span>) and <b>Location</b> (e.g. <span class="mono-inline">Riser Closet A</span>); use <b>Remove ⌫</b> on the sheet to delete it.</p>
+            <p>Each sheet = one power supply. Add one with <b>+ Add power supply</b> at the bottom of the sidebar, <b>+ Add Location</b> in the quick row, or <b>Edit → + Add Location</b>. Click a sheet in the sidebar to show it. Sheets are grouped by their <b>Location</b> (the Area/Group name; an Import .pl fills it from the PipeCAD floor). Each shows its required Ah and a status dot: <b>green</b> complete, <b>amber</b> needs entry (amber-outlined fields left), <b>red</b> error (an INVALID CALCULATION condition or a Validation Error; the red count shows how many), and an extra <b>blue</b> dot when the sheet overrides the project settings. At the top of the sheet fill in the <b>Power Supply Name</b> (e.g. <span class="mono-inline">PS-1</span>) and <b>Location</b> (e.g. <span class="mono-inline">Riser Closet A</span>); use <b>Remove ⌫</b> on the sheet to delete it. <b>New sheets start with no modules</b> (02.00.004): an empty sheet shows a guide with two choices — <b>Import .pl…</b> to bring modules in from PipeCAD, or <b>+ Add Display</b> / <b>+ Add Detector</b> to add them by hand. An empty sheet shows <i>Needs entry</i> and INCOMPLETE until it has modules.</p>
             <figure class="qs-figure"><img data-qs-slot="2-add-location" alt="Sidebar"><figcaption>Screenshot: sheet sidebar with status dots and + Add power supply</figcaption></figure>
           </div>
         </div>
@@ -1556,7 +1574,8 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">7</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-addressing">Choose Networked or Standalone addressing</div>
-            <p>Just below "Clusters supported" is a per-sheet <b>Networked / Standalone</b> toggle. <b>Networked</b> is the default (unchanged for every existing project) — Address stays the 1–127 dropdown from the Address step, unique across the whole document. <b>Standalone</b> is for a cluster with no SenseNET pathway connecting it to anything else: Address becomes a 1–9 dropdown, and uniqueness is scoped to that one cluster rather than the whole document — a completely unrelated cluster elsewhere can freely reuse the same addresses, even if it happens to share the same cluster number, since there's no physical network tying them together. A sheet with multiple clusters still gets an independent 1–9 pool per cluster even in Standalone mode, and Cluster identification is still fully required either way — Standalone only changes the addressing pool, nothing else. Cross-sheet cluster referencing (see Build each cluster) keeps working normally no matter which scheme either sheet uses. Switching a sheet to Standalone clears any of its own addresses already set above 9, since they're no longer valid options.</p>
+            <p>Just below "Clusters supported" is a per-sheet <b>Networked / Standalone</b> toggle. <b>Networked</b> is the default (unchanged for every existing project) — Address is the 1–127 dropdown, unique across <b>every Networked sheet</b> (one SenseNET network). <b>Standalone</b> is for a sheet with no SenseNET pathway connecting it to anything else: Address becomes a 1–9 dropdown and is unique <b>within that sheet only</b> (02.00.004) — a Standalone sheet may reuse addresses used on any other sheet, Networked or Standalone, and is never flagged for that; two modules on the same Standalone sheet with one address are still flagged. Cluster identification is still required either way, and cross-sheet cluster referencing keeps working. Switching a sheet to Standalone clears any of its addresses above 9.</p>
+            <p><b>Mixed sheets.</b> When a project has both Networked and Standalone sheets, an amber <b>Mixed addressing</b> banner appears above the sheet with <b>Make all Networked…</b> and <b>Make all Standalone…</b>. Each asks for confirmation first (Cancel changes nothing) and offers <b>Also re-address all modules</b>: Networked numbers every module 1, 2, 3… starting on the first sheet and continuing through every sheet in order; Standalone starts at 1 on every sheet. Module order, displays/detectors, ribbon (Power) links, AUX circuits and cluster assignments are not changed — only the Address values. Without re-addressing, addresses are kept (Standalone still clears any above 9). Imported designs (Import Calc, Import project, .pl re-import) keep their addresses; if they contain duplicates under these rules, a notice lists them right after the import.</p>
           </div>
         </div>
 
@@ -1630,7 +1649,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">15</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-needs-entry">Amber needs-entry highlights</div>
-            <p>Empty editable fields — and fields still sitting on their factory defaults — show a <b>amber</b> (orange) 2px outline and light amber tint so unfinished entry is easy to spot. This is intentionally different from the <b>yellow</b> Validation Error panel and the <b>red</b> INVALID CALCULATION banner. Amber clears when you fill an empty field, or when you change a factory-default value away from its starter setting. <b>Date</b> is excluded: new and cleared documents still initialize Date to today, and you can edit it normally afterward, but it is never amber-highlighted. Project-header fields (Project Name, Prepared By, Network #, Building, CDM locations) use the same empty/default rules as sheet fields.</p>
+            <p>Empty required fields — selections with no usable default, such as Power Supply Name, Location, a module's Address, Zone and Fan Speed — show an <b>amber</b> (orange) 2px outline and light amber tint so unfinished entry is easy to spot. This is intentionally different from the <b>yellow</b> Validation Error panel and the <b>red</b> INVALID CALCULATION banner. Amber clears when you fill the field. <b>Valid defaults are never flagged</b> (02.00.004): Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and never make a sheet <i>Needs entry</i>. <b>Date</b> is excluded: new and cleared documents still initialize Date to today, and you can edit it normally afterward, but it is never amber-highlighted. Project-header fields (Project Name, Prepared By, Network #, Building, CDM locations) are amber only while empty.</p>
             <figure class="qs-figure"><img data-qs-slot="10-needs-entry" alt="Amber needs-entry highlights"><figcaption>Screenshot: amber-highlighted empty/default fields on the project header and current sheet</figcaption></figure>
           </div>
         </div>
@@ -1639,7 +1658,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">16</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-confirm-defaults">Confirm defaults</div>
-            <p>When factory defaults are intentional (you reviewed them and want to keep them), click <b>Edit → Confirm defaults</b>. That clears amber highlighting on factory-default fields for the <b>project header</b> and the <b>current sheet</b> (the sheet you last clicked or focused — shown with a subtle outline). Empty fields stay amber until you fill them. Confirming does not change any values — it only marks those defaults as reviewed.</p>
+            <p>Since 02.00.004 you no longer need this step: valid defaults are not amber-flagged and never hold a sheet in <i>Needs entry</i>. <b>Edit → Confirm defaults</b> is kept (it is harmless — it only marks the current sheet's defaults as reviewed and changes no values). Empty required fields stay amber until you fill them.</p>
             <figure class="qs-figure"><img data-qs-slot="11-confirm-defaults" alt="Confirm defaults button"><figcaption>Screenshot: Edit → Confirm defaults clearing amber on reviewed factory defaults</figcaption></figure>
           </div>
         </div>
@@ -1648,7 +1667,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">17</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-clear">Clear a sheet or the entire file</div>
-            <p><b>Edit → Clear…</b> asks what to wipe. <b>This sheet only</b> resets the current power-supply sheet to a blank factory starter (modules + defaults) and leaves project header fields alone — you confirm before it runs. <b>Entire file</b> removes every sheet, then asks whether to <b>keep</b> or <b>clear</b> the project/header fields, and asks for a final confirm before wiping. Either path starts you with a fresh blank sheet afterward. (The separate <b>Edit → Clear saved data</b> only wipes browser Auto-Save storage — different from Clear….)</p>
+            <p><b>Edit → Clear…</b> asks what to wipe. <b>This sheet only</b> resets the current power-supply sheet to a blank sheet (no modules, default settings) and leaves project header fields alone — you confirm before it runs. <b>Entire file</b> removes every sheet, then asks whether to <b>keep</b> or <b>clear</b> the project/header fields, and asks for a final confirm before wiping. Either path starts you with a fresh blank sheet afterward. (The separate <b>Edit → Clear saved data</b> only wipes browser Auto-Save storage — different from Clear….)</p>
             <figure class="qs-figure"><img data-qs-slot="12-clear" alt="Clear dialog"><figcaption>Screenshot: Clear prompt choosing this sheet vs entire file</figcaption></figure>
           </div>
         </div>
@@ -1860,7 +1879,7 @@ body.v2 .model-cell{ font-size:10.5px; }
         </div>
         <div class="help-faq-item">
           <div class="q">What do the sidebar's status dots mean?</div>
-          <p class="a">Green: complete — no validation messages and no fields left to enter. Amber: needs entry — amber-outlined fields are still empty or on unconfirmed factory defaults; click <b>Show next ›</b> in the Live Results panel to jump to each one. Red: error — the sheet has an INVALID CALCULATION condition or a Validation Error (the red number is how many). A second, blue dot means the sheet overrides the settings most sheets use (Design Basis, standby, alarm, temperature or margin). The same legend is at the bottom of the sidebar.</p>
+          <p class="a">Green: complete — no validation messages and no fields left to enter. Amber: needs entry — amber-outlined required fields are still empty, or the sheet has no modules yet (valid defaults are never flagged); click <b>Show next ›</b> in the Live Results panel to jump to each one. Red: error — the sheet has an INVALID CALCULATION condition or a Validation Error (the red number is how many). A second, blue dot means the sheet overrides the settings most sheets use (Design Basis, standby, alarm, temperature or margin). The same legend is at the bottom of the sidebar.</p>
         </div>
         <div class="help-faq-item">
           <div class="q">How is PASS / FAIL / INCOMPLETE decided?</div>
@@ -1983,7 +2002,11 @@ body.v2 .model-cell{ font-size:10.5px; }
         </div>
         <div class="help-faq-item">
           <div class="q">What does the Standalone / Networked addressing toggle do?</div>
-          <p class="a">It's a per-sheet setting, just below the "Clusters supported" strip, controlling how Address is scoped. <b>Networked</b> (the default, both for new sheets and for any project saved before this feature existed) is today's familiar behavior: Address is a 1–127 dropdown, unique across the entire document — once claimed anywhere, it's disabled/"(taken)" everywhere else. <b>Standalone</b> is for a cluster with no SenseNET pathway connecting it to anything else: Address becomes a 1–9 dropdown, and uniqueness is scoped to that specific cluster rather than the whole document — a different, unrelated cluster elsewhere (even one that happens to share the same cluster number) can freely reuse the same addresses, since there's no physical network tying them together. If a sheet has multiple clusters, each cluster still gets its own independent 1–9 pool, and Cluster identification is still fully required either way — Standalone only changes the addressing pool, nothing else. Cross-sheet cluster referencing keeps working normally regardless of either sheet's addressing scheme. Switching a sheet to Standalone clears any of its own addresses above 9, since they're no longer valid options.</p>
+          <p class="a">It's a per-sheet setting, just below the "Clusters supported" strip. <b>Networked</b> (the default, also for older files) uses addresses 1–127, unique across every Networked sheet — they form one SenseNET network. <b>Standalone</b> is for a sheet with no SenseNET pathway: addresses 1–9, unique within that sheet only. Since 02.00.004 a Standalone sheet may share addresses with any other sheet without a Validation Error; duplicates inside one Standalone sheet are still flagged. Cluster identification is still required either way.</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">My project mixes Networked and Standalone sheets — what should I do?</div>
+          <p class="a">The amber <b>Mixed addressing</b> banner warns you. If it's intended (for example a standalone cluster in an outbuilding), leave it. Otherwise click <b>Make all Networked…</b> or <b>Make all Standalone…</b>; the confirm dialog offers <b>Also re-address all modules</b> (Networked: 1…N across all sheets in sheet order; Standalone: 1…n on each sheet). Only Address values change — module order, ribbon links, AUX and cluster assignments stay the same. Cancel changes nothing.</p>
         </div>
         <div class="help-faq-item">
           <div class="q">What is "Show granular calculation detail," and where do I find it?</div>
@@ -2415,6 +2438,7 @@ const AMENDMENTS = [
 { rev: "001", major: "02", minor: "00", date: "261013", desc: "<b>ModuLaser project file</b> (.mlproj.json), shared with the MASD Field Report 02.00.000. <b>File → Export project…</b> saves the project details, every power supply (name, Area/Group, model, battery model, Ah and quantity, required Ah, standby/alarm, result) and every detector and display (16-character name, type, address, power supply, fan speed, linked .pl device) plus the PipeCAD pipe data the Field Report needs: sampling holes (size, flow, transport time, sensitivity), test points, pipe length, total flow, hole balance, fittings, Alarm Factor and design sensitivity, and the .pl PSU/Battery positions. <b>File → Import project…</b> opens one; if sheets are already on screen it first shows the differences. The calculator owns the design section and never edits the Field Report's site results: they are kept and written back unchanged. Imported .pl files now keep their hole and results data in the calc file too. The .pl reading and the file format live in modulaser-project.js, shared by both tools. <b>Calculation math unchanged.</b>" },
 { rev: "002", major: "02", minor: "00", date: "261013", desc: "<b>Shared MASD engine 1.0.0.</b> The battery math (standby, alarm, BS 5839-1 D factor, NFPA 72 minimum margin, safety margin, temperature multiplier, supplies required, group estimates), the reference data (module currents, fan-speed currents, design-basis presets, battery models) and the PipeCAD .pl import now live in one shared engine (<code>masd-engine.js</code>), used byte-for-byte by this calculator and the MASD Engineering Toolbox 00.01.000, so both produce identical results. Harmonization rule: any engine change bumps the engine version and the revision of both apps, with matching notes here. Results unchanged: the regression scenarios and the full test suite give the same numbers as 02.00.001. <b>Also in 02.00.002:</b> project-file pass-through of field changes, approvals, Toolbox device configuration, the Toolbox Performance Criteria (referenced standard preset, limits, code prescriptions, Area/Group overrides, narrative, Engineer of Record, spec reference; the British Standards presets mirror this calculator's BS 5839-1 Design Basis options) and unknown top-level keys (forward compatibility); a reload no longer loses the linked-site/project extras; Saved-by records the Prepared By name. Shared modulaser-project.js 1.3.0, identical in the Battery Calculator, the MASD Field Report and the MASD Engineering Toolbox (sync test): SHA-256 design hash over the full design plus a separate site hash; metric .pl imports warn that PipeCAD's hole-sensitivity unit is unconfirmed; typical configuration defaults re-cited (flow ±20% and 120 s flow-fault delay, Table 29 p.76; FM/UL hole limits App. A printed p.113, ModuLaser Install Manual 04-4001-501-0803-05; 'Action' is Prealarm; unsourced values labelled typical – unverified). The MASD Engineering Toolbox 00.01.000 embeds this calculator and the same engine; harmonization rule: any engine change bumps both apps' revisions with matching notes and each records the engine version. <b>QA audit</b> — date 2026-10-13; commit audited cc55189 (02.00.001) plus working tree; issue: <a href=\"https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1\" target=\"_blank\" rel=\"noopener\">Calculator issue #1</a>; summary: defaults citations FAIL → fixed; Solano worst-hole rule PASS; audit trail FAIL → fixed (pass-through, hashes); Quick Start version text FAIL → fixed (Export project needs 02.00.001+); test.py fixed 800 ms wait replaced by wait-for-condition. QA re-check 2026-10-13 (8:28–8:45 PM ET): CONDITIONAL PASS. Fixed after the re-check: design hash stable on a no-op Calculator round trip (site and carried data kept out of design; calculator row ids renumbered by position); the mis-cited table number removed from the Report (App. A, printed p.113); UL 268, 7th Edition compliance never auto-confirmed — the engineer must confirm it before \"Complies with UL 268, 7th Edition\" prints; UL thresholds for NFPA presets per Brent: sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft, transport time no more than 60 / 43 / 43 s (UL 268 Special Application Range 1 / Range 2 / Open Area, ModuLaser Install Manual App. A, printed p.113; EWFD 1.5 from NFPA 76); sign-off order technician → designer → QA enforced, no hand-set status, reopening keeps history, real names required, QA overrides logged; Report edits blocked until a technician name is set; the edit log never overwrites entries; ASAG44201 citation replaced by NFPA 76-2024 clauses (Research 2026-10-13); standalone Quick Start says Battery Calculator 02.00.001+; legacy-import tests check required Ah per sheet. Final verdict: QA audit 2026-10-13, final re-check of commit 848e97d (clean tree). PASS. Tests: regress 3/3, test 106/106, calc_project_test 16/16, shared-file and engine parity 2/2. Verified: SHA-256 design hash stable on a no-op round trip (Report → Calculator → Calculator), unknown fields, change log and sign-offs preserved, savedBy name, shared modulaser-project.js 1.3.0 and MASD engine 1.0.0 identical across apps. Known limitation: metric PipeCAD hole sensitivity is shown unconverted with a warning (unit unconfirmed). UL 268 thresholds (shared) are per Brent, not verified by QA. Issue: https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1 QA delta re-check 2026-10-13, commit b1cb13b (clean). PASS. Brent's rule is verified: a hole passes at or below (≤) the class maximum, the more restrictive of UL and NFPA (VEWFD 1.0 %obs/ft / 60 s, EWFD 1.5 / 43 s, SFD/OAP 2.18 / 43 s; targets 1.0 / 1.5 / 2.0). UL projects enforce the ModuLaser UL 268 range lower limits (Install Manual App. A p.113). This supersedes the earlier rule (a hole had to be below the limit). Tests: sens_rule 14/14, regress 3/3, test 106/106, calc_project_test 16/16, parity 2/2; design hash stable on round trip. Per Brent, unverified by QA: the ≤ rule (the manual's FM 3230 rows say \"<\") and EWFD 1.5 (from NFPA 76-2024 8.5.3.2.1.3; UL Range 2 itself is 0.05–2.18). Final pre-tag pass 2026-10-13 (10:02–10:40 PM ET): Calculator 6adde0d / Report 5448488 (release a32d988) / Toolbox 8aa707a — GO; sens_rule 14/14; committed tests pass (release commits differ from these only by this release-note line)..." },
 { rev: "003", major: "02", minor: "00", date: "261014", desc: "<b>Needs-entry fix (QA/Auditor).</b> Sheets showed the amber <i>Needs entry</i> status but the fields that needed entry were not visibly marked: the 02.00 dark theme kept the old 1px soft-blue (#5b9bd5) outline, which looked the same as ordinary input borders, so the highlight could not be seen (most of these fields are custom dropdowns over hidden native selects). Needs-entry fields now use a 2px <b>amber</b> outline and tint that match the amber sidebar dot, on inputs, custom dropdown buttons and radio groups. The Live Results message now reads <i>N fields still need entry (amber outline)</i> with a <b>Show next ›</b> button that scrolls to and focuses each field in turn. Status logic, counts and calculation math are unchanged. Help, Quick Start, How Do I and FAQ wording updated from blue to amber. Also: print label grey darkened #747574 → #6b6c6b for WCAG AA contrast (5.0:1 on the info panel). Regression test test_needs_entry.py uses Brent's saved file (5/5 pass; 1/3 on 02.00.002). <b>Module table columns (02.00.003, per Brent):</b> Module Type shows DISP-MIN / DISP-STD / DISP-CMD / DETECTOR (stored values unchanged, so saved files and imports are unaffected); Cluster shows the 2-digit number only (01); Power shows <i>Own circuit</i> or <i>Ribbon Path</i> (the dropdown list still names the entry point). Fixed pixel column widths (Superdesign layout suggestion: Model wide enough for FHSD83x0-ULF, narrow Cluster) with no truncation or wrap; the table scrolls sideways on narrow windows. Print/Export and Word module tables gain Model, Cluster and Power columns with the same labels, single-line cells (Word no-wrap). Test test_module_columns.py 10/10 on Brent\'s file (2/10 on 02.00.002). **QA follow-up (2026-10-14):** cross-sheet Cluster hint clipped with ellipsis and full text on hover; 'No cluster display defined on any page' shows '—' on the button (full text on hover); needs-entry count and Show next skip CSS-hidden fields (a new sheet shows 18, not 19) and Show next starts from the first field on each sheet; Word export has an Arial 9 pt default font (styles.xml), fixed-layout tables and summary rows spanning the descriptive columns so nothing wraps or is clipped. Saved .html files keep their own code: re-open data via File \u2192 Import Calc. Final (QA re-check): Word module table Standby mA / Alarm mA columns 1100 twips (header no longer wraps), summary row shows 'Status:' again; offline cache renamed." },
+{ rev: "004", major: "02", minor: "00", date: "261015", desc: "Per Brent. <b>Valid defaults are no longer amber-flagged</b>: Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet <i>Needs entry</i>; only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are flagged. Edit → Confirm defaults is kept but no longer needed (harmless). <b>New sheets start with no modules</b>: an empty-state guide offers Import .pl… or + Add Display / + Add Detector; the last module can now be removed (the guide returns); an empty sheet shows Needs entry and INCOMPLETE. <b>Standby (h) / Alarm (min)</b> boxes no longer shrink and cut values off on screens ≤ 1366 px (the settings row wraps instead). <b>Addressing</b>: duplicate addresses are checked per mode — Networked sheets share one SenseNET pool; a Standalone sheet is its own 1–9 pool (scoped per sheet, previously per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside a Standalone sheet are still flagged. Projects mixing Networked and Standalone sheets show a <b>Mixed addressing</b> banner with Make all Networked… / Make all Standalone… and an optional <i>Also re-address all modules</i> (Networked 1…N across all sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged; confirm first). Imports (Import Calc, Import project, .pl re-import) keep addresses and list any per-mode conflicts right after import. Calculation math, the shared engine (masd-engine.js 1.0.0) and project format (modulaser-project.js 1.3.0) are unchanged." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -2845,6 +2869,21 @@ function applyLoadedState(state){
   if (typeof stampHeaderFactoryDefaults === 'function') stampHeaderFactoryDefaults();
   if (typeof refreshAllAmber === 'function') refreshAllAmber();
   syncPrintHeaders();
+  // 02.00.004: imports (Import Calc, Import project, legacy files) keep their addresses; after the
+  // app has started, report any duplicates per addressing mode so the user can fix or re-address.
+  if (window.__appBooted) setTimeout(reportAddrConflictsAfterImport, 60);
+}
+function reportAddrConflictsAfterImport(){
+  const c = addrConflicts();
+  const name = l => { const n = (l.querySelector('.ps-name') || {}).value || ''; return n.trim() || ('Sheet ' + l.getAttribute('data-loc')); };
+  const items = [];
+  if (c.network.size) items.push(`<li>Networked sheets (one SenseNET network): address${c.network.size === 1 ? '' : 'es'} <b>${Array.from(c.network).join(', ')}</b> used more than once.</li>`);
+  document.querySelectorAll('.location').forEach(l => { const d = c.standalone[l.getAttribute('data-loc')]; if (d && d.size) items.push(`<li>Standalone sheet <b>${v2Esc(name(l))}</b>: address${d.size === 1 ? '' : 'es'} <b>${Array.from(d).join(', ')}</b> repeated on the sheet.</li>`); });
+  if (!items.length) return;
+  const mixed = new Set(Array.from(document.querySelectorAll('.location')).map(addrSchemeOf)).size > 1;
+  showPromptModal({ title: 'Address conflicts in the imported design',
+    desc: `<p>Imported addresses were kept as they were in the file. These duplicates are flagged on their sheets:</p><ul>${items.join('')}</ul><p>Standalone sheets may reuse addresses used on other sheets. Fix the addresses on the flagged sheets${mixed ? ', or use <b>Make all Networked…</b> / <b>Make all Standalone…</b> in the mixed-addressing banner with <b>Also re-address</b>' : ''}.</p>`,
+    buttons: [{ label: 'OK', value: true, primary: true }] });
 }
 
 // A file that was produced via "Save As" carries its data (and activation status) baked
@@ -3034,7 +3073,7 @@ function buildModuleRow(loc, uid, defaultType, defaultZone, defaultFan){
 function locationTemplate(loc){
   const idx = String(loc).padStart(2,"0");
   return `
-  <div class="location" id="location-${loc}" data-loc="${loc}" data-module-uid="3">
+  <div class="location" id="location-${loc}" data-loc="${loc}" data-module-uid="0">
     <div class="print-header">
       <span><b class="ph-project"></b></span>
       <span class="ph-preparedby"></span>
@@ -3120,7 +3159,7 @@ function locationTemplate(loc){
     <div class="addr-scheme-row">
       <span class="addr-scheme-label">Addressing:</span>
       <label class="mode-opt mode-opt-sm"><input type="radio" class="addr-scheme-radio" name="addrscheme-${loc}" value="networked" checked onchange="onAddrSchemeChange('${loc}')"> Networked (SenseNET, 1–127 network-wide)</label>
-      <label class="mode-opt mode-opt-sm"><input type="radio" class="addr-scheme-radio" name="addrscheme-${loc}" value="standalone" onchange="onAddrSchemeChange('${loc}')"> Standalone (no SenseNET pathway, 1–9 per cluster)</label>
+      <label class="mode-opt mode-opt-sm"><input type="radio" class="addr-scheme-radio" name="addrscheme-${loc}" value="standalone" onchange="onAddrSchemeChange('${loc}')"> Standalone (no SenseNET pathway, 1–9 per sheet)</label>
     </div>
     <div class="location-body">
       <div class="col-devices">
@@ -3139,11 +3178,18 @@ function locationTemplate(loc){
             <tr><th style="width:108px">Address</th><th style="width:160px">Zone</th><th style="width:112px">Module Type</th><th style="width:108px">Model</th><th style="width:72px">Cluster</th><th style="width:146px">Power</th><th style="width:88px">Fan Speed</th><th style="width:118px; text-align:right">Current</th><th style="width:44px"></th></tr>
           </thead>
           <tbody class="devices-body">
-            ${buildModuleRow(loc, 1, "Standard Display", "", "")}
-            ${buildModuleRow(loc, 2, "Detector", "", "")}
-            ${buildModuleRow(loc, 3, "Detector", "", "")}
           </tbody>
         </table>
+        <div class="empty-modules" role="region" aria-label="No modules yet">
+          <div class="em-title">No modules yet — add this power supply's ModuLaser modules</div>
+          <p class="em-note">New sheets start empty (02.00.004). Choose one:</p>
+          <ol class="em-steps">
+            <li><b>Import from PipeCAD</b> — bring in detectors and displays (type, zone name, fan speed, display model) from one or more <span class="mono-inline">.pl</span> files; one sheet is created per power supply.
+              <div class="em-act"><button type="button" class="btn btn-primary btn-sm" onclick="openPlWizard()">Import .pl…</button></div></li>
+            <li><b>Add modules manually</b> — add a display first, then the detectors on its cluster; set Address, Zone and Fan Speed for each.
+              <div class="em-act"><button type="button" class="btn btn-sm" onclick="addModuleRow('${loc}', 'Standard Display')">+ Add Display</button> <button type="button" class="btn btn-sm" onclick="addModuleRow('${loc}', 'Detector')">+ Add Detector</button></div></li>
+          </ol>
+        </div>
         <div class="add-zone-row">
           <button class="btn btn-sm" onclick="addModuleRow('${loc}', 'Detector')">+ Add Detector</button>
           <button class="btn btn-sm" onclick="addModuleRow('${loc}', 'Standard Display')">+ Add Display</button>
@@ -3529,7 +3575,7 @@ function removeModuleRow(loc, rowId){
   const row = document.getElementById(rowId);
   const locEl = document.getElementById(`location-${loc}`);
   const moduleCount = locEl.querySelectorAll('[data-role="module"]').length;
-  if (moduleCount <= 1){ alert("At least one module row is required."); return; }
+  // 02.00.004: the last module may be removed — the sheet then shows the empty-state guide
   if (row) row.remove();
   recalcLocation(loc);
 }
@@ -4821,19 +4867,19 @@ function recalcLocationInner(loc){
     flags.push(`${missingCircuit.length} entry-point module(s) missing circuit source (e.g., "PS-1 AUX-2"): ${missingCircuit.slice(0,6).join(', ')}${missingCircuit.length > 6 ? '…' : ''}.`);
   }
 
-  // Duplicate addresses network-wide (a safety net — the dropdown itself prevents most
-  // duplicates proactively, but a legacy saved file could still have pre-existing ones,
-  // and a duplicate could span two different sheets, not just this one).
-  const addrSeen = {};
-  const addrDupes = new Set();
-  document.querySelectorAll('[data-role="module"]').forEach(r => {
-    const a = r.querySelector('.module-address').value.trim();
-    if (!a) return;
-    if (addrSeen[a]) addrDupes.add(a);
-    else addrSeen[a] = true;
-  });
-  if (addrDupes.size){
-    flags.push(`Duplicate module address(es) across the network: ${Array.from(addrDupes).join(', ')} — each module in a SenseNET network needs a unique address.`);
+  // Duplicate addresses (a safety net — the dropdown prevents most duplicates, but a legacy or
+  // imported file can carry them). 02.00.004: mode-aware — Networked sheets share one SenseNET
+  // pool across every Networked sheet; a Standalone sheet is its own pool (it may reuse
+  // addresses used on any other sheet), duplicates within it are still flagged.
+  const addrC = addrConflicts();
+  const ownScheme = (locEl.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone' ? 'standalone' : 'networked';
+  const ownAddrs = new Set(Array.from(locEl.querySelectorAll('[data-role="module"] .module-address')).map(sel => sel.value.trim()).filter(Boolean));
+  if (ownScheme === 'networked'){
+    const d = Array.from(addrC.network).filter(a => ownAddrs.has(a));
+    if (d.length) flags.push(`Duplicate module address(es) across the network: ${d.join(', ')} — each module on Networked sheets (one SenseNET network) needs a unique address.`);
+  } else {
+    const d = Array.from(addrC.standalone[loc] || []);
+    if (d.length) flags.push(`Duplicate module address(es) on this Standalone sheet: ${d.join(', ')} — each module on a Standalone sheet needs a unique address (other sheets may reuse them).`);
   }
 
   // Auto Battery Sizing: decide power supply capacity from total AUX current before reading it below.
@@ -5509,6 +5555,12 @@ function recalcLocation(loc){
         .some(r => MODULE_TYPES[r.querySelector('.type-select').value].kind === 'display');
       if (!hasDisplay) recalcLocationInner(otherLoc);
     });
+    // 02.00.004: when the duplicate-address picture changes, refresh every sheet's flags
+    const sig = addrConflictSig();
+    if (sig !== window.__addrSig){
+      window.__addrSig = sig;
+      document.querySelectorAll('.location').forEach(otherEl => { const o = otherEl.getAttribute('data-loc'); if (String(o) !== String(loc)) recalcLocationInner(o); });
+    }
     window.__inCascade = false;
     updateNetworkAddressAvailability();
     refreshAllClusterSummaries();
@@ -5552,8 +5604,7 @@ function updateNetworkAddressAvailability(){
     allAddrSelects.push({ sel, row, scheme });
     if (!sel.value) return;
     if (scheme === 'standalone'){
-      const clusterNum = resolveRowClusterNumber(row);
-      const key = clusterNum !== null ? String(clusterNum) : '__unclustered__';
+      const key = addrSheetKey(row);   // 02.00.004: a Standalone sheet is its own address pool
       standaloneUsageByCluster[key] = standaloneUsageByCluster[key] || {};
       (standaloneUsageByCluster[key][sel.value] = standaloneUsageByCluster[key][sel.value] || []).push(sel);
     } else {
@@ -5566,9 +5617,7 @@ function updateNetworkAddressAvailability(){
     const max = scheme === 'standalone' ? 9 : MAX_MODULES_PER_NETWORK;
     let usageForThisRow = networkedUsage;
     if (scheme === 'standalone'){
-      const clusterNum = resolveRowClusterNumber(row);
-      const key = clusterNum !== null ? String(clusterNum) : '__unclustered__';
-      usageForThisRow = standaloneUsageByCluster[key] || {};
+      usageForThisRow = standaloneUsageByCluster[addrSheetKey(row)] || {};
     }
     let opts = '<option value="">— Select —</option>';
     for (let i = 1; i <= max; i++){
@@ -5581,6 +5630,86 @@ function updateNetworkAddressAvailability(){
   });
 }
 
+function addrConflictSig(){
+  const c = addrConflicts();
+  const schemes = Array.from(document.querySelectorAll('.location')).map(l => (l.querySelector('.addr-scheme-radio:checked') || {}).value).join(',');
+  return schemes + '|' + Array.from(c.network).sort().join(',') + '|' + Object.keys(c.standalone).sort().map(k => k + ':' + Array.from(c.standalone[k]).sort().join(',')).join(';');
+}
+// 02.00.004: mixed Networked + Standalone sheets — warn and offer to unify (optionally re-address).
+function addrSchemeOf(l){ return (l.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone' ? 'standalone' : 'networked'; }
+function refreshAddrMixBanner(){
+  const host = document.getElementById('locations-container'); if (!host) return;
+  let b = document.getElementById('addr-mix-banner');
+  if (!b){
+    b = document.createElement('div'); b.id = 'addr-mix-banner'; b.className = 'addr-mix-banner'; b.hidden = true; b.setAttribute('role', 'status');
+    host.parentNode.insertBefore(b, host);
+  }
+  const locs = Array.from(document.querySelectorAll('.location'));
+  const nNet = locs.filter(l => addrSchemeOf(l) === 'networked').length, nSa = locs.length - nNet;
+  const mixed = nNet > 0 && nSa > 0;
+  b.hidden = !mixed;
+  if (!mixed){ b.innerHTML = ''; return; }
+  b.innerHTML = `<span class="amb-txt"><b>Mixed addressing:</b> ${nNet} Networked and ${nSa} Standalone sheet${nSa === 1 ? '' : 's'}. Standalone sheets may reuse addresses from other sheets; Networked sheets share one SenseNET address pool. If that isn't intended, make them all the same.</span>
+    <span class="amb-act"><button type="button" class="btn btn-sm" data-mode="networked" onclick="unifyAddressing('networked')">Make all Networked…</button><button type="button" class="btn btn-sm" data-mode="standalone" onclick="unifyAddressing('standalone')">Make all Standalone…</button></span>`;
+}
+async function unifyAddressing(mode){
+  window.__ambRe = false;
+  const isNet = mode === 'networked';
+  const choice = await showPromptModal({
+    title: isNet ? 'Make all sheets Networked?' : 'Make all sheets Standalone?',
+    desc: isNet
+      ? 'Every sheet joins one SenseNET network: addresses 1–127, unique across all sheets.'
+      : 'Every sheet becomes its own Standalone pool: addresses 1–9, unique within each sheet; addresses above 9 are cleared unless you re-address.',
+    extraHtml: `<label class="amb-re"><input type="checkbox" id="amb-readdress" onchange="window.__ambRe = this.checked"> Also re-address all modules — ${isNet ? 'start at 1 on the first sheet and number every module on every sheet in order' : 'start at 1 on every sheet and number its modules in order'} (module order, ribbon, AUX and cluster assignments are unchanged)</label>`,
+    buttons: [{ label: 'Cancel', value: null }, { label: isNet ? 'Make all Networked' : 'Make all Standalone', value: 'go', primary: true }]
+  });
+  const readdress = !!window.__ambRe; window.__ambRe = false;
+  if (choice !== 'go') return;
+  applyUnifiedAddressing(mode, readdress);
+}
+// mode: 'networked' | 'standalone'; readdress: renumber modules (sheet order, then row order)
+function applyUnifiedAddressing(mode, readdress){
+  const locs = Array.from(document.querySelectorAll('.location'));
+  locs.forEach(l => { const r = l.querySelector(`.addr-scheme-radio[value="${mode}"]`); if (r) r.checked = true; });
+  const max = mode === 'standalone' ? 9 : MAX_MODULES_PER_NETWORK;
+  let n = 0, skipped = 0;
+  locs.forEach(l => {
+    if (mode === 'standalone') n = 0;
+    l.querySelectorAll('[data-role="module"] .module-address').forEach(sel => {
+      if (readdress){
+        n++; sel.value = ''; if (n <= max) sel.dataset.desiredValue = String(n); else { delete sel.dataset.desiredValue; skipped++; }
+      } else if (mode === 'standalone' && parseInt(sel.value) > 9){ sel.value = ''; }
+    });
+  });
+  updateNetworkAddressAvailability();
+  window.__addrSig = null;
+  locs.forEach(l => recalcLocationInner(l.getAttribute('data-loc')));
+  window.__addrSig = addrConflictSig();
+  updateNetworkAddressAvailability();
+  if (typeof refreshAllClusterSummaries === 'function') refreshAllClusterSummaries();
+  if (typeof refreshAllAmber === 'function') refreshAllAmber();
+  if (typeof v2Refresh === 'function') v2Refresh();
+  scheduleSave();
+  if (skipped) alert(`${skipped} module(s) were left without an address: ${mode === 'standalone' ? 'a Standalone sheet allows addresses 1–9' : 'a network allows 1–' + MAX_MODULES_PER_NETWORK}.`);
+}
+function addrSheetKey(row){
+  const l = row.closest('.location'); return l ? l.getAttribute('data-loc') : '__none__';
+}
+// 02.00.004: duplicate addresses per addressing mode. network = Set of addresses used more than once
+// across all Networked sheets; standalone = { sheetLoc: Set } of addresses repeated within that sheet.
+function addrConflicts(){
+  const net = {}, sa = {}, out = { network: new Set(), standalone: {} };
+  document.querySelectorAll('.location').forEach(l => {
+    const loc = l.getAttribute('data-loc');
+    const standalone = (l.querySelector('.addr-scheme-radio:checked') || {}).value === 'standalone';
+    l.querySelectorAll('[data-role="module"] .module-address').forEach(sel => {
+      const a = sel.value.trim(); if (!a) return;
+      if (standalone){ sa[loc] = sa[loc] || {}; if (sa[loc][a]) (out.standalone[loc] = out.standalone[loc] || new Set()).add(a); sa[loc][a] = true; }
+      else { if (net[a]) out.network.add(a); net[a] = true; }
+    });
+  });
+  return out;
+}
 function resolveRowClusterNumber(row){
   const type = row.querySelector('.type-select').value;
   const info = MODULE_TYPES[type];
@@ -5779,7 +5908,7 @@ function qsWireframe(slot){
       `<rect x="200" y="66" width="90" height="28" rx="3" fill="rgba(210,153,34,0.12)" stroke="#d29922"/><text x="208" y="78" font-size="7" fill="#666">Address</text><text x="208" y="88" font-size="8" fill="#d29922" font-style="italic">— Select —</text>` +
       `<rect x="10" y="108" width="175" height="18" rx="3" fill="#fdf8e3" stroke="#d4b106"/><text x="18" y="120" font-size="7.5" fill="#8f7704">⚠ yellow = Validation Error</text>` +
       `<rect x="200" y="108" width="175" height="18" rx="3" fill="#fdeaea" stroke="#c81e2c"/><text x="208" y="120" font-size="7.5" fill="#c81e2c">red = INVALID CALCULATION</text>` +
-      `<text x="10" y="142" font-size="7.5" fill="#666">Amber clears when filled, changed off factory default, or via Confirm defaults</text>`);
+      `<text x="10" y="142" font-size="7.5" fill="#666">Amber only on empty required fields; valid defaults never flagged</text>`);
 
     case '11-confirm-defaults': return shell(defs +
       `<rect x="8" y="10" width="384" height="36" rx="4" fill="#fff" stroke="#666"/>` +
@@ -6026,49 +6155,11 @@ function refreshAmberForLocation(locEl){
       markFieldAmber(el, true);
       return;
     }
-    // Factory default?
-    const conf = el.dataset.confirmed === '1';
-    if (conf){ markFieldAmber(el, false); return; }
-    const factory = FACTORY_FIELD_DEFAULTS.find(f => el.matches(f.sel));
-    if (factory && String(el.value) === String(factory.value)){
-      markFieldAmber(el, true);
-      return;
-    }
-    // Module starter types count as factory until confirmed/changed
-    if (el.classList.contains('type-select')){
-      const factoryTypes = ['Standard Display', 'Detector', 'Minimum Display', 'Command Display'];
-      // Only amber type if it was never touched — use data-factory-type stamped at creation
-      if (el.dataset.factoryType && el.value === el.dataset.factoryType && el.dataset.confirmed !== '1'){
-        markFieldAmber(el, true);
-        return;
-      }
-    }
-    if (el.classList.contains('power-select') && el.value === 'own' && el.dataset.confirmed !== '1' && el.dataset.userTouched !== '1'){
-      // own-circuit is the factory power mode for new rows
-      markFieldAmber(el, true);
-      return;
-    }
+    // 02.00.004: valid defaults (Design Basis, Standby, Alarm, temperature, module type, power, addressing,
+    // supply mode, edition, margin…) are never flagged — only empty required selections need entry.
     markFieldAmber(el, false);
   });
-  // Addressing radios: networked is factory
-  const addrNet = locEl.querySelector('.addr-scheme-radio[value="networked"]');
-  const addrStand = locEl.querySelector('.addr-scheme-radio[value="standalone"]');
-  if (addrNet && addrStand){
-    const wrap = locEl.querySelector('.addr-scheme-row');
-    if (wrap){
-      const stillFactory = addrNet.checked && wrap.dataset.confirmed !== '1';
-      wrap.classList.toggle('field-needs-wrap', stillFactory);
-    }
-  }
-  // Mode radios: builtin is factory
-  const modeBuiltin = locEl.querySelector('.mode-radio[value="builtin"]');
-  if (modeBuiltin){
-    const wrap = locEl.querySelector('.mode-toggle');
-    if (wrap){
-      const stillFactory = modeBuiltin.checked && wrap.dataset.confirmed !== '1';
-      wrap.classList.toggle('field-needs-wrap', stillFactory);
-    }
-  }
+  locEl.querySelectorAll('.field-needs-wrap').forEach(w => w.classList.remove('field-needs-wrap'));
 }
 const HEADER_NEEDS_IDS = [
   'project-name-input',
@@ -6234,7 +6325,7 @@ async function handleClearClick(){
     const name = sheetDisplayName(locEl);
     const ok = await showPromptModal({
       title: 'Clear this sheet?',
-      desc: `Reset <b>${escapeAttr(name)}</b> to a blank factory sheet (starter modules + default settings). Project header fields are left alone.`,
+      desc: `Reset <b>${escapeAttr(name)}</b> to a blank sheet (no modules, default settings). Project header fields are left alone.`,
       buttons: [
         { label: 'Cancel', value: false },
         { label: 'Clear sheet', value: true, primary: true },
@@ -6518,6 +6609,21 @@ const HOWDOI_COMMON = [
     common: true,
   },
   {
+    id: 'add-modules',
+    title: 'Add modules to a new (empty) sheet',
+    keywords: 'empty no modules start new sheet add detector display import pl guide',
+    blurb: 'New sheets start with no modules. The guide on the empty sheet offers Import .pl… (bring modules in from PipeCAD) or + Add Display / + Add Detector to add them by hand. Removing the last module brings the guide back.',
+    target: 'qs-step-sidebar',
+    common: true,
+  },
+  {
+    id: 'mixed-addressing',
+    title: 'Make all sheets Networked or Standalone (re-address)',
+    keywords: 'mixed addressing networked standalone re-address readdress renumber duplicate address banner',
+    blurb: 'When Networked and Standalone sheets are mixed, the banner above the sheet offers Make all Networked… / Make all Standalone… with an optional Also re-address all modules (Networked 1…N across sheets; Standalone 1…n per sheet). Confirm first; Cancel changes nothing.',
+    target: 'qs-step-addressing',
+  },
+  {
     id: 'import-pl',
     title: 'Import PipeCAD .pl files',
     keywords: 'pipecad pl import wizard area group floor detector rename power supply psu cluster 3 ft 65 ah metric',
@@ -6617,7 +6723,7 @@ const HOWDOI_COMMON = [
     id: 'confirm-defaults',
     title: 'Confirm defaults',
     keywords: 'confirm defaults amber needs-entry factory header',
-    blurb: 'Confirm defaults clears amber needs-entry highlighting on factory-default fields for the project header and the current sheet. Empty fields stay amber until filled; values themselves are unchanged.',
+    blurb: 'Not needed since 02.00.004: valid defaults are never amber-flagged. Confirm defaults is kept and harmless (marks the current sheet reviewed, changes no values). Empty required fields stay amber until filled.',
     target: 'qs-step-confirm-defaults',
     common: true,
   },
@@ -6625,7 +6731,7 @@ const HOWDOI_COMMON = [
     id: 'needs-entry',
     title: 'Amber needs-entry highlights',
     keywords: 'amber orange highlight empty factory default date',
-    blurb: 'Amber marks empty editable fields and unconfirmed factory defaults (not yellow Validation Errors or red Invalid Calculation). Date is never amber-highlighted but still initializes to today on new/cleared documents.',
+    blurb: 'Amber marks empty required fields only — valid defaults are never flagged (not yellow Validation Errors or red Invalid Calculation). Date is never amber-highlighted but still initializes to today on new/cleared documents.',
     target: 'qs-step-needs-entry',
     common: true,
   },
@@ -6695,8 +6801,8 @@ const HOWDOI_COMMON = [
   {
     id: 'addressing',
     title: 'Standalone vs Networked addressing',
-    keywords: 'standalone networked address senseNET 1-127 1-9',
-    blurb: 'Networked (default) uses addresses 1–127 unique network-wide. Standalone is for clusters with no SenseNET pathway: addresses 1–9 unique per cluster only.',
+    keywords: 'standalone networked address senseNET 1-127 1-9 mixed re-address readdress duplicate',
+    blurb: 'Networked (default) uses addresses 1–127 unique across all Networked sheets. Standalone is for sheets with no SenseNET pathway: addresses 1–9 unique within the sheet; it may reuse other sheets\' addresses. Mixed projects show a banner with Make all Networked / Standalone and optional re-addressing.',
     target: 'qs-step-addressing',
     common: true,
   },
@@ -7676,6 +7782,7 @@ if (!tryLoadEmbeddedState() && !loadState()){
 }
 if (typeof stampHeaderFactoryDefaults === 'function') stampHeaderFactoryDefaults();
 if (typeof refreshAllAmber === 'function') refreshAllAmber();
+window.__appBooted = true;
 autosaveToggleInput.checked = isAutosaveActivated() && isAutosaveEnabled();
 function renderHelpCurrentDrawTable(){
   const tbody = document.getElementById('help-fanspeed-currentdraw-rows');
@@ -8042,7 +8149,9 @@ function v2SheetModel(locEl){
   let status = 'pass';
   if (invalid || psRequired > 1 || (!exportMode && requiredAh > CHARGER_MAX_AH) || (batteryAh && ahPerSupply > batteryAh + 1e-9)) status = 'fail';
   else if (withheld) status = 'incomplete';
-  const dot = (invalid || flags.length) ? 'error' : (needs ? 'needs' : 'complete');
+  const noModules = !locEl.querySelector('[data-role="module"]');
+  if (noModules && status === 'pass') status = 'incomplete';   // 02.00.004: an empty sheet is not a PASS
+  const dot = (invalid || flags.length) ? 'error' : ((needs || noModules) ? 'needs' : 'complete');
   const basisKey = v2Val(locEl, '.design-basis-select');
   const preset = DESIGN_BASIS_PRESETS[basisKey];
   const bs = !!(preset && preset.formula === 'bs5839');
@@ -8073,7 +8182,7 @@ function v2SheetModel(locEl){
   return {
     loc: locEl.dataset.loc, el: locEl, idx: String(locEl.dataset.loc).padStart(2, '0'),
     psName: v2Val(locEl, '.ps-name'), area: v2Val(locEl, '.ps-location'), label: v2Val(locEl, '.location-name'),
-    mode, submode, exportMode, invalid, withheld, invalidList, flags, needs, status, dot, clean,
+    mode, submode, exportMode, invalid, withheld, invalidList, flags, needs, noModules, status, dot, clean,
     requiredAh, psRequired, ahPerSupply, batteryAh, batteryLabel,
     initialAh: v2Num(g(exportMode ? '.cd-initial-ah-detail' : '.initial-ah')), standbyAh: v2Num(g(exportMode ? '.export-standby-ah' : '.standby-ah')), alarmAh: v2Num(g(exportMode ? '.export-alarm-ah' : '.alarm-ah')),
     moduleMa: v2Num(g('.module-load-ma')), psMa: v2Num(g('.ps-load-ma')), totalMa: v2Num(g('.total-ma')),
@@ -8171,6 +8280,7 @@ function v2Refresh(){
   const basis = v2ProjectBasis();
   const models = Array.from(document.querySelectorAll('.location')).map(el => { const m = v2SheetModel(el); m.overrides = v2Overrides(el, basis); return m; });
   v2RenderSidebar(models, cur);
+  refreshAddrMixBanner();
   v2RenderResults(models.find(m => m.el === cur));
   v2RenderSettingsSummary(models, basis);
   models.forEach(m => {
@@ -8237,7 +8347,8 @@ function v2RenderResults(m){
       ${m.invalidList.map(t => `<div class="rp-msg bad">${v2Esc(t)}</div>`).join('')}
       ${m.flags.map(t => `<div class="rp-msg warn">${v2Esc(t)}</div>`).join('')}
       ${m.needs ? `<div class="rp-msg needs"><span>${m.needs} field${m.needs === 1 ? '' : 's'} still need${m.needs === 1 ? 's' : ''} entry (amber outline).</span><button type="button" class="rp-needs-next" onclick="v2NeedsNext()" title="Scroll to and focus the next field that still needs entry on this sheet">Show next ›</button></div>` : ''}
-      ${!m.invalidList.length && !m.flags.length && !m.needs ? '<div class="rp-msg ok">No validation messages on this sheet.</div>' : ''}
+      ${m.noModules ? '<div class="rp-msg needs"><span>No modules yet — use <b>Import .pl…</b> or <b>+ Add Display</b> / <b>+ Add Detector</b> on the sheet.</span></div>' : ''}
+      ${!m.invalidList.length && !m.flags.length && !m.needs && !m.noModules ? '<div class="rp-msg ok">No validation messages on this sheet.</div>' : ''}
     </div>`;
 }
 // Needs entry (02.00.003): jump to the next amber field on the current sheet. Native selects are visually

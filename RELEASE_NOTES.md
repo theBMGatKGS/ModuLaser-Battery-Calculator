@@ -2,6 +2,23 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
+## v02.00.004 — Defaults, empty sheets, addressing modes (2026-10-15, not yet released)
+
+### Highlights
+- **Valid defaults are no longer flagged.** Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet *Needs entry*. Only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are amber. **Edit → Confirm defaults** is kept but no longer needed (harmless).
+- **New sheets start with no modules.** An empty sheet shows a guide: **Import .pl…** (from PipeCAD) or **+ Add Display / + Add Detector** (by hand). The last module can be removed (the guide returns). An empty sheet is *Needs entry* / INCOMPLETE.
+- **Standby (h) / Alarm (min)** no longer cut values off on screens ≤ 1366 px (boxes keep 92 px; the settings row wraps).
+- **Addressing per mode.** Networked sheets share one SenseNET address pool (1–127). A Standalone sheet is its own pool (1–9, now scoped per sheet instead of per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside one Standalone sheet are still flagged.
+- **Mixed Networked + Standalone** projects show a *Mixed addressing* banner: **Make all Networked…** / **Make all Standalone…**, confirm first, optional **Also re-address all modules** (Networked 1…N across sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged).
+- **Imports keep addresses** (Import Calc, Import project, .pl re-import) and list any per-mode conflicts right after import.
+- Calculation math, `masd-engine.js` 1.0.0 and `modulaser-project.js` 1.3.0 unchanged (no engine bump).
+- Open older saved .html files in 02.00.004 with **File → Import Calc** to get these changes.
+
+### QA audit
+| Date | Commits audited | Result | Report |
+|---|---|---|---|
+| pending | — | QA pending | `qa/brief-02.00.004.md` |
+
 ## v02.00.003 — Needs-entry highlight fix (2026-10-14)
 
 ### Highlights

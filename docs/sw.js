@@ -1,5 +1,5 @@
 /* ModuLaser Battery Calculator — service worker */
-const CACHE_VERSION = 'modulaser-calc-v49';
+const CACHE_VERSION = 'modulaser-calc-v50';
 const APP_SHELL = [
   './',
   './index.html',
