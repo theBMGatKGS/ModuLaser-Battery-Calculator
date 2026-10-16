@@ -2,6 +2,18 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
+## v02.00.005 — Auto addressing, CAD Schedule settings (2026-10-16) · not yet released
+
+### Highlights
+- **Allow auto addressing? (Brent 10-16).** A Yes / No prompt after a .pl import and whenever modules are added (+ Add Display / + Add Detector, or Import Calc → Merge sheets). **Yes:** each sheet keeps its mode; Networked sheets are numbered 1, 2, 3… in sheet order across all Networked sheets (a sheet stays on one SenseNET network; past 127 the next whole sheet starts SenseNET network 2 at 1, with the new-network infrastructure notice); Standalone sheets start at 1 on every sheet. Module order, ribbon, AUX and cluster assignments are unchanged. Logged in **Edit → Address change log** and undoable in one step (Undo bar or Ctrl+Z). **No:** addresses stay as entered; duplicates are still flagged. After a .pl import **Confirm Settings?** comes first (Revise import rolls the import back, so there's nothing to address); auto addressing is offered after **Confirm**. Linked-file re-imports keep addresses and don't prompt. Quick repeated adds give one prompt, never stacked on another prompt.
+- **Excel CAD Schedule shows standby, alarm and margin.** Each power supply table starts with a row with that sheet's own **Standby time** (h), **Alarm time** (min) and **Safety margin** (%). Still no merged cells or fills.
+- Calculation math, `masd-engine.js` 1.0.0 and `modulaser-project.js` 1.4.0 unchanged.
+
+### QA audit
+| Date | Commits audited | Result | Report |
+|---|---|---|---|
+| pending | — | QA/Auditor review pending | `qa/brief-02.00.005.md` |
+
 ## v02.00.004 — Defaults, empty sheets, addressing modes (2026-10-15) · released 2026-10-16
 
 ### Highlights
