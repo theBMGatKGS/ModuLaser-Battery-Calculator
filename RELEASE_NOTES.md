@@ -2,7 +2,7 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
-## v02.00.004 — Defaults, empty sheets, addressing modes (2026-10-15, not yet released)
+## v02.00.004 — Defaults, empty sheets, addressing modes (2026-10-15) · released 2026-10-16
 
 ### Highlights
 - **Valid defaults are no longer flagged.** Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet *Needs entry*. Only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are amber. **Edit → Confirm defaults** is kept but no longer needed (harmless).
