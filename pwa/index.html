@@ -1638,7 +1638,7 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="qs-step-num">12</div>
           <div class="qs-step-body">
             <div class="qs-step-title" id="qs-step-results">Read the live results panel</div>
-            <p>The right-hand panel updates as you type. <b>Required capacity</b> shows the Ah per supply in large type with a gauge: the solid part is the standby + alarm load, the lighter part is the safety margin and temperature de-rating, the blue mark is the selected battery and the dashed red mark is the 65 Ah maximum. Below it a status line reads <b>PASS</b> (valid, no flags, within the selected battery and 65 Ah), <b>FAIL</b> (an INVALID CALCULATION condition, more than one supply needed, or capacity beyond the battery / 65 Ah) or <b>INCOMPLETE</b> (Validation Error flags still open). Then the selected battery and recommended hardware, the load breakdown (modules, power supply quiescent + AUX, total, standby/alarm/required Ah), the clusters on this supply, and the sheet's own validation messages — red for INVALID CALCULATION, yellow for Validation Errors, amber for fields that still need entry (with <b>Show next ›</b> to jump to each one). The full calculation, hardware and Bill of Materials stay on the sheet below the module table. Until a sheet has modules, Live Results and the sidebar show <b>Incomplete</b> for it: no Ah figure, no PASS.</p>
+            <p>The right-hand panel updates as you type. <b>Required capacity</b> shows the Ah per supply in large type with a gauge: the solid part is the standby + alarm load, the lighter part is the safety margin and temperature de-rating, the blue mark is the selected battery and the dashed red mark is the 65 Ah maximum. Below it a status line reads <b>PASS</b> (valid, no flags, within the selected battery and 65 Ah), <b>FAIL</b> (an INVALID CALCULATION condition, more than one supply needed, or capacity beyond the battery / 65 Ah) or <b>INCOMPLETE</b> (Validation Error flags still open). Then the selected battery and recommended hardware, the load breakdown (modules, power supply quiescent + AUX, total, standby/alarm/required Ah), the clusters on this supply, and the sheet's own validation messages — red for INVALID CALCULATION, yellow for Validation Errors, amber for fields that still need entry (with <b>Show next ›</b> to jump to each one). The full calculation, hardware and Bill of Materials stay on the sheet below the module table. Until a sheet has modules it shows <b>Incomplete</b> for battery capacity everywhere: Live Results, the sidebar, the sheet's results card, print, Word, Excel and the project file (required Ah left empty and marked incomplete). There's no Ah figure, no PASS, and no battery or power-supply recommendation.</p>
           </div>
         </div>
         <div class="qs-step">
@@ -2459,7 +2459,7 @@ const AMENDMENTS = [
 { rev: "001", major: "02", minor: "00", date: "261013", desc: "<b>ModuLaser project file</b> (.mlproj.json), shared with the MASD Field Report 02.00.000. <b>File → Export project…</b> saves the project details, every power supply (name, Area/Group, model, battery model, Ah and quantity, required Ah, standby/alarm, result) and every detector and display (16-character name, type, address, power supply, fan speed, linked .pl device) plus the PipeCAD pipe data the Field Report needs: sampling holes (size, flow, transport time, sensitivity), test points, pipe length, total flow, hole balance, fittings, Alarm Factor and design sensitivity, and the .pl PSU/Battery positions. <b>File → Import project…</b> opens one; if sheets are already on screen it first shows the differences. The calculator owns the design section and never edits the Field Report's site results: they are kept and written back unchanged. Imported .pl files now keep their hole and results data in the calc file too. The .pl reading and the file format live in modulaser-project.js, shared by both tools. <b>Calculation math unchanged.</b>" },
 { rev: "002", major: "02", minor: "00", date: "261013", desc: "<b>Shared MASD engine 1.0.0.</b> The battery math (standby, alarm, BS 5839-1 D factor, NFPA 72 minimum margin, safety margin, temperature multiplier, supplies required, group estimates), the reference data (module currents, fan-speed currents, design-basis presets, battery models) and the PipeCAD .pl import now live in one shared engine (<code>masd-engine.js</code>), used byte-for-byte by this calculator and the MASD Engineering Toolbox 00.01.000, so both produce identical results. Harmonization rule: any engine change bumps the engine version and the revision of both apps, with matching notes here. Results unchanged: the regression scenarios and the full test suite give the same numbers as 02.00.001. <b>Also in 02.00.002:</b> project-file pass-through of field changes, approvals, Toolbox device configuration, the Toolbox Performance Criteria (referenced standard preset, limits, code prescriptions, Area/Group overrides, narrative, Engineer of Record, spec reference; the British Standards presets mirror this calculator's BS 5839-1 Design Basis options) and unknown top-level keys (forward compatibility); a reload no longer loses the linked-site/project extras; Saved-by records the Prepared By name. Shared modulaser-project.js 1.3.0, identical in the Battery Calculator, the MASD Field Report and the MASD Engineering Toolbox (sync test): SHA-256 design hash over the full design plus a separate site hash; metric .pl imports warn that PipeCAD's hole-sensitivity unit is unconfirmed; typical configuration defaults re-cited (flow ±20% and 120 s flow-fault delay, Table 29 p.76; FM/UL hole limits App. A printed p.113, ModuLaser Install Manual 04-4001-501-0803-05; 'Action' is Prealarm; unsourced values labelled typical – unverified). The MASD Engineering Toolbox 00.01.000 embeds this calculator and the same engine; harmonization rule: any engine change bumps both apps' revisions with matching notes and each records the engine version. <b>QA audit</b> — date 2026-10-13; commit audited cc55189 (02.00.001) plus working tree; issue: <a href=\"https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1\" target=\"_blank\" rel=\"noopener\">Calculator issue #1</a>; summary: defaults citations FAIL → fixed; Solano worst-hole rule PASS; audit trail FAIL → fixed (pass-through, hashes); Quick Start version text FAIL → fixed (Export project needs 02.00.001+); test.py fixed 800 ms wait replaced by wait-for-condition. QA re-check 2026-10-13 (8:28–8:45 PM ET): CONDITIONAL PASS. Fixed after the re-check: design hash stable on a no-op Calculator round trip (site and carried data kept out of design; calculator row ids renumbered by position); the mis-cited table number removed from the Report (App. A, printed p.113); UL 268, 7th Edition compliance never auto-confirmed — the engineer must confirm it before \"Complies with UL 268, 7th Edition\" prints; UL thresholds for NFPA presets per Brent: sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft, transport time no more than 60 / 43 / 43 s (UL 268 Special Application Range 1 / Range 2 / Open Area, ModuLaser Install Manual App. A, printed p.113; EWFD 1.5 from NFPA 76); sign-off order technician → designer → QA enforced, no hand-set status, reopening keeps history, real names required, QA overrides logged; Report edits blocked until a technician name is set; the edit log never overwrites entries; ASAG44201 citation replaced by NFPA 76-2024 clauses (Research 2026-10-13); standalone Quick Start says Battery Calculator 02.00.001+; legacy-import tests check required Ah per sheet. Final verdict: QA audit 2026-10-13, final re-check of commit 848e97d (clean tree). PASS. Tests: regress 3/3, test 106/106, calc_project_test 16/16, shared-file and engine parity 2/2. Verified: SHA-256 design hash stable on a no-op round trip (Report → Calculator → Calculator), unknown fields, change log and sign-offs preserved, savedBy name, shared modulaser-project.js 1.3.0 and MASD engine 1.0.0 identical across apps. Known limitation: metric PipeCAD hole sensitivity is shown unconverted with a warning (unit unconfirmed). UL 268 thresholds (shared) are per Brent, not verified by QA. Issue: https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/issues/1 QA delta re-check 2026-10-13, commit b1cb13b (clean). PASS. Brent's rule is verified: a hole passes at or below (≤) the class maximum, the more restrictive of UL and NFPA (VEWFD 1.0 %obs/ft / 60 s, EWFD 1.5 / 43 s, SFD/OAP 2.18 / 43 s; targets 1.0 / 1.5 / 2.0). UL projects enforce the ModuLaser UL 268 range lower limits (Install Manual App. A p.113). This supersedes the earlier rule (a hole had to be below the limit). Tests: sens_rule 14/14, regress 3/3, test 106/106, calc_project_test 16/16, parity 2/2; design hash stable on round trip. Per Brent, unverified by QA: the ≤ rule (the manual's FM 3230 rows say \"<\") and EWFD 1.5 (from NFPA 76-2024 8.5.3.2.1.3; UL Range 2 itself is 0.05–2.18). Final pre-tag pass 2026-10-13 (10:02–10:40 PM ET): Calculator 6adde0d / Report 5448488 (release a32d988) / Toolbox 8aa707a — GO; sens_rule 14/14; committed tests pass (release commits differ from these only by this release-note line)..." },
 { rev: "003", major: "02", minor: "00", date: "261014", desc: "<b>Needs-entry fix (QA/Auditor).</b> Sheets showed the amber <i>Needs entry</i> status but the fields that needed entry were not visibly marked: the 02.00 dark theme kept the old 1px soft-blue (#5b9bd5) outline, which looked the same as ordinary input borders, so the highlight could not be seen (most of these fields are custom dropdowns over hidden native selects). Needs-entry fields now use a 2px <b>amber</b> outline and tint that match the amber sidebar dot, on inputs, custom dropdown buttons and radio groups. The Live Results message now reads <i>N fields still need entry (amber outline)</i> with a <b>Show next ›</b> button that scrolls to and focuses each field in turn. Status logic, counts and calculation math are unchanged. Help, Quick Start, How Do I and FAQ wording updated from blue to amber. Also: print label grey darkened #747574 → #6b6c6b for WCAG AA contrast (5.0:1 on the info panel). Regression test test_needs_entry.py uses Brent's saved file (5/5 pass; 1/3 on 02.00.002). <b>Module table columns (02.00.003, per Brent):</b> Module Type shows DISP-MIN / DISP-STD / DISP-CMD / DETECTOR (stored values unchanged, so saved files and imports are unaffected); Cluster shows the 2-digit number only (01); Power shows <i>Own circuit</i> or <i>Ribbon Path</i> (the dropdown list still names the entry point). Fixed pixel column widths (Superdesign layout suggestion: Model wide enough for FHSD83x0-ULF, narrow Cluster) with no truncation or wrap; the table scrolls sideways on narrow windows. Print/Export and Word module tables gain Model, Cluster and Power columns with the same labels, single-line cells (Word no-wrap). Test test_module_columns.py 10/10 on Brent\'s file (2/10 on 02.00.002). **QA follow-up (2026-10-14):** cross-sheet Cluster hint clipped with ellipsis and full text on hover; 'No cluster display defined on any page' shows '—' on the button (full text on hover); needs-entry count and Show next skip CSS-hidden fields (a new sheet shows 18, not 19) and Show next starts from the first field on each sheet; Word export has an Arial 9 pt default font (styles.xml), fixed-layout tables and summary rows spanning the descriptive columns so nothing wraps or is clipped. Saved .html files keep their own code: re-open data via File \u2192 Import Calc. Final (QA re-check): Word module table Standby mA / Alarm mA columns 1100 twips (header no longer wraps), summary row shows 'Status:' again; offline cache renamed." },
-{ rev: "004", major: "02", minor: "00", date: "261015", desc: "Per Brent. <b>Valid defaults are no longer amber-flagged</b>: Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet <i>Needs entry</i>; only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are flagged. Edit → Confirm defaults is kept but no longer needed (harmless). <b>New sheets start with no modules</b>: an empty-state guide offers Import .pl… or + Add Display / + Add Detector; the last module can now be removed (the guide returns); an empty sheet shows Needs entry and INCOMPLETE. <b>Standby (h) / Alarm (min)</b> boxes no longer shrink and cut values off on screens ≤ 1366 px (the settings row wraps instead). <b>Addressing</b>: duplicate addresses are checked per mode — Networked sheets share an address pool per SenseNET network; a Standalone sheet is its own 1–9 pool (scoped per sheet, previously per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside a Standalone sheet are still flagged. Projects mixing Networked and Standalone sheets show a <b>Mixed addressing</b> banner with Make all Networked… / Make all Standalone… and an optional <i>Also re-address all modules</i> (Networked 1…N across all sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged; confirm first). Imports (Import Calc, Import project, .pl re-import) keep addresses and list any per-mode conflicts right after import. <b>SenseNET networks</b> (per Brent): one network holds up to 127 modules; each Networked sheet has a SenseNET network number (selector on the Addressing row, SN tag in the sidebar, <i>Networked · SenseNET n</i> in print/Word/Excel settings, saved per sheet; older files default to network 1). Past 127, whole sheets (last in sheet order first) move to SenseNET 2, 3… and are addressed from 1, with a notice that a new network was added and the design must include its infrastructure; a sheet never spans networks. Duplicates are checked per network. Networked re-address numbers 1–127 on SenseNET 1 in sheet order and continues 1–127 on SenseNET 2. Imports keep networks and never move sheets on their own; an import over 127 offers Move overflow to a new SenseNET network. <b>Address change log + Undo</b> (QA F1/F2): unify / re-address, SenseNET moves and Standalone clears are logged (Edit → Address change log…, saved with the project) with before/after address and network per module, and undo in one step (Undo bar or Ctrl+Z when no field/dropdown has focus; disarmed by the next manual address/mode/network edit); auto-move only when a network's count rises past 127, otherwise a Move overflow banner; Clear file clears the log; Make all Standalone lists the addresses above 9 it will clear and reports them afterwards. <b>Confirm Settings?</b> after a .pl import (Confirm marks imported items confirmed; Revise import rolls back to the review step with choices kept). Design Basis and Ambient Temperature start on <i>- Select -</i> (amber, sheet INCOMPLETE, no de-rating until chosen); the .pl wizard requires them; saved/legacy files keep their values. Sheets with no modules show <b>Incomplete</b> in Live Results and the sidebar (no Ah, no PASS). Calculation math, the shared engine (masd-engine.js 1.0.0) and project format (modulaser-project.js 1.3.0) are unchanged." },
+{ rev: "004", major: "02", minor: "00", date: "261015", desc: "Per Brent. <b>Valid defaults are no longer amber-flagged</b>: Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet <i>Needs entry</i>; only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are flagged. Edit → Confirm defaults is kept but no longer needed (harmless). <b>New sheets start with no modules</b>: an empty-state guide offers Import .pl… or + Add Display / + Add Detector; the last module can now be removed (the guide returns); an empty sheet shows Needs entry and INCOMPLETE. <b>Standby (h) / Alarm (min)</b> boxes no longer shrink and cut values off on screens ≤ 1366 px (the settings row wraps instead). <b>Addressing</b>: duplicate addresses are checked per mode — Networked sheets share an address pool per SenseNET network; a Standalone sheet is its own 1–9 pool (scoped per sheet, previously per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside a Standalone sheet are still flagged. Projects mixing Networked and Standalone sheets show a <b>Mixed addressing</b> banner with Make all Networked… / Make all Standalone… and an optional <i>Also re-address all modules</i> (Networked 1…N across all sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged; confirm first). Imports (Import Calc, Import project, .pl re-import) keep addresses and list any per-mode conflicts right after import. <b>SenseNET networks</b> (per Brent): one network holds up to 127 modules; each Networked sheet has a SenseNET network number (selector on the Addressing row, SN tag in the sidebar, <i>Networked · SenseNET n</i> in print/Word/Excel settings, saved per sheet; older files default to network 1). Past 127, whole sheets (last in sheet order first) move to SenseNET 2, 3… and are addressed from 1, with a notice that a new network was added and the design must include its infrastructure; a sheet never spans networks. Duplicates are checked per network. Networked re-address numbers 1–127 on SenseNET 1 in sheet order and continues 1–127 on SenseNET 2. Imports keep networks and never move sheets on their own; an import over 127 offers Move overflow to a new SenseNET network. <b>Address change log + Undo</b> (QA F1/F2): unify / re-address, SenseNET moves and Standalone clears are logged (Edit → Address change log…, saved with the project) with before/after address and network per module, and undo in one step (Undo bar or Ctrl+Z when no field/dropdown has focus; disarmed by the next manual address/mode/network edit); auto-move only when a network's count rises past 127, otherwise a Move overflow banner; Clear file clears the log; Make all Standalone lists the addresses above 9 it will clear and reports them afterwards. <b>Confirm Settings?</b> after a .pl import (Confirm marks imported items confirmed; Revise import rolls back to the review step with choices kept). Design Basis and Ambient Temperature start on <i>- Select -</i> (amber, sheet INCOMPLETE, no de-rating until chosen); the .pl wizard requires them; saved/legacy files keep their values. Sheets with no modules show <b>Incomplete</b> for battery Ah everywhere (results card, Live Results, sidebar, print, Word, Excel; .mlproj requiredAh null + incomplete), with no battery/PSU recommendation. Calculation math, the shared engine (masd-engine.js 1.0.0) and project format (modulaser-project.js 1.3.0) are unchanged." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -7835,6 +7835,26 @@ async function plConfirmSettings(created, prevState){
   return v;
 }
 
+/* QA r3 H1: empty (no-module) sheets — every Ah cell reads Incomplete and no battery / PSU recommendation is shown. */
+(function hookEmptySheetIncomplete(){
+  const _inner = recalcLocationInner;
+  recalcLocationInner = function(loc){
+    const r = _inner.apply(this, arguments);
+    const l = document.getElementById('location-' + loc);
+    if (l){
+      const empty = !l.querySelector('[data-role="module"]');
+      l.classList.toggle('sheet-no-modules', empty);
+      if (empty){
+        l.classList.add('recommendations-withheld');
+        l.querySelectorAll('.standby-ah, .alarm-ah, .initial-ah, .required-ah, .ah-per-supply, .export-required-ah, .export-standby-ah, .export-alarm-ah').forEach(e => { e.textContent = 'Incomplete'; });
+        l.querySelectorAll('.hw-supply, .hw-enclosure, .hw-battery').forEach(e => { e.textContent = 'Incomplete — add modules'; });
+        l.querySelectorAll('.cd-battery-model-detail').forEach(e => { e.textContent = 'Incomplete — add modules'; });
+        l.querySelectorAll('.gauge-max-label').forEach(e => { e.textContent = ''; });
+      }
+    }
+    return r;
+  };
+})();
 /* ---------- persistence hooks ---------- */
 (function hookPlState(){
   const _ser = serializeLocation;
@@ -8447,6 +8467,7 @@ function v2SheetModel(locEl){
   } else {
     batteryLabel = 'Third-party (loads exported)';
   }
+  if (!locEl.querySelector('[data-role="module"]')){ batteryAh = null; batteryLabel = 'Incomplete — add modules'; }   // QA r3 H1
   const invalidList = Array.from(locEl.querySelectorAll('.icb-list li')).filter(li => !li.closest('[hidden]')).map(li => li.textContent.trim()).filter(Boolean);
   const flags = Array.from(locEl.querySelectorAll('.flags-list li')).filter(li => !li.closest('[hidden]')).map(li => li.textContent.trim()).filter(Boolean);
   const needs = v2NeedsFields(locEl).length;
@@ -8454,6 +8475,7 @@ function v2SheetModel(locEl){
   if (invalid || psRequired > 1 || (!exportMode && requiredAh > CHARGER_MAX_AH) || (batteryAh && ahPerSupply > batteryAh + 1e-9)) status = 'fail';
   else if (withheld) status = 'incomplete';
   const noModules = !locEl.querySelector('[data-role="module"]');
+  if (noModules){ status = status === 'fail' && !invalid ? 'incomplete' : status; }
   if (noModules && status === 'pass') status = 'incomplete';   // 02.00.004: an empty sheet is not a PASS
   const unselected = ['.design-basis-select', '.temperature-select'].some(q => { const e = locEl.querySelector(q); return e && e.value === ''; });
   if (unselected && status === 'pass') status = 'incomplete';   // '- Select -' Design Basis / Ambient Temp
@@ -8511,13 +8533,16 @@ function v2AllModels(scope){
 }
 function v2PsTag(m){ return m.psName || ('Sheet ' + m.idx); }
 function v2StatusWord(s){ return s === 'pass' ? 'PASS' : s === 'fail' ? 'FAIL' : 'INCOMPLETE'; }
+// QA r3 H1: an empty (no-module) sheet has no battery figure anywhere — 'Incomplete' instead of the PSU-only Ah.
+function v2AhFmt(m, n, d){ return m && m.noModules ? 'Incomplete' : v2Fmt(n, d); }
+function v2AhU(m, n, d){ return m && m.noModules ? 'Incomplete' : v2Fmt(n, d) + ' Ah'; }
 function v2Fmt(n, d){ return isFinite(n) ? Number(n).toFixed(d == null ? 2 : d) : '—'; }
 
 /* Calculation steps by detail level. Every value string comes from the sheet's own
    granular-detail fields (written by recalcLocationInner), so it always matches the screen. */
 const V2_LEVELS = { summary: 'Summary', standard: 'Standard', full: 'Full' };
 function v2CalcSteps(m, level){
-  if (level === 'summary') return [];
+  if (level === 'summary' || m.noModules) return [];   // QA r3 H1: no battery calculation for an empty sheet
   const c = m.cd, ref = m.codeRef, ptRef = 'ModuLaser current-draw reference (24 V, this calculator)';
   const tempSel = (m.settings.find(s => s[0] === 'Ambient temperature') || [])[1] || '';
   const steps = [];
@@ -8608,7 +8633,7 @@ function v2RenderSidebar(models, cur){
       <span class="dot st-${m.dot}" aria-label="${dotTitle[m.dot]}"></span>${m.overrides.length ? '<span class="dot st-overridden" aria-label="Overridden"></span>' : ''}
       <span class="sb-name">${v2Esc(v2PsTag(m))}${addrSchemeOf(m.el) === 'networked' ? `<span class="sb-net" title="SenseNET network ${sheetSenseNet(m.el)}">SN${sheetSenseNet(m.el)}</span>` : ''}</span>
       ${m.flags.length + m.invalidList.length ? `<span class="sb-cnt">${m.flags.length + m.invalidList.length}</span>` : ''}
-      <span class="sb-ah">${m.noModules ? 'Incomplete' : (isFinite(m.requiredAh) ? v2Fmt(m.requiredAh, 1) + ' Ah' : '')}</span></button>`).join('')}</div>`).join('')
+      <span class="sb-ah">${m.noModules ? 'Incomplete' : (isFinite(m.requiredAh) ? v2AhFmt(m, m.requiredAh, 1) + ' Ah' : '')}</span></button>`).join('')}</div>`).join('')
     : '<p class="sb-empty">No power supply sheets yet. Click <b>+ Add power supply</b> or <b>Import .pl</b>.</p>';
   const c = document.getElementById('sb-count'); if (c) c.textContent = models.length + (models.length === 1 ? ' sheet' : ' sheets');
 }
@@ -8639,7 +8664,7 @@ function v2RenderResults(m){
   }
   p.innerHTML = `
     <div class="rp-card rp-cap"><div class="rp-k">Required capacity${m.psRequired > 1 ? ' (per supply)' : ''} · ${v2Esc(v2PsTag(m))}</div>
-      <div class="rp-big">${v2Fmt(m.ahPerSupply, 1)}<small> Ah</small></div>
+      <div class="rp-big">${v2AhU(m, m.ahPerSupply, 1)}</small></div>
       ${v2GaugeSvgDark(m)}
       <div class="rp-legend"><span><i class="lg-solid"></i>load (standby + alarm)</span><span><i class="lg-soft"></i>margin &amp; de-rating</span></div>
       <div class="rp-status st-${m.status}" id="rp-status">${word}${m.status === 'pass' ? ' — within selected battery and 65 Ah' : m.status === 'fail' ? ' — see messages below' : ' — finish the flagged entries'}</div></div>
@@ -8651,9 +8676,9 @@ function v2RenderResults(m){
       <div class="rp-row"><span>ModuLaser modules</span><b>${v2Fmt(m.moduleMa, 0)} mA</b></div>
       <div class="rp-row"><span>Power supply (quiescent + AUX)</span><b>${v2Fmt(m.psMa, 0)} mA</b></div>
       <div class="rp-row tot"><span>Total load</span><b>${v2Fmt(m.totalMa, 0)} mA</b></div>
-      <div class="rp-row"><span>Standby capacity</span><b>${v2Fmt(m.standbyAh)} Ah</b></div>
-      <div class="rp-row"><span>Alarm capacity</span><b>${v2Fmt(m.alarmAh)} Ah</b></div>
-      <div class="rp-row tot"><span>Required (margin, temp.)</span><b>${v2Fmt(m.requiredAh)} Ah</b></div></div>
+      <div class="rp-row"><span>Standby capacity</span><b>${v2AhU(m, m.standbyAh)}</b></div>
+      <div class="rp-row"><span>Alarm capacity</span><b>${v2AhU(m, m.alarmAh)}</b></div>
+      <div class="rp-row tot"><span>Required (margin, temp.)</span><b>${v2AhU(m, m.requiredAh)}</b></div></div>
     <div class="rp-card"><div class="rp-k">Clusters on this supply</div>
       <div class="rp-row"><span>Clusters</span><b>${m.clusters.length ? m.clusters.map(pad2).join(', ') : '—'}</b></div>
       <div class="rp-row"><span>Displays · Detectors</span><b>${disp} · ${det}</b></div></div>
@@ -8813,6 +8838,7 @@ var pages=document.querySelectorAll('.page');pages.forEach(function(p,i){var s=p
 document.documentElement.setAttribute('data-fit','done');})();`;
 
 function v2GaugeSvgPrint(m){
+  if (m.noModules) return '<p style="font-size:9pt;color:#8a5a00;font-weight:700;margin:6px 0">Battery capacity: Incomplete — add modules to calculate</p>';   // QA r3 H1
   const per = isFinite(m.ahPerSupply) ? m.ahPerSupply : 0, bat = m.batteryAh || 0, init = isFinite(m.initialAh) ? m.initialAh / (m.psRequired || 1) : 0;
   const max = Math.ceil(Math.max(CHARGER_MAX_AH, per, bat) * 1.08 / 10) * 10, W = 700, L = 10, R = W - 10, x = v => L + (R - L) * Math.min(Math.max(v, 0), max) / max;
   const fill = m.status === 'pass' ? '#1b7a3a' : m.status === 'fail' ? '#ac242a' : '#b07a10';
@@ -8870,7 +8896,7 @@ function v2ModTable(m){
   return `<table class="mods"><thead><tr><th>Zone</th><th>Type</th><th>Model</th><th class="n">Cluster</th><th>Power</th><th class="n">Fan</th><th class="n">Addr</th><th class="n">Standby mA</th><th class="n">Alarm mA</th></tr></thead><tbody>${rows}
     <tr><td colspan="7">Power supply quiescent + AUX</td><td class="n">${v2Fmt(m.psMa, 0)}</td><td class="n">${v2Fmt(m.psMa, 0)}</td></tr></tbody>
     <tfoot><tr><td colspan="7">Total load</td><td class="n">${v2Fmt(m.totalMa, 0)}</td><td class="n">${v2Fmt(m.totalMa, 0)}</td></tr>
-    <tr><td colspan="4">Required Ah: ${v2Fmt(m.requiredAh)} Ah${m.psRequired > 1 ? ` (${m.psRequired} supplies, ${v2Fmt(m.ahPerSupply)} Ah each)` : ''}</td><td colspan="4">Battery: ${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr></tfoot></table>`;
+    <tr><td colspan="4">Required Ah: ${v2AhU(m, m.requiredAh)}${m.psRequired > 1 ? ` (${m.psRequired} supplies, ${v2AhU(m, m.ahPerSupply)} each)` : ''}</td><td colspan="4">Battery: ${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr></tfoot></table>`;
 }
 function v2BomTable(m){
   if (!m.bom) return '<p style="font-size:8pt;color:#6b6c6b;margin:2px 0">Bill of Materials withheld until every validation issue on this sheet is resolved.</p>';
@@ -8885,7 +8911,7 @@ function v2SummaryPages(models, H, level){
     <div class="tiles"><div class="tile"><b>${models.length}</b><span>Power supplies</span></div><div class="tile pass"><b>${counts.pass}</b><span>Pass</span></div><div class="tile fail"><b>${counts.fail}</b><span>Fail</span></div><div class="tile incomplete"><b>${counts.incomplete}</b><span>Incomplete</span></div></div>`}
     <h2>Power supplies</h2>
     <table><thead><tr><th>Sheet</th><th>PSU</th><th>Area/Group</th><th>Design basis</th><th class="n">Required Ah</th><th>Battery</th><th>Status</th></tr></thead><tbody>
-    ${ch.map(m => `<tr><td>${m.idx}</td><td>${v2Esc(v2PsTag(m))}</td><td>${v2Esc(m.area || '—')}</td><td>${v2Esc(m.settings[0][1])}</td><td class="n">${v2Fmt(m.requiredAh)}</td><td>${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr>`).join('')}</tbody></table>
+    ${ch.map(m => `<tr><td>${m.idx}</td><td>${v2Esc(v2PsTag(m))}</td><td>${v2Esc(m.area || '—')}</td><td>${v2Esc(m.settings[0][1])}</td><td class="n">${v2AhFmt(m, m.requiredAh)}</td><td>${v2Esc(m.batteryLabel)}</td><td class="st ${m.status}">${v2StatusWord(m.status)}</td></tr>`).join('')}</tbody></table>
     ${ci === chunks.length - 1 ? '<p style="font-size:7.5pt;color:#6b6c6b;margin-top:6px">PASS: the calculation is valid, every validation check is clear and the required Ah per supply is within the selected battery and the 65 Ah maximum. FAIL: an INVALID CALCULATION condition, more than one supply needed, or capacity over the selected battery / 65 Ah. INCOMPLETE: validation flags still open (recommendations and BOM withheld).</p>' : ''}
     <div class="foot"><span>${v2Esc(H.project)} · ModuLaser Battery Calculator ${v2Esc(H.rev)}</span><span class="pgno"></span></div></section>`).join('');
 }
@@ -9019,7 +9045,7 @@ function v2CadRows(models){
     m.modules.forEach(d => rows.push({ style: 1, cells: [d.zone || '—', d.type, d.kind === 'detector' ? (d.fan ? Number(d.fan) : '—') : 'N/A', d.addr ? Number(d.addr) : '—', d.ma, d.ma] }));
     rows.push({ style: 1, cells: ['PSU quiescent + AUX', '', '', '', isFinite(m.psMa) ? m.psMa : '', isFinite(m.psMa) ? m.psMa : ''] });
     rows.push({ style: 2, cells: ['Total load', '', '', '', isFinite(m.totalMa) ? m.totalMa : '', isFinite(m.totalMa) ? m.totalMa : ''] });
-    rows.push({ style: 2, cells: ['Required Ah: ' + v2Fmt(m.requiredAh) + (m.psRequired > 1 ? ' (' + m.psRequired + ' supplies)' : ''), 'Battery: ' + m.batteryLabel, '', '', 'PASS/FAIL', v2StatusWord(m.status)] });
+    rows.push({ style: 2, cells: ['Required Ah: ' + v2AhFmt(m, m.requiredAh) + (m.psRequired > 1 ? ' (' + m.psRequired + ' supplies)' : ''), 'Battery: ' + m.batteryLabel, '', '', 'PASS/FAIL', v2StatusWord(m.status)] });
     rows.push({ cells: [] });
   });
   return rows;
@@ -9031,7 +9057,7 @@ function v2DetailRows(models, level){
   if (H.network) rows.push({ cells: ['Network Number', H.network] }); if (H.building) rows.push({ cells: ['Building', H.building] });
   rows.push({ cells: [] });
   models.forEach(m => {
-    rows.push({ style: 3, cells: [`${v2PsTag(m)} — ${m.area || 'No Area/Group'}`, 'Required Ah', isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : '—', 'Status', v2StatusWord(m.status)] });
+    rows.push({ style: 3, cells: [`${v2PsTag(m)} — ${m.area || 'No Area/Group'}`, 'Required Ah', m.noModules ? 'Incomplete' : (isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : '—'), 'Status', v2StatusWord(m.status)] });
     if (level === 'summary'){
       rows.push({ level: 1, cells: ['Battery', m.batteryLabel] }, { level: 1, cells: ['Design Basis', m.settings[0][1]] }, { level: 1, cells: ['Addressing', (m.settings.find(x => x[0] === 'Addressing') || [])[1] || ''] }, { level: 1, cells: ['Total load (mA)', m.totalMa] });
     } else {
@@ -9117,7 +9143,7 @@ async function v2BuildDocx(opts){
     body += v2DocxTable(null, [['Project', H.project, 'Prepared by', H.preparedBy || '—'], ['Date', H.date || '—', 'Network #', H.network || '—'], ['Building', H.building || '—', 'Primary CDM', H.cdm1 || '—'], ['Backup CDM', H.cdm2 || '—', 'Power supplies', String(models.length)]], [1700, 3700, 1700, 3700]);
     body += v2DocxTable(['Power supplies', 'Pass', 'Fail', 'Incomplete'], [{ cells: [String(models.length), String(c.pass), String(c.fail), String(c.incomplete)], b: true, sz: 24 }], [2700, 2700, 2700, 2700]);
     body += v2DocxH('Power supplies');
-    body += v2DocxTable(['Sheet', 'PSU', 'Area/Group', 'Design basis', 'Required Ah', 'Battery', 'Status'], models.map(m => [m.idx, v2PsTag(m), m.area || '—', m.settings[0][1], v2Fmt(m.requiredAh), m.batteryLabel, v2StatusWord(m.status)]), [600, 1300, 1700, 2500, 1100, 2300, 1300], { right: [4] });
+    body += v2DocxTable(['Sheet', 'PSU', 'Area/Group', 'Design basis', 'Required Ah', 'Battery', 'Status'], models.map(m => [m.idx, v2PsTag(m), m.area || '—', m.settings[0][1], v2AhFmt(m, m.requiredAh), m.batteryLabel, v2StatusWord(m.status)]), [600, 1300, 1700, 2500, 1100, 2300, 1300], { right: [4] });
   }
   for (let i = 0; i < models.length; i++){
     const m = models[i]; if (body) body += V2_PB;
@@ -9133,7 +9159,7 @@ async function v2BuildDocx(opts){
     body += v2DocxH('Modules') + v2DocxTable(['Zone', 'Type', 'Model', 'Cluster', 'Power', 'Fan', 'Addr', 'Standby mA', 'Alarm mA'],
       m.modules.map(d => [d.zone || '—', moduleTypeShort(d.type), d.model || '—', d.cluster || '—', d.power || '—', d.fan || (d.kind === 'detector' ? '—' : 'N/A'), d.addr || '—', String(d.ma), String(d.ma)])
         .concat([{ cells: ['Power supply quiescent + AUX', v2Fmt(m.psMa, 0), v2Fmt(m.psMa, 0)], spans: [7, 1, 1] }, { cells: ['Total load', v2Fmt(m.totalMa, 0), v2Fmt(m.totalMa, 0)], spans: [7, 1, 1], b: true, fill: 'F7F8F9' },
-          { cells: ['Required Ah: ' + v2Fmt(m.requiredAh) + ' Ah', 'Battery: ' + m.batteryLabel, 'Status: ' + v2StatusWord(m.status)], spans: [4, 3, 2], b: true, fill: 'F7F8F9' }]), [1650, 1100, 1350, 700, 2700, 550, 550, 1100, 1100], { right: [3, 5, 6, 7, 8], mono: [2], noWrap: true });
+          { cells: ['Required Ah: ' + v2AhU(m, m.requiredAh), 'Battery: ' + m.batteryLabel, 'Status: ' + v2StatusWord(m.status)], spans: [4, 3, 2], b: true, fill: 'F7F8F9' }]), [1650, 1100, 1350, 700, 2700, 550, 550, 1100, 1100], { right: [3, 5, 6, 7, 8], mono: [2], noWrap: true });
     if (m.invalidList.length || m.flags.length) body += v2DocxH('Validation messages') + m.invalidList.map(t => v2DocxP('■ ' + t, { color: 'AC242A', sz: 16 })).join('') + m.flags.map(t => v2DocxP('▲ ' + t, { color: '8A5A00', sz: 16 })).join('');
     const steps = v2CalcSteps(m, opts.level);
     const mathRows = steps.flatMap(st => [{ cells: [st.title, '', '', '', ''], b: true, fill: 'DCE6F0' }].concat(st.rows.map(r => [r.label, r.sym, r.sub, r.res, r.ref])));
@@ -9755,13 +9781,13 @@ function mlpBuildDesign(){
     const psuId = locEl.dataset.plSheetId || ('sheet-' + (i + 1));
     const area = m.area || '';
     if (area && !areas.includes(area)) areas.push(area);
-    const bat = (m.batteryLabel || m.hwBattery || '').trim();
+    const bat = m.noModules ? '' : (m.batteryLabel || m.hwBattery || '').trim();
     const bomBat = (m.bom || []).find(r => /battery/i.test(r.description || '') && !/enclosure|cabinet/i.test(r.description || ''));
     const bomQty = bomBat && isFinite(+bomBat.qty) ? +bomBat.qty : null;
     psus.push({ id: psuId, sheet: i + 1, name: m.psName || ('PS-' + (i + 1)), area, location: area || m.label || '',
       model: (m.hwSupply || '').trim(), enclosure: (m.hwEnclosure || '').trim(),
       battery: { model: bat, ah: isFinite(m.batteryAh) ? m.batteryAh : null, qty: bomQty, part: bomBat ? bomBat.partNumber : '' },
-      requiredAh: isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : null,
+      requiredAh: !m.noModules && isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : null, incomplete: m.noModules || undefined,
       standbyHours: v2Num(v2Val(locEl, '.standby-hours')), alarmMinutes: v2Num(v2Val(locEl, '.alarm-minutes')),
       designBasis: m.basisKey || '', totalMa: isFinite(m.totalMa) ? m.totalMa : null, status: v2StatusWord(m.status), flags: m.invalidList || [] });
     const rows = Array.from(locEl.querySelectorAll('[data-role="module"]'));
