@@ -21,7 +21,7 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 ### QA audit
 | Date | Commits audited | Result | Report |
 |---|---|---|---|
-| pending | — | QA pending | `qa/brief-02.00.004.md` |
+| 2026-10-16 | Calculator 951f769 / Toolbox 956e1e1 / Report de287fb | QA 2026-10-16: Calculator 951f769 / Toolbox 956e1e1 / Report de287fb GO | `qa/brief-02.00.004.md` |
 
 ## v02.00.003 — Needs-entry highlight fix (2026-10-14)
 
