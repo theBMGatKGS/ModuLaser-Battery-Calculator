@@ -9796,7 +9796,7 @@ function mlpBuildDesign(){
     const bomBat = (m.bom || []).find(r => /battery/i.test(r.description || '') && !/enclosure|cabinet/i.test(r.description || ''));
     const bomQty = bomBat && isFinite(+bomBat.qty) ? +bomBat.qty : null;
     psus.push({ id: psuId, sheet: i + 1, name: m.psName || ('PS-' + (i + 1)), area, location: area || m.label || '',
-      model: (m.hwSupply || '').trim(), enclosure: (m.hwEnclosure || '').trim(),
+      model: m.noModules ? '' : (m.hwSupply || '').trim(), enclosure: m.noModules ? '' : (m.hwEnclosure || '').trim(),   // empty sheet: no PSU recommendation in the project file
       battery: { model: bat, ah: isFinite(m.batteryAh) ? m.batteryAh : null, qty: bomQty, part: bomBat ? bomBat.partNumber : '' },
       requiredAh: !m.noModules && isFinite(m.requiredAh) ? +m.requiredAh.toFixed(2) : null, incomplete: m.noModules || undefined,
       standbyHours: v2Num(v2Val(locEl, '.standby-hours')), alarmMinutes: v2Num(v2Val(locEl, '.alarm-minutes')),
