@@ -2,9 +2,9 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
-## v02.00.005 — Auto addressing, CAD Schedule settings (2026-10-16) · not yet released
+## v02.00.005 — Auto addressing, CAD Schedule settings (2026-10-16) · released 2026-10-16
 
-### Highlights
+### Recent improvements
 - **Auto addressing (Brent 10-16, revised 5:27 PM).** **New build** (first modules in an empty project — first .pl import or first + Add): **Networked or Standalone?** sets every sheet's mode, then **Auto address?** Yes / No. Yes numbers Networked sheets 1…N in sheet order across sheets (whole sheets roll to SenseNET 2 past 127, with the infrastructure notice) and Standalone sheets from 1 on each sheet. **Existing project** gaining modules (new .pl import, a new sheet, modules added to a sheet, Import Calc → Merge sheets): one prompt — **Continue addressing per previous sheets** (only the new modules; Networked continues after the last address on its network, a new sheet rolls to the next network past 127; a new Standalone sheet starts at 1), **Manually address**, or **Re-auto address entire project**. New sheets take the project's mode; mixed projects keep the Mixed addressing banner. After a .pl import: Confirm Settings? → (mode) → address; Revise import and linked-file re-imports don't prompt. Every automatic change is one **Edit → Address change log** entry with one-step Undo (Undo bar or Ctrl+Z). Quick repeated adds give one prompt, never stacked on another prompt.
 - **Excel CAD Schedule shows standby, alarm and margin.** Each power supply table starts with a row with that sheet's own **Standby time** (h), **Alarm time** (min) and **Safety margin** (%). Still no merged cells or fills.
 - **Cluster Validation Report print redesign (Brent approved).** KGS palette on white: navy title bar, project/network summary box, **Entry point** / **Ribbon Path** / **CALCULATION INVALID** / **VALIDATION ERROR PENDING** chips; every page repeats a header (CLUSTER VALIDATION REPORT · project · Network #) and footer (app name + revision · Page n of N); table headers repeat across pages, rows never split, cells don't wrap. On-screen report unchanged apart from the chips.
@@ -14,7 +14,7 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 ### QA audit
 | Date | Commits audited | Result | Report |
 |---|---|---|---|
-| pending | — | QA/Auditor review pending | `qa/brief-02.00.005.md` |
+| 2026-10-16 | Calculator 57230cc / Toolbox f04f862 | QA/Auditor PASS (GO), no blocking findings. Calculator suites green: amber 22, auto_address 47, cad 6, cvr 12, addrlog 27, sensenet 30, confirm 24, empty 17, g1 13, columns 24, needs_entry 14, 0204 43, v2 64, regress 3/3 | `qa/qa-report-02.00.005.md` |
 
 ## v02.00.004 — Defaults, empty sheets, addressing modes (2026-10-15) · released 2026-10-16
 
