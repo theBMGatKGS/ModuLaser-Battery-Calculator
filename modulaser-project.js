@@ -10,7 +10,7 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.3.0';
+MLP.VERSION = '1.4.0';
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -316,6 +316,14 @@ MLP.linkFromParsed = function (pc, sha, size, lastModified){
     version: pc.version, unit: pc.unitLabel, project: pc.project.name, groups: pc.groups.map(g => g.name), importedAt: new Date().toISOString() };
 };
 
+/* ---------------- SenseNET networks (1.4.0) ----------------
+   design.devices[].network: SenseNET network number (1, 2, …), each network holds up to 127 modules.
+   Missing on older files → network 1. Standalone devices carry standalone:true (their own 1–9 pool per power
+   supply) and network null. Addresses are unique per network, not per design. */
+MLP.MAX_PER_NETWORK = 127;
+MLP.devNetwork = d => (d && d.standalone) ? null : (parseInt(d && d.network, 10) >= 1 ? parseInt(d.network, 10) : 1);
+MLP.devAddrScope = d => (d && d.standalone) ? 'sa:' + (d.psuId || '') : 'net:' + MLP.devNetwork(d);
+MLP.networkCounts = function (devices){ const c = {}; (devices || []).forEach(d => { const n = MLP.devNetwork(d); if (n != null) c[n] = (c[n] || 0) + 1; }); return c; };
 /* ---------------- validation ---------------- */
 MLP.validateDesign = function (design){
   const issues = [];
@@ -324,17 +332,21 @@ MLP.validateDesign = function (design){
   (design.devices || []).forEach(d => {
     if (!MLP.nameOk(d.name)) issues.push({ id: d.id, level: 'error', msg: `“${d.name}” is ${MLP.nameLen(d.name)} characters — the ModuLaser display shows ${MLP.NAME_MAX}.` });
     const a = String(d.address == null ? '' : d.address).trim();
-    if (a && a !== '0'){ (byAddr[a] = byAddr[a] || []).push(d); const n = Number(a); if (!(n >= 1 && n <= 127)) issues.push({ id: d.id, level: 'error', msg: `${d.name}: address ${a} is outside 1–127.` }); }
+    if (a && a !== '0'){ const k = MLP.devAddrScope(d) + '|' + a; (byAddr[k] = byAddr[k] || []).push(d); const n = Number(a), max = d.standalone ? 9 : 127;
+      if (!(n >= 1 && n <= max)) issues.push({ id: d.id, level: 'error', msg: `${d.name}: address ${a} is outside 1–${max}.` }); }
   });
-  Object.entries(byAddr).forEach(([a, list]) => { if (list.length > 1) list.forEach(d => issues.push({ id: d.id, level: 'error', msg: `Address ${a} is used by ${list.map(x => x.name).join(', ')}.` })); });
+  Object.entries(byAddr).forEach(([k, list]) => { if (list.length > 1){ const a = k.slice(k.indexOf('|') + 1), sc = k.startsWith('net:') ? ` on SenseNET ${k.slice(4, k.indexOf('|'))}` : ' on standalone supply';
+    list.forEach(d => issues.push({ id: d.id, level: 'error', msg: `Address ${a}${sc} is used by ${list.map(x => x.name).join(', ')}.` })); } });
+  const nc = MLP.networkCounts(design.devices);
+  Object.keys(nc).forEach(n => { if (nc[n] > MLP.MAX_PER_NETWORK) issues.push({ id: '', level: 'error', msg: `SenseNET ${n} has ${nc[n]} modules — limit ${MLP.MAX_PER_NETWORK} per network.` }); });
   return issues;
 };
 
 /* ---------------- diff ----------------
    Compares two design sections. Returns {project:[], psus:{added,removed,changed}, devices:{added,removed,changed}, count}. */
-const DEV_FIELDS = [['name', 'Name'], ['type', 'Type'], ['area', 'Area/Group'], ['address', 'Address'], ['psuId', 'Power supply'], ['fan', 'Fan speed'], ['cluster', 'Cluster'], ['model', 'Model'], ['pipeTT', 'PipeCAD transport time (s)'], ['pipeHoles', 'Sampling holes'], ['pipeLen', 'Pipe length (ft)'], ['af', 'Alarm Factor']];
+const DEV_FIELDS = [['name', 'Name'], ['type', 'Type'], ['area', 'Area/Group'], ['address', 'Address'], ['network', 'SenseNET network'], ['psuId', 'Power supply'], ['fan', 'Fan speed'], ['cluster', 'Cluster'], ['model', 'Model'], ['pipeTT', 'PipeCAD transport time (s)'], ['pipeHoles', 'Sampling holes'], ['pipeLen', 'Pipe length (ft)'], ['af', 'Alarm Factor']];
 const PSU_FIELDS = [['name', 'Name'], ['area', 'Area/Group'], ['location', 'Location'], ['model', 'Model'], ['batteryModel', 'Battery'], ['batteryAh', 'Battery Ah'], ['batteryQty', 'Battery qty'], ['requiredAh', 'Required Ah'], ['standbyHours', 'Standby (h)'], ['alarmMinutes', 'Alarm (min)'], ['status', 'Calculator result']];
-function devFlat(d){ const p = d.pipe || {}; return { name: d.name, type: d.type, area: d.area, address: d.address || '', psuId: d.psuId || '', fan: d.fan == null ? '' : String(d.fan), cluster: d.cluster || '', model: d.model || '',
+function devFlat(d){ const p = d.pipe || {}; return { name: d.name, type: d.type, area: d.area, address: d.address || '', network: d.standalone ? 'standalone' : String(MLP.devNetwork(d)), psuId: d.psuId || '', fan: d.fan == null ? '' : String(d.fan), cluster: d.cluster || '', model: d.model || '',
   pipeTT: p.tt == null ? '' : (+p.tt).toFixed(1), pipeHoles: p.holes ? String(p.holes.length) : '', pipeLen: p.lengthFt == null ? '' : (+p.lengthFt).toFixed(1), af: p.af == null ? '' : String(p.af) }; }
 function psuFlat(p){ const b = p.battery || {}; return { name: p.name, area: p.area || '', location: p.location || '', model: p.model || '', batteryModel: b.model || '', batteryAh: b.ah == null ? '' : String(b.ah), batteryQty: b.qty == null ? '' : String(b.qty),
   requiredAh: p.requiredAh == null ? '' : (+p.requiredAh).toFixed(2), standbyHours: p.standbyHours == null ? '' : String(p.standbyHours), alarmMinutes: p.alarmMinutes == null ? '' : String(p.alarmMinutes), status: p.status || '' }; }
