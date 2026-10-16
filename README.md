@@ -1,5 +1,8 @@
 # ModuLaser Battery Calculator — Desktop App (Electron)
 
+![ModuLaser Battery Calculator PWA in its dark theme: empty default sheet with project settings, power-supply sidebar and Live Results panel](docs/screenshot.png)
+
+
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
