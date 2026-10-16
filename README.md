@@ -6,6 +6,11 @@
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
+## What's new in 02.00.005
+- **Allow auto addressing? (Brent 10-16).** A Yes / No prompt after a .pl import and whenever modules are added (+ Add Display / + Add Detector, or Import Calc → Merge sheets). **Yes:** each sheet keeps its mode; Networked sheets are numbered 1, 2, 3… in sheet order across all Networked sheets (a sheet stays on one SenseNET network; past 127 the next whole sheet starts SenseNET network 2 at 1, with the new-network infrastructure notice); Standalone sheets start at 1 on every sheet. Module order, ribbon, AUX and cluster assignments are unchanged. Logged in **Edit → Address change log** and undoable in one step (Undo bar or Ctrl+Z). **No:** addresses stay as entered; duplicates are still flagged. After a .pl import **Confirm Settings?** comes first (Revise import rolls the import back, so there's nothing to address); auto addressing is offered after **Confirm**. Linked-file re-imports keep addresses and don't prompt. Quick repeated adds give one prompt, never stacked on another prompt.
+- **Excel CAD Schedule shows standby, alarm and margin.** Each power supply table starts with a row with that sheet's own **Standby time** (h), **Alarm time** (min) and **Safety margin** (%). Still no merged cells or fills.
+- Calculation math, `masd-engine.js` 1.0.0 and `modulaser-project.js` 1.4.0 unchanged.
+
 ## What's new in 02.00.004
 - **Valid defaults are no longer flagged.** Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet *Needs entry*. Only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are amber. **Edit → Confirm defaults** is kept but no longer needed (harmless).
 - **New sheets start with no modules.** An empty sheet shows a guide: **Import .pl…** (from PipeCAD) or **+ Add Display / + Add Detector** (by hand). The last module can be removed (the guide returns). An empty sheet is *Needs entry* / INCOMPLETE.
@@ -107,8 +112,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.004.exe
-npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.004.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.005.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.00.005.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -131,7 +136,7 @@ on a `macos-latest` runner — happy to help set that up if you want it.
 
 The app has a Help → About menu item (and on macOS, the standard app menu's
 "About ModuLaser Battery Calculator" too) showing the revision and author —
-currently Revision `02.00.004_261015`, authored by The BMG. These are set
+currently Revision `02.00.005_261016`, authored by The BMG. These are set
 as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
 update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section
