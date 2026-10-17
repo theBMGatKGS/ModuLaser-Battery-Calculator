@@ -10,7 +10,7 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.5.0';
+MLP.VERSION = '1.5.1';   // 1.5.1: MiniLaser pipe limits (M p.66) — miniLaserPipeLimits / miniLaserPipeCheck
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -635,7 +635,9 @@ MLP.miniLaserPipeLimits = function (key){
   else { hk = 'SFD'; lk = 'NFPA'; }
   return { holesMax: P.maxHoles[hk], lenMax: P.maxLenFt[lk], holesKey: hk, lenKey: lk, firstHoleFt: P.firstHoleFt };
 };
-/* errors[] for holes over the class maximum, pipe longer than allowed, and (when known) first hole farther than 16 ft (M ch.5 / p.66). */
+/* errors[] for holes over the class maximum, pipe longer than allowed, and first hole farther than 16 ft (M ch.5 / p.66).
+   firstHoleFt is manual-entry only: the .pl hole records carry no position along the pipe, so no importer supplies it; callers pass it
+   only when a user has entered it. (Pre-engineered picker layouts satisfy it by construction.) */
 MLP.miniLaserPipeCheck = function (o){
   const L = MLP.miniLaserPipeLimits(o.key), errors = [];
   const h = Number(o.holes), len = Number(o.lengthFt), fh = Number(o.firstHoleFt);
