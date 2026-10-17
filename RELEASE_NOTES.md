@@ -2,6 +2,19 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
+## v02.01.000 — MiniLaser ASD support (2026-10-16) · not yet released
+
+### Recent improvements
+- **MiniLaser ASD (FHSD8075-ULF) support (Brent 10-16).** Each sheet has a separate **Standalone ASDs** table: a MiniLaser is never addressed, isn't on SenseNET and can be on any sheet. Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA (standby = alarm).
+- **Dedicated AUX circuit per MiniLaser.** One MiniLaser per AUX circuit, never shared, with the 35 mA per-circuit overhead and 3.0 A per-circuit limit. When there are more MiniLasers plus entry points than AUX outputs, validation fails and recommends adding a power supply.
+- **I/O Expansion Modules.** Choose 0–2 × 9-30521 per MiniLaser (no added draw). The 9-30520 housing is added automatically when the count is above 0, and the BOM lists both by part number.
+- **+ Add MiniLaser.** Opens the Pre-engineered picker (T or I shape, manual Tables 13–31). It fills fan speed, alarm factor and DIP settings and shows pipe length, hole sizes and transport time. Choose Manual config for anything else; the fan speed starts blank, amber with ⚠, until you set it.
+- **.pl import.** SOLO detectors become MiniLasers, with fan speed and alarm factor taken from the .pl. Expansions in the .pl are ignored, with a notice, and Confirm Settings? still runs. When the .pl has no alarm factor, the app uses the highest factor whose average hole sensitivity (Fire 1 × holes) stays within the class limit (VEWFD 1.0, EWFD 1.5, SFD 2.0, OAP 2.18 %obs/ft). If even 0 is over the limit, 0 is set and validation fails, recommending fewer holes or a redesign. Each MiniLaser gets a DIP or Remote configuration recommendation.
+- MiniLasers appear on screen, in print, Word, Excel (CAD Schedule, no fills), the Cluster Validation Report and `.mlproj.json`. `modulaser-project.js` 1.5.0 and `masd-engine.js` 1.1.0; ModuLaser calculation math unchanged.
+
+### QA audit
+- Pending.
+
 ## v02.00.005 — Auto addressing, CAD Schedule settings (2026-10-16) · released 2026-10-16
 
 ### Recent improvements

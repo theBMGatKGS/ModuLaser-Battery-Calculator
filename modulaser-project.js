@@ -10,7 +10,7 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.4.0';
+MLP.VERSION = '1.5.0';
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -120,8 +120,9 @@ MLP.parsePl = function (text, fileName){
       let key = `${gname}#${idTxt !== '' ? 'id' + idTxt : 'n' + name}`;
       if (seen[key]) key += '~' + (++seen[key]); else seen[key] = 1;
       const fanN = parseInt(txt(d, 'aspiratorSpeed'), 10);
-      const rec = { key, ord: di, kind: 'detector', origName: name, typeRaw, type: MLP.DETECTOR_TYPES[typeRaw],
-        fan: (fanN >= 1 && fanN <= 16) ? fanN : null, address: txt(d, 'address'), partNumber: txt(d, 'partNumber'),
+      const isML = typeRaw === 'SOLO';   // 1.5.0: MiniLaser FHSD8075-ULF — standalone, never addressed (Brent Q1/Q2)
+      const rec = { key, ord: di, kind: isML ? 'minilaser' : 'detector', origName: name, typeRaw, type: MLP.DETECTOR_TYPES[typeRaw],
+        fan: (fanN >= 1 && fanN <= (isML ? 10 : 16)) ? fanN : null, address: isML ? '' : txt(d, 'address'), partNumber: txt(d, 'partNumber'),
         x: num0(d, 'startX') * scale, y: num0(d, 'startY') * scale, z: num0(d, 'startZ') * scale };
       rec.fp = fnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
       if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
@@ -149,6 +150,18 @@ MLP.parsePl = function (text, fileName){
         bends90: sd ? first(sd, 'bends90') : null, sockets: sd ? first(sd, 'sockets') : null, clips: sd ? first(sd, 'clips') : null,
         hasResults: !!sd, holes, testPoints
       };
+      if (isML){   // 1.5.0: raw flags for the alarm-factor rule (Brent Q20) and DIP/Remote advice (Q22)
+        const ints = tag => { const a = sd && kid(sd, tag); return a ? Array.from(a.children).map(c => Number(c.textContent) || 0) : null; };
+        const b90 = ints('bends90'), b45 = ints('bends45');
+        rec.pipe.afActivatedRaw = txt(d, 'alarmFactorActivated');
+        rec.pipe.bends90Total = b90 ? b90.reduce((a, b) => a + b, 0) : null;
+        rec.pipe.bends45Total = b45 ? b45.reduce((a, b) => a + b, 0) : null;
+        rec.pipe.tees = sd ? sd.getElementsByTagName('tPieceList').length ? Array.from(sd.getElementsByTagName('tPieceList')).reduce((a, t) => a + t.children.length, 0) : 0 : null;
+        const exp = kid(fl, 'expansionDatabase');
+        rec.pipe.expansionInPl = !!(exp && exp.children.length);
+        if (rec.pipe.expansionInPl) out.skipped.push(`${gname}: “${name}” — the .pl lists MiniLaser expansion items; they are not imported. Enter I/O modules by hand.`);
+        if (txt(d, 'address') && txt(d, 'address') !== '0') out.skipped.push(`${gname}: “${name}” — MiniLaser address ${txt(d, 'address')} ignored (MiniLasers are never addressed).`);
+      }
       if (!rec.pipe.tt && holes.length){ const m = Math.max(...holes.map(h => h.tt || 0)); if (m > 0) rec.pipe.tt = m; }
       g.detectors.push(rec);
     });
@@ -305,10 +318,13 @@ MLP.designFromPl = function (parsedList, links){
 };
 MLP.deviceFromPl = function (d, area, link, extra){
   const dev = { id: (link ? link.id : 'pl') + '|' + d.key, kind: d.kind, type: d.type, partNumber: d.partNumber || '',
-    model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : 'FHSD8330',
+    model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : d.kind === 'minilaser' ? MLP.MINILASER.model : 'FHSD8330',
     name: d.origName, plName: d.origName, area, address: '', psuId: '', fan: d.fan || null, cluster: '',
     pos: { x: +(d.x || 0).toFixed(2), y: +(d.y || 0).toFixed(2), z: +(d.z || 0).toFixed(2) },
     pl: link ? { link: link.id, file: link.name, key: d.key, fp: d.fp } : null, pipe: d.pipe || null };
+  if (d.kind === 'minilaser'){ const ml = MLP.miniLaserFromPl(d, extra && extra.perfClass);
+    Object.assign(dev, { standalone: true, network: null, ioModules: 0, minilaser: { alarmFactor: ml.alarmFactor, alarmFactorSrc: ml.alarmFactorSrc, perfClass: ml.perfClass, perfClassSrc: ml.perfClassSrc,
+      holes: ml.holes, configMethod: ml.configMethod, advice: ml.advice.text, derivation: ml.derivation, expansionInPl: ml.expansionInPl } }); }
   return Object.assign(dev, extra || {});
 };
 MLP.linkFromParsed = function (pc, sha, size, lastModified){
@@ -321,7 +337,7 @@ MLP.linkFromParsed = function (pc, sha, size, lastModified){
    Missing on older files → network 1. Standalone devices carry standalone:true (their own 1–9 pool per power
    supply) and network null. Addresses are unique per network, not per design. */
 MLP.MAX_PER_NETWORK = 127;
-MLP.devNetwork = d => (d && d.standalone) ? null : (parseInt(d && d.network, 10) >= 1 ? parseInt(d.network, 10) : 1);
+MLP.devNetwork = d => (d && (d.standalone || d.kind === 'minilaser')) ? null : (parseInt(d && d.network, 10) >= 1 ? parseInt(d.network, 10) : 1);
 MLP.devAddrScope = d => (d && d.standalone) ? 'sa:' + (d.psuId || '') : 'net:' + MLP.devNetwork(d);
 MLP.networkCounts = function (devices){ const c = {}; (devices || []).forEach(d => { const n = MLP.devNetwork(d); if (n != null) c[n] = (c[n] || 0) + 1; }); return c; };
 /* ---------------- validation ---------------- */
@@ -331,6 +347,12 @@ MLP.validateDesign = function (design){
   const byAddr = {};
   (design.devices || []).forEach(d => {
     if (!MLP.nameOk(d.name)) issues.push({ id: d.id, level: 'error', msg: `“${d.name}” is ${MLP.nameLen(d.name)} characters — the ModuLaser display shows ${MLP.NAME_MAX}.` });
+    if (d.kind && !MLP.KNOWN_KINDS.includes(d.kind)){ issues.push({ id: d.id, level: 'warn', msg: `${d.name}: unknown device kind “${d.kind}” — this app version cannot check it.` }); return; }
+    if (d.kind === 'minilaser'){ const m = d.minilaser || {};   // 1.5.0: never addressed; fan and alarm factor checks
+      if (String(d.address || '').trim()) issues.push({ id: d.id, level: 'error', msg: `${d.name}: MiniLasers are never addressed (address ${d.address} must be cleared).` });
+      if (!(d.fan >= 1 && d.fan <= 10)) issues.push({ id: d.id, level: 'incomplete', msg: `⚠ ${d.name}: MiniLaser fan speed not set (1–10).` });
+      if (m.derivation && m.derivation.fail) issues.push({ id: d.id, level: 'error', msg: `${d.name}: ${m.derivation.msg}` });
+      return; }
     const a = String(d.address == null ? '' : d.address).trim();
     if (a && a !== '0'){ const k = MLP.devAddrScope(d) + '|' + a; (byAddr[k] = byAddr[k] || []).push(d); const n = Number(a), max = d.standalone ? 9 : 127;
       if (!(n >= 1 && n <= max)) issues.push({ id: d.id, level: 'error', msg: `${d.name}: address ${a} is outside 1–${max}.` }); }
@@ -344,10 +366,11 @@ MLP.validateDesign = function (design){
 
 /* ---------------- diff ----------------
    Compares two design sections. Returns {project:[], psus:{added,removed,changed}, devices:{added,removed,changed}, count}. */
-const DEV_FIELDS = [['name', 'Name'], ['type', 'Type'], ['area', 'Area/Group'], ['address', 'Address'], ['network', 'SenseNET network'], ['psuId', 'Power supply'], ['fan', 'Fan speed'], ['cluster', 'Cluster'], ['model', 'Model'], ['pipeTT', 'PipeCAD transport time (s)'], ['pipeHoles', 'Sampling holes'], ['pipeLen', 'Pipe length (ft)'], ['af', 'Alarm Factor']];
+const DEV_FIELDS = [['ioModules', 'MiniLaser I/O modules'], ['mlAf', 'MiniLaser alarm factor'], ['mlMethod', 'MiniLaser configuration'], ['name', 'Name'], ['type', 'Type'], ['area', 'Area/Group'], ['address', 'Address'], ['network', 'SenseNET network'], ['psuId', 'Power supply'], ['fan', 'Fan speed'], ['cluster', 'Cluster'], ['model', 'Model'], ['pipeTT', 'PipeCAD transport time (s)'], ['pipeHoles', 'Sampling holes'], ['pipeLen', 'Pipe length (ft)'], ['af', 'Alarm Factor']];
 const PSU_FIELDS = [['name', 'Name'], ['area', 'Area/Group'], ['location', 'Location'], ['model', 'Model'], ['batteryModel', 'Battery'], ['batteryAh', 'Battery Ah'], ['batteryQty', 'Battery qty'], ['requiredAh', 'Required Ah'], ['standbyHours', 'Standby (h)'], ['alarmMinutes', 'Alarm (min)'], ['status', 'Calculator result']];
 function devFlat(d){ const p = d.pipe || {}; return { name: d.name, type: d.type, area: d.area, address: d.address || '', network: d.standalone ? 'standalone' : String(MLP.devNetwork(d)), psuId: d.psuId || '', fan: d.fan == null ? '' : String(d.fan), cluster: d.cluster || '', model: d.model || '',
-  pipeTT: p.tt == null ? '' : (+p.tt).toFixed(1), pipeHoles: p.holes ? String(p.holes.length) : '', pipeLen: p.lengthFt == null ? '' : (+p.lengthFt).toFixed(1), af: p.af == null ? '' : String(p.af) }; }
+  pipeTT: p.tt == null ? '' : (+p.tt).toFixed(1), pipeHoles: p.holes ? String(p.holes.length) : '', pipeLen: p.lengthFt == null ? '' : (+p.lengthFt).toFixed(1), af: p.af == null ? '' : String(p.af),
+  ioModules: d.ioModules == null ? '' : String(d.ioModules), mlAf: d.minilaser && d.minilaser.alarmFactor != null ? String(d.minilaser.alarmFactor) : '', mlMethod: d.minilaser ? d.minilaser.configMethod || '' : '' }; }
 function psuFlat(p){ const b = p.battery || {}; return { name: p.name, area: p.area || '', location: p.location || '', model: p.model || '', batteryModel: b.model || '', batteryAh: b.ah == null ? '' : String(b.ah), batteryQty: b.qty == null ? '' : String(b.qty),
   requiredAh: p.requiredAh == null ? '' : (+p.requiredAh).toFixed(2), standbyHours: p.standbyHours == null ? '' : String(p.standbyHours), alarmMinutes: p.alarmMinutes == null ? '' : String(p.alarmMinutes), status: p.status || '' }; }
 function diffList(oldL, newL, flat, fields){
@@ -531,6 +554,212 @@ MLP.perfDraft = function (perf, classesUsed){
 };
 MLP.perfStatement = perf => { if (!perf) return ''; MLP.perfMigrate(perf); const std = MLP.perfStdName(perf);
   return MLP.perfIsUl(perf.standard) ? (perf.ulConfirmed ? `${MLP.UL_STATEMENT} · Referenced standard: ${std}` : `UL 268, 7th Edition compliance NOT YET CONFIRMED by the engineer · Referenced standard: ${std}`) : `Referenced standard: ${std}${(MLP.perfPreset(perf.standard) || {}).family === 'FM' ? ' (FM requirements; not a UL 268 listing statement)' : ' (engineer-defined limits)'}`; };
+/* ---------------- MiniLaser ASD FHSD8075-ULF (1.5.0) ----------------
+   Sources: MiniLaser Installation Manual 3103175-EN Rev 001 ("M p.N" = printed page), I/O module datasheet
+   K85001-1064 ("DS p.N"), Brent 2026-10-16 decisions (plan-02.01.000-minilaser.md §2, §2.2). Real data only. */
+MLP.DETECTOR_TYPES.SOLO = 'MiniLaser';
+MLP.KNOWN_KINDS = ['detector', 'display', 'command', 'minilaser'];
+MLP.MINILASER = {
+  model: 'FHSD8075-ULF',                                   // Brent Q11: this part number only, everywhere
+  fanMa: { 1: 120, 2: 134, 3: 157, 4: 180, 5: 200, 6: 230, 7: 255, 8: 285, 9: 320, 10: 365 },   // M p.65 at 24 VDC; standby = alarm (Brent)
+  relays: [
+    { id: 'r1', label: 'R1 Fault relay (fixed)', fn: 'Fault', fixed: true, failsafe: true },   // fail-safe per Brent Q5
+    { id: 'r2', label: 'R2 Relay output 1 (Prealarm)', fn: 'Prealarm' },
+    { id: 'r3', label: 'R3 Relay output 2 (Fire Alarm)', fn: 'Fire Alarm' }],
+  input: { id: 'in1', label: 'IN1 Supervised input (15 kΩ EOL)', eolOhm: 15000 },            // M p.65, p.18 Table 7
+  expansion: { housing: '9-30520', housingDesc: 'MiniLaser Expansion Housing', module: '9-30521', moduleDesc: 'MiniLaser I/O Expansion Module',
+    maxModules: 2, outPerModule: 5, inPerModule: 2, outRating: 'latched relay, 2 A @ 30 VDC', inEol: '15 kΩ supervised' },   // DS p.1–2; no draw (Brent; not stated in DS)
+  dipFan: [2, 4, 7, 10], dipAlarmFactor: [2, 4, 6, 8],     // M p.28–29: other values need Remote configuration
+  remoteOnlyAlarmFactor: [0, 1, 3, 5, 7],                  // M Table 9 note [1]
+  /* M p.29 Table 9 */
+  table9: { 0: 'Very high · once per year · semiconductor clean room', 1: 'High · once per 5 years · computer room', 2: 'High · once per 10 years · non-smoking office',
+    3: 'High · once per 50 years · clean factory', 4: 'Medium · once per 1,000 years · warehouse', 5: 'Medium · once per 5,000 years · warehouse with diesel trucks',
+    6: 'Medium · once per 10,000 years · warehouse with diesel trucks', 7: 'Low · once per 20,000 years · warehouse with diesel trucks', 8: 'Low · once per 100,000 years · warehouse with diesel trucks' },
+  /* Brent's Alarm Factor Calculator (af-table.xlsx): detector Fire 1 level %obs/ft per alarm factor */
+  afFire1: { 8: 0.25, 7: 0.18, 6: 0.12, 5: 0.08, 4: 0.04, 3: 0.03, 2: 0.02, 1: 0.01, 0: 0.005 },
+  /* Brent 2026-10-16: more restrictive of UL and NFPA (existing suite rule); UL Open Area 2.18 */
+  afThresholds: { VEWFD: 1.0, EWFD: 1.5, SFD: 2.0, OAP: 2.18 },
+  /* M p.72 Table 35: hole sensitivity %obs/ft and transport time s per application */
+  table35: {
+    'UL 268 Ed.7 OAP': { sensMin: 1.70, sensMax: 2.18, ttMin: 6, ttMax: 43 },
+    'UL 268 Ed.7 SA Range 1': { sensMin: 0.05, sensMax: 1.00, ttMin: 3, ttMax: 60 },
+    'UL 268 Ed.7 SA Range 2': { sensMin: 0.05, sensMax: 2.18, ttMin: 3, ttMax: 43 },
+    'ULC-S529': { sensMin: 0.05, sensMax: 1.82, ttMin: 3, ttMax: 100 },
+    'FM 3230 VEWFD': { sensMaxExcl: 1.00, ttMaxExcl: 60 },
+    'FM 3230 EWFD': { sensMaxExcl: 1.50, ttMaxExcl: 90 },
+    'FM 3230 SFD': { sensMaxExcl: 2.50, ttMaxExcl: 120 } },
+  /* M p.66 */
+  pipe: { maxLenFt: { NFPA: 400, 'UL OAP': 300, 'SA-R1': 300, 'SA-R2': 200, ULC: 400 }, maxHoles: { VEWFD: 10, EWFD: 20, SFD: 35, OAP: 24, 'SA-R1': 25, 'SA-R2': 25, ULC: 35 }, firstHoleFt: 16 },
+  /* M p.27 Table 8, p.30 */
+  local: { fan: 4, alarmFactor: 4, flowDly: [120, 240], flowLevel: [20, 40], alarmDly: [5, 30] },
+  ref: 'MiniLaser Installation Manual 3103175-EN Rev 001'
+};
+MLP.isMiniLaser = d => !!(d && (d.kind === 'minilaser' || d.type === 'MiniLaser' || d.typeRaw === 'SOLO'));
+MLP.miniLaserMa = fan => MLP.MINILASER.fanMa[fan] || 0;
+/* Brent Q20/Q21: highest AF whose average hole sensitivity (Fire 1 × holes) ≤ threshold; round toward more sensitive.
+   cls: VEWFD | EWFD | SFD | OAP. Returns { af, avg, threshold, cls, fail, steps }. */
+MLP.deriveAlarmFactor = function (holes, cls){
+  const T = MLP.MINILASER.afThresholds, n = Math.max(0, parseInt(holes, 10) || 0), c = T[cls] != null ? cls : 'SFD', thr = T[c];
+  const steps = [];
+  for (let af = 8; af >= 0; af--){
+    const avg = +(MLP.MINILASER.afFire1[af] * n).toFixed(4); steps.push({ af, avg });
+    if (avg <= thr + 1e-9) return { af, avg, threshold: thr, cls: c, holes: n, fail: false, steps };
+  }
+  return { af: 0, avg: +(MLP.MINILASER.afFire1[0] * n).toFixed(4), threshold: thr, cls: c, holes: n, fail: true, steps,
+    msg: `Even alarm factor 0 gives ${(MLP.MINILASER.afFire1[0] * n).toFixed(3)} %obs/ft average hole sensitivity with ${n} holes — over the ${c} limit ${thr}. Use fewer holes or redesign the pipework.` };
+};
+/* Brent Q22: pre-engineered (T or I, ≤1 90° elbow) → DIP; otherwise DIP only if fan ∈ {2,4,7,10} AND AF ∈ {2,4,6,8}, else Remote. */
+MLP.miniLaserAdvice = function (o){
+  const M = MLP.MINILASER, fan = parseInt(o.fan, 10), af = parseInt(o.af, 10);
+  const pre = o.bends90 != null && o.bends90 <= 1 && (o.tees == null || o.tees <= 1);
+  const dipOk = M.dipFan.includes(fan) && M.dipAlarmFactor.includes(af);
+  const why = [];
+  if (!pre) why.push(o.bends90 != null ? `${o.bends90} × 90° elbows (pre-engineered allows ≤1)` : 'pipe layout unknown');
+  if (!M.dipFan.includes(fan)) why.push(`fan speed ${isFinite(fan) ? fan : '—'} is not DIP-settable (2/4/7/10)`);
+  if (!M.dipAlarmFactor.includes(af)) why.push(`alarm factor ${isFinite(af) ? af : '—'} is not DIP-settable (2/4/6/8)`);
+  const method = dipOk ? 'DIP' : 'Remote';
+  const remoteWhy = why.filter(w => !/elbow|layout/.test(w));
+  return { preEngineered: pre, method, why, text: method === 'DIP' ? (pre ? 'DIP (pre-engineered layout, manual ch.5)' : 'DIP (fan speed and alarm factor are DIP-settable)') : 'Remote (Remote.exe) — ' + (remoteWhy.join('; ') || why.join('; ')) + (pre ? '' : ' · not pre-engineered') };
+};
+/* M ch.5 pre-engineered tables 13–31. Row: [holes, transport s, AF2, AF4, AF6, AF8, diameters]; AF cell 'value:tags'
+   (V VEWFD, E EWFD, S SFD, A SA, O OAP, C ULC) or '' (not offered). Diameters: per branch for T (holes/2), per hole for I. */
+(function (){
+  const TAG = { V: 'VEWFD', E: 'EWFD', S: 'SFD', A: 'SA', O: 'OAP', C: 'ULC' };
+  const X = (s, n) => Array(n).fill(s);
+  const T = [
+    { shape: 'T', fan: 2, tables: '13–14', page: 50, lengths: [30, 60, 84, 108], rows: [
+      [2, 14, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['19/64']],
+      [4, 30, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', ['9/32', '19/64']],
+      [6, 45, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', ['1/4', '17/64', '5/16']],
+      [8, 73, '0.17:EC', '0.34:EC', '1.02:EC', '', ['3/16', '3/16', '13/64', '15/64']]] },
+    { shape: 'T', fan: 4, tables: '15–16', page: 51, lengths: [30, 60, 84, 108, 132, 156], rows: [
+      [2, 18, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['11/64']],
+      [4, 28, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('11/64', 2)],
+      [6, 45, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', X('9/64', 3)],
+      [8, 63, '0.16:EAC', '0.32:EAC', '0.96:EAC', '', X('1/8', 4)],
+      [10, 88, '0.21:EAC', '0.42:EAC', '1.26:EAC', '', X('7/64', 5)],
+      [12, 101, '0.25:S', '0.50:S', '1.50:S', '', X('7/64', 6)]] },
+    { shape: 'T', fan: 7, tables: '17–18', page: 52, lengths: [30, 60, 84, 108, 132, 156, 180], rows: [
+      [2, 15, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['9/64']],
+      [4, 15, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SA', ['17/64', '9/32']],
+      [6, 32, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', X('9/64', 3)],
+      [8, 45, '0.16:VAC', '0.32:VAC', '0.96:VAC', '', X('1/8', 4)],
+      [10, 62, '0.20:EC', '0.40:EC', '1.20:EC', '', X('7/64', 5)],
+      [12, 86, '0.24:EC', '0.48:EC', '1.44:EC', '', X('3/32', 6)],
+      [14, 95, '0.29:SC', '0.58:SC', '1.74:SC', '', X('3/32', 7)]] },
+    { shape: 'T', fan: 10, tables: '19–20', page: 53, lengths: [30, 60, 84, 108, 132, 156, 180], rows: [
+      [2, 14, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['5/32']],
+      [4, 19, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('5/32', 2)],
+      [6, 30, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', X('1/8', 3)],
+      [8, 43, '0.16:VAC', '0.32:VAC', '0.96:VAC', '', X('7/64', 4)],
+      [10, 62, '0.20:EC', '0.40:EC', '1.20:EC', '', X('3/32', 5)],
+      [12, 91, '0.24:SC', '0.48:SC', '1.44:SC', '', X('5/64', 6)],
+      [14, 99, '0.28:SC', '0.56:SC', '1.68:SC', '', X('5/64', 7)]] },
+    { shape: 'I', fan: 2, tables: '21–22', page: 55, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200], rows: [
+      [1, 4, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 13, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('17/64', 2)],
+      [3, 28, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('1/4', 3)],
+      [4, 34, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('13/64', 4)],
+      [5, 53, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('3/16', 4).concat(['13/64'])],
+      [6, 66, '0.13:EC', '0.26:EC', '0.78:EC', '', X('5/32', 5).concat(['11/64'])],
+      [7, 75, '0.15:EC', '0.30:EC', '0.90:EC', '', X('5/32', 6).concat(['11/64'])],
+      [8, 89, '0.17:EC', '0.34:EC', '1.02:EC', '', X('9/64', 6).concat(X('5/32', 2))],
+      [9, 95, '0.20:SC', '0.40:SC', '1.20:SC', '', X('1/8', 6).concat(X('9/64', 2), ['3/16'])],
+      [10, 113, '0.23:S', '0.46:S', '1.38:S', '', X('1/8', 7).concat(X('9/64', 2), ['5/32'])]] },
+    { shape: 'I', fan: 4, tables: '23–24', page: 56, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220], rows: [
+      [1, 3, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 13, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('3/16', 2)],
+      [3, 23, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('5/32', 3)],
+      [4, 34, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('9/64', 4)],
+      [5, 46, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('1/8', 5)],
+      [6, 64, '0.12:EC', '0.24:EC', '0.72:EC', '', X('7/64', 6)],
+      [7, 77, '0.15:EC', '0.30:EC', '0.90:EC', '', X('3/32', 6).concat(['7/64'])],
+      [8, 82, '0.17:EC', '0.34:EC', '1.02:EC', '', X('3/32', 7).concat(['7/64'])],
+      [9, 102, '0.19:S', '0.38:S', '1.14:S', '', X('3/32', 8).concat(['7/64'])],
+      [10, 105, '0.23:S', '0.46:S', '1.38:S', '', X('3/32', 5).concat(X('7/64', 5))],
+      [11, 117, '0.24:S', '0.48:S', '1.44:S', '', ['3/32'].concat(X('7/64', 9), ['1/8'])]] },
+    { shape: 'I', fan: 7, tables: '25–26', page: 58, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240], rows: [
+      [1, 2, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 10, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('3/16', 2)],
+      [3, 25, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('1/8', 3)],
+      [4, 37, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('7/64', 4)],
+      [5, 56, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('3/32', 5)],
+      [6, 60, '0.12:VC', '0.24:VC', '0.72:VC', '', X('3/32', 6)],
+      [7, 74, '0.15:EC', '0.30:EC', '0.90:EC', '', X('5/64', 6).concat(['3/32'])],
+      [8, 78, '0.17:EC', '0.34:EC', '1.02:EC', '', X('5/64', 7).concat(['3/32'])],
+      [9, 83, '0.19:EC', '0.38:EC', '1.14:EC', '', X('5/64', 8).concat(['3/32'])],
+      [10, 97, '0.21:S', '0.42:S', '1.26:S', '', X('5/64', 9).concat(['3/32'])],
+      [11, 103, '0.26:S', '0.52:S', '1.56:S', '', X('3/32', 3).concat(X('7/64', 8))],
+      [12, 111, '0.30:S', '0.60:S', '1.80:S', '', X('5/64', 2).concat(X('3/32', 3), X('7/64', 7))]] },
+    { shape: 'I', fan: 10, tables: '27–28', page: 60, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300], rows: [
+      [1, 2, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 8, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('3/16', 2)],
+      [3, 21, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('1/8', 3)],
+      [4, 32, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('7/64', 4)],
+      [5, 44, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('3/32', 5)],
+      [6, 68, '0.12:EC', '0.24:EC', '0.72:EC', '', X('5/64', 6)],
+      [7, 73, '0.14:EC', '0.28:EC', '0.84:EC', '', X('5/64', 7)],
+      [8, 82, '0.16:EC', '0.32:EC', '0.96:EC', '', X('5/64', 8)],
+      [9, 90, '0.18:EC', '0.36:EC', '1.08:EC', '', X('5/64', 9)],
+      [10, 98, '0.21:SC', '0.42:SC', '1.26:SC', '', X('5/64', 10)],
+      [11, 94, '0.24:SC', '0.48:SC', '1.44:SC', '', X('3/32', 11)],
+      [12, 105, '0.27:S', '0.54:S', '1.62:S', '', X('3/32', 12)],
+      [13, 111, '0.35:S', '0.70:S', '2.10:S', '', X('5/64', 5).concat(X('3/32', 8))],
+      [14, 113, '0.32:S', '0.64:S', '1.92:S', '', X('5/64', 2).concat(X('3/32', 2), ['7/64'], X('1/8', 8), ['9/64'])],
+      [15, 113, '0.35:S', '0.70:S', '2.10:S', '', X('5/64', 3).concat(['3/32', '7/64'], X('1/8', 8), X('9/64', 2))]] },
+    { shape: 'I225', fan: 10, tables: '29–31', page: 62, lengths: Array.from({ length: 25 }, (_, i) => 9 * (i + 1)), rows: [
+      [1, 2, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['5/16']],
+      [2, 2, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['19/64', '5/16']],
+      [3, 3, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', ['17/64', '19/64', '5/16']],
+      [4, 5, '0.09:VAC', '0.18:VAC', '0.54:VAC', '2.25:S', ['15/64', '17/64', '5/16', '5/16']],
+      [5, 6, '0.14:VAC', '0.28:VAC', '0.84:VAC', '', ['3/16', '3/16', '3/16', '1/4', '5/16']],
+      [6, 8, '0.19:VAC', '0.38:VAC', '1.14:EAC', '', X('3/16', 4).concat(['17/64', '5/16'])],
+      [7, 10, '0.21:VAC', '0.42:VAC', '1.26:EAC', '', X('11/64', 4).concat(['7/32', '5/16', '5/16'])],
+      [8, 13, '0.26:VAC', '0.52:VAC', '1.56:SAC', '', X('9/64', 4).concat(['13/64'], X('5/16', 3))],
+      [9, 16, '0.30:VAC', '0.60:VAC', '1.80:SAC', '', X('9/64', 5).concat(['13/64'], X('5/16', 3))],
+      [10, 18, '0.26:VAC', '0.52:VAC', '1.56:SAC', '', ['1/8', '9/64', '9/64', '5/32', '11/64', '3/16', '7/32', '7/32', '15/64', '5/16']],
+      [11, 20, '0.30:VAC', '0.60:VAC', '1.80:SAO', '', ['7/64', '1/8', '1/8', '9/64', '5/32', '11/64', '3/16', '13/64', '13/64', '13/64', '5/16']],
+      [12, 21, '0.32:VAC', '0.64:VAC', '1.92:SAO', '', X('7/64', 3).concat(['1/8', '9/64', '9/64', '5/32'], X('11/64', 4), ['1/4'])],
+      [13, 25, '0.34:VAC', '0.68:VAC', '2.04:SAO', '', ['3/32', '7/64', '7/64', '7/64', '1/8', '9/64', '9/64', '5/32', '11/64', '11/64', '11/64', '3/16', '9/32']],
+      [14, 28, '0.38:VAC', '0.76:VAC', '2.28:S', '', ['3/32'].concat(X('7/64', 3), ['1/8', '1/8', '9/64', '5/32', '11/64', '3/16', '3/16', '3/16', '13/64', '5/16'])],
+      [15, 31, '0.49:VAC', '0.98:VAC', '', '', ['3/32', '3/32', '7/64', '7/64', '1/8', '1/8', '9/64', '5/32'].concat(X('13/64', 4), ['7/32', '15/64', '5/16'])],
+      [16, 34, '0.44:VAC', '0.88:VAC', '', '', X('3/32', 4).concat(['7/64', '7/64', '1/8', '9/64', '5/32', '5/32'], X('11/64', 4), ['3/16', '5/16'])],
+      [17, 37, '0.46:VAC', '0.92:VAC', '', '', ['5/64'].concat(X('3/32', 4), ['7/64', '7/64', '1/8', '9/64'], X('5/32', 4), ['11/64', '11/64', '3/16', '5/16'])],
+      [18, 36, '0.49:VAC', '0.98:VAC', '', '', X('5/64', 3).concat(X('3/32', 4), ['7/64', '7/64'], X('9/64', 5), ['5/32', '5/32', '5/32', '17/64'])],
+      [19, 47, '0.54:VAC', '1.08:EC', '', '', X('5/64', 3).concat(X('3/32', 3), ['7/64', '7/64', '1/8', '9/64', '9/64'], X('5/32', 4), ['11/64', '11/64', '3/16', '5/16'])],
+      [20, 47, '0.54:VAC', '1.08:EC', '', '', X('5/64', 4).concat(X('3/32', 4), ['7/64', '1/8'], X('9/64', 5), ['9/64', '5/32', '5/32', '11/64', '5/16'])],
+      [21, 52, '0.58:VAC', '1.16:EC', '', '', X('5/64', 5).concat(X('3/32', 3), ['7/64'], X('1/8', 3), X('9/64', 3), X('9/64', 3), ['5/32', '11/64', '5/16'])],
+      [22, 52, '0.59:VAC', '1.18:EC', '', '', X('5/64', 6).concat(X('3/32', 3), ['7/64', '1/8', '1/8'], X('9/64', 3), X('9/64', 3), ['5/32', '11/64', '3/16', '5/16'])],
+      [23, 58, '0.69:VAC', '1.38:EC', '', '', X('5/64', 7).concat(['3/32', '3/32'], X('7/64', 3), X('1/8', 3), X('1/8', 3), X('9/64', 3), ['5/32', '5/16'])],
+      [24, 59, '0.70:VAC', '1.40:EC', '', '', X('5/64', 8).concat(['3/32', '3/32'], X('7/64', 5), X('1/8', 6), ['9/64', '9/64', '5/16'])],
+      [25, 59, '0.85:VAC', '1.70:SC', '', '', X('5/64', 9).concat(['3/32', '3/32'], X('7/64', 4), X('7/64', 6), ['1/8', '1/8', '3/16', '5/16'])]] }
+  ];
+  const cell = s => { if (!s) return null; const [v, t] = s.split(':'); return { avg: Number(v), classes: t.split('').map(c => TAG[c]) }; };
+  MLP.MINILASER.preEngineered = T.map(t => ({ shape: t.shape, fan: t.fan, tables: t.tables, page: t.page, rows: t.rows.map(r => {
+    const perBranch = t.shape === 'T' ? r[0] / 2 : r[0];
+    return { holes: r[0], transport: r[1], af: { 2: cell(r[2]), 4: cell(r[3]), 6: cell(r[4]), 8: cell(r[5]) }, diameters: r[6],
+      lengthFt: t.lengths[perBranch - 1], lengthNote: t.shape === 'T' ? 'per branch' : 'total' }; }) }));
+})();
+MLP.preEngTable = (shape, fan) => MLP.MINILASER.preEngineered.find(t => t.shape === shape && t.fan === +fan) || null;
+MLP.preEngLookup = function (shape, fan, holes, af){
+  const t = MLP.preEngTable(shape, fan); if (!t) return null;
+  const r = t.rows.find(x => x.holes === +holes); if (!r) return null;
+  const a = af != null ? r.af[af] : null;
+  return { table: t, row: r, af: a, dip: { fan: +fan, alarmFactor: af != null ? +af : null }, cite: `M Tables ${t.tables}, printed p.${t.page}` };
+};
+/* parsed .pl detector → MiniLaser design fields (Brent Q18/Q20/Q22). cls = intended performance class or null. */
+MLP.miniLaserFromPl = function (rec, cls){
+  const p = rec.pipe || {}, holes = (p.holes || []).length;
+  const tt = MLP.TT_TO_CLASS[p.maxTransit];
+  const useCls = cls || tt || 'SFD';
+  const clsSrc = cls ? 'project' : tt ? 'pl maxTransitTime' : 'default SFD/OAP – NFPA 72 (suite default preset)';
+  let af, afSrc, derivation = null;
+  if (p.afActivatedRaw === 'true' && p.af != null){ af = p.af; afSrc = 'pl'; }
+  else { derivation = MLP.deriveAlarmFactor(holes, useCls); af = derivation.af; afSrc = 'derived'; }
+  const advice = MLP.miniLaserAdvice({ fan: rec.fan, af, bends90: p.bends90Total, tees: p.tees });
+  return { fan: rec.fan, alarmFactor: af, alarmFactorSrc: afSrc, derivation, perfClass: useCls, perfClassSrc: clsSrc, holes, advice,
+    configMethod: advice.method, expansionInPl: !!p.expansionInPl };
+};
 root.MLP = MLP;
 if (typeof module !== 'undefined' && module.exports) module.exports = MLP;
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -1800,6 +1800,13 @@ body.v2 .model-cell{ font-size:10.5px; }
             <p><b>File → Export project…</b> downloads a <span class="mono-inline">.mlproj.json</span> ModuLaser project file. It holds the project details, every power supply sheet (name, Area/Group, model, battery model, Ah and quantity, required Ah, standby and alarm time, PASS/FAIL), every detector and display (16-character name, type, address, power supply, fan speed) and, for detectors imported from PipeCAD, the pipe data commissioning needs: each sampling hole's size, flow, transport time and sensitivity, test points, pipe length, total flow, hole balance, fittings, Alarm Factor and design sensitivity, plus the .pl PSU and Battery positions. Open it in the <b>MASD Field Report</b> with <b>File → Import project…</b> and every detector, display and power supply sheet is created for you; nothing is typed twice. Both tools save the same file: the calculator owns the <i>design</i> part and the Field Report owns the <i>site</i> results. <b>File → Import project…</b> here opens a project file; if sheets are already on screen it lists every difference (added, removed or changed devices and power supplies) before replacing them. The Field Report's site results are never edited by the calculator; they are kept and written back unchanged the next time you export. Set addresses here: the Field Report imports them and confirms them on site.</p>
           </div>
         </div>
+        <div class="qs-step">
+          <div class="qs-step-num">26</div>
+          <div class="qs-step-body">
+            <div class="qs-step-title" id="qs-step-minilaser">Add a MiniLaser (standalone ASD, FHSD8075-ULF)</div>
+            <p>Each sheet has a <b>Standalone ASDs (MiniLaser FHSD8075-ULF)</b> table below the MASD modules. <b>+ Add MiniLaser</b> opens the <b>Pre-engineered</b> picker (MiniLaser manual ch.5, Tables 13–31): choose T- or I-shaped, fan speed, number of holes and alarm factor — only combinations in the manual's tables are offered — and it fills the fan speed, alarm factor and DIP settings and shows pipe length, hole diameters, transport time and average sensitivity. Cancel switches the row to <b>Manual config</b> for non-pre-engineered installs; the fan speed stays blank and amber (⚠) until you choose it. A MiniLaser is never addressed and never on SenseNET; it needs its <b>own AUX circuit</b> (one MiniLaser per circuit, never shared) with the same 35 mA per-circuit overhead and 3.0 A per-circuit limit. Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA (standby = alarm). Pick 0–2 I/O Expansion Modules (9-30521); the 9-30520 housing is added to the BOM automatically. A .pl import brings SOLO detectors in here with the fan speed and alarm factor from the .pl; when the .pl has no alarm factor the highest factor whose average hole sensitivity (Fire 1 × holes) stays within the class limit is used, and DIP or Remote configuration is recommended.</p>
+          </div>
+        </div>
 
         <p style="font-size:12px; color:var(--text-faint); background:var(--panel-3); padding:8px 12px; margin:20px 0 0; border-radius:5px; line-height:1.5;">
           <i>Each step above shows a wireframe of the relevant part of the calculator. To replace a wireframe with a real screenshot: capture the live UI, save it under a name like <span class="mono-inline">qs-1-project-header.png</span> in the same folder as this HTML, then set <span class="mono-inline">src="qs-1-project-header.png"</span> on the matching <span class="mono-inline">&lt;img data-qs-slot="1-project-header"&gt;</span> tag. The wireframe stays until a real image is provided.</i>
@@ -1831,6 +1838,8 @@ body.v2 .model-cell{ font-size:10.5px; }
 
       <div class="help-section" id="help-standards">
         <h3>Standards and Formulas</h3>
+        <p><b>MiniLaser (02.01.000).</b> MiniLaser installation manual: current draw by fan speed; fan-speed and alarm-factor DIP settings (Table 9); pre-engineered pipe tables (Tables 13–31); hole sensitivity and transport limits (Table 35). I/O Expansion Module 9-30521: 5 latched relays 2 A @ 30 VDC, 2 supervised inputs 15 kΩ; no current draw published, treated as no added draw per Brent. Alarm-factor Fire 1 levels per Brent (2026-10-16).</p>
+
         <p style="font-size:12px; color:var(--text-faint); background:var(--panel-3); padding:9px 12px; border-radius:5px; margin:0 0 16px; line-height:1.5;">
           <i>General reference only — not a substitute for the current adopted edition of NFPA 72, your local building/fire code, the AHJ's requirements, or the equipment manufacturer's published installation instructions. Code editions and local amendments change; always verify against what's actually adopted for your jurisdiction and project.</i>
         </p>
@@ -1930,6 +1939,22 @@ body.v2 .model-cell{ font-size:10.5px; }
 
       <div class="help-section" id="help-faq">
         <h3>FAQs</h3>
+        <div class="help-faq-item">
+          <div class="q">Why doesn't a MiniLaser get an address?</div>
+          <p class="a">The MiniLaser (FHSD8075-ULF) is a standalone aspirating detector with no SenseNET connection . It sits in each sheet's Standalone ASDs table, is left out of addressing, auto-addressing, duplicate checks and the 127-per-network count, and can go on any sheet, Networked or Standalone (02.01.000).</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">Why does each MiniLaser need its own AUX circuit?</div>
+          <p class="a">Per Brent (2026-10-16): every MiniLaser is on its own dedicated AUX output, never shared with a ModuLaser entry point or another MiniLaser, with the same 35 mA per-circuit overhead and 3.0 A per-circuit limit. The Edwards supplies have 4 AUX circuits, so more MiniLasers plus entry points than 4 is a validation error that recommends adding a power supply.</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">Where does the MiniLaser alarm factor come from?</div>
+          <p class="a">From the PipeCAD .pl when PipeCAD's Alarm Factor option was on. When it is off (alarmFactorActivated false), the calculator uses the highest alarm factor whose average hole sensitivity — detector Fire 1 level (AF 8 0.25, 7 0.18, 6 0.12, 5 0.08, 4 0.04, 3 0.03, 2 0.02, 1 0.01, 0 0.005 %obs/ft) × number of sampling holes — is at or below the class limit (VEWFD 1.0, EWFD 1.5, SFD 2.0, UL Open Area 2.18 %obs/ft), rounding toward more sensitive. If even 0 is over the limit it sets 0 and flags a validation error recommending fewer holes or a redesign. DIP switches offer only fan 2/4/7/10 and alarm factor 2/4/6/8; anything else needs Remote configuration (Remote.exe).</p>
+        </div>
+        <div class="help-faq-item">
+          <div class="q">Why didn't my .pl MiniLaser expansion import?</div>
+          <p class="a">Expansion items in a .pl are not imported (Brent 2026-10-16). Enter the number of I/O Expansion Modules (9-30521, 0–2) on the MiniLaser row; the import shows a notice when the .pl lists expansions.</p>
+        </div>
         <div class="help-faq-item">
           <div class="q">What is the MASD Engineering Toolbox, and is the math the same?</div>
           <p class="a">The MASD Engineering Toolbox (00.01.000) absorbs this calculator and adds detector/display configuration, legacy-file migration and the field-change approval loop. Both apps run the same <b>MASD engine</b> (shown in Help → Revision Log → Calculation engine) and the same .pl import, so the same inputs give the same Ah, supplies and battery in both. Harmonization rule: any engine change bumps both apps' revisions with matching notes. Projects move between them through the same .mlproj.json file; this calculator keeps the Toolbox's configuration, field changes and approvals unchanged when it exports.</p>
@@ -2141,7 +2166,7 @@ body.v2 .model-cell{ font-size:10.5px; }
    MASD_ENGINE_VERSION and the revision of BOTH apps, with matching
    Revision-log notes that name the engine version.
    ===================================================================== */
-const MASD_ENGINE_VERSION = '1.0.0';
+const MASD_ENGINE_VERSION = '1.1.0';
 const MASD_ENGINE = {
   version: MASD_ENGINE_VERSION,
   /* BS 5839-1 Annex E: D = 1 when the battery 20-hour rate (Ah / 20) meets the alarm current, else 1.75. */
@@ -2162,7 +2187,11 @@ const MASD_ENGINE = {
     return ((standbyHours * (totalMa / 1000)) + ((alarmMinutes / 60) * (totalMa / 1000))) * (1 + margin);
   },
   suppliesRequired(requiredAh, sizeAh){ return sizeAh > 0 ? Math.max(1, Math.ceil(requiredAh / sizeAh)) : 1; },
-  detectorMa(fan, psuVolts){ return (psuVolts === 18 ? FAN_SPEED_MA_18V : FAN_SPEED_MA)[fan] || 0; }
+  detectorMa(fan, psuVolts){ return (psuVolts === 18 ? FAN_SPEED_MA_18V : FAN_SPEED_MA)[fan] || 0; },
+  /* 1.1.0 MiniLaser FHSD8075-ULF: one figure per fan speed (M p.65, 24 VDC) — standby = alarm (Brent 2026-10-16). Blank fan → 0 (amber needs-entry). */
+  miniLaserMa(fan){ return MINILASER_FAN_MA[fan] || 0; },
+  /* AUX circuits needed on a sheet: one per ModuLaser entry point plus one dedicated circuit per MiniLaser (Brent Q2/Q3). */
+  auxNeeded(entryPoints, miniLasers){ return (entryPoints || 0) + (miniLasers || 0); }
 };
 
 /* ---------------- reference data ---------------- */
@@ -2179,6 +2208,10 @@ const FAN_SPEED_MA = {1:218,2:234,3:255,4:279,5:301,6:330,7:363,8:393,9:431,10:4
 // see the Help menu's Module Current Draw Reference for the documented sourcing.
 const FAN_SPEED_MA_18V = {1:250,2:279,3:305,4:330,5:358,6:380,7:430,8:465,9:517,10:566,11:615,12:685,13:733,14:786,15:872,16:1021};
 
+/* 1.1.0 MiniLaser ASD — standalone, never addressed, own dedicated AUX circuit, not a MODULE_TYPES entry (no address/cluster/ribbon). */
+const MINILASER_MODEL = 'FHSD8075-ULF';
+const MINILASER_FAN_MA = {1:120,2:134,3:157,4:180,5:200,6:230,7:255,8:285,9:320,10:365};
+const MINILASER_HOUSING = '9-30520', MINILASER_IO_MODULE = '9-30521', MINILASER_MAX_IO = 2;
 const QUIESCENT_MA = 70;
 const AUX_MA_PER_CIRCUIT = 35;
 const MAX_AUX_BUILTIN = 4;
@@ -2309,7 +2342,7 @@ function plParse(text, fileName){
   const floors = floorDb ? Array.from(floorDb.children).filter(c => c.tagName === 'Floor') : [];
   floors.forEach((fl, gi) => {
     const gname = plTxt(fl, 'name') || `Area ${gi + 1}`;
-    const g = { idx: gi, origName: gname, name: gname, include: true, detectors: [], displays: [], psus: [] };
+    const g = { idx: gi, origName: gname, name: gname, include: true, detectors: [], displays: [], psus: [], miniLasers: [] };
     const seen = {};
     const ddb = plKid(fl, 'detectorDatabase');
     (ddb ? Array.from(ddb.children).filter(c => c.tagName === 'Detector') : []).forEach((d, di) => {
@@ -2324,6 +2357,10 @@ function plParse(text, fileName){
         address: plTxt(d, 'address'),
         x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale };
       rec.fp = plFnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
+      if (typeRaw === 'SOLO'){   // 1.1.0: MiniLaser — kept out of the ModuLaser PSU/cluster suggestion; placed in the sheet's Standalone ASD table
+        rec.kind = 'minilaser'; rec.type = 'MiniLaser'; rec.address = ''; rec.fan = (fan >= 1 && fan <= 10) ? fan : null;
+        g.miniLasers.push(rec); return;
+      }
       if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
       g.detectors.push(rec);
     });
@@ -2348,6 +2385,7 @@ function plParse(text, fileName){
 /* ---------- battery math (mirrors recalcLocationInner, Edwards A/BPS, 1 AUX circuit) ---------- */
 function plDeviceMa(dev){
   if (dev.kind === 'display') return (MODULE_TYPES[dev.type] || {}).ma || 0;
+  if (dev.kind === 'minilaser') return MINILASER_FAN_MA[dev.fan] || 0;
   return FAN_SPEED_MA[dev.fan] || FAN_SPEED_MA[16];
 }
 function plRequiredAh(devices, s){
@@ -2447,7 +2485,7 @@ function plSuggestForGroup(g, devs){
 //         change made in chat, until the minor version above is next revised
 //   YYMMDD = the actual calendar date the revision was made
 const APP_MAJOR = "02";
-const APP_MINOR = "00";
+const APP_MINOR = "01";
 const APP_AUTHOR = "The BMG";
 
 // Running amendment log. Each entry is one distinct logical change.
@@ -2521,6 +2559,7 @@ const AMENDMENTS = [
 { rev: "003", major: "02", minor: "00", date: "261014", desc: "<b>Needs-entry fix (QA/Auditor).</b> Sheets showed the amber <i>Needs entry</i> status but the fields that needed entry were not visibly marked: the 02.00 dark theme kept the old 1px soft-blue (#5b9bd5) outline, which looked the same as ordinary input borders, so the highlight could not be seen (most of these fields are custom dropdowns over hidden native selects). Needs-entry fields now use a 2px <b>amber</b> outline and tint that match the amber sidebar dot, on inputs, custom dropdown buttons and radio groups. The Live Results message now reads <i>N fields still need entry (amber outline)</i> with a <b>Show next ›</b> button that scrolls to and focuses each field in turn. Status logic, counts and calculation math are unchanged. Help, Quick Start, How Do I and FAQ wording updated from blue to amber. Also: print label grey darkened #747574 → #6b6c6b for WCAG AA contrast (5.0:1 on the info panel). Regression test test_needs_entry.py uses Brent's saved file (5/5 pass; 1/3 on 02.00.002). <b>Module table columns (02.00.003, per Brent):</b> Module Type shows DISP-MIN / DISP-STD / DISP-CMD / DETECTOR (stored values unchanged, so saved files and imports are unaffected); Cluster shows the 2-digit number only (01); Power shows <i>Own circuit</i> or <i>Ribbon Path</i> (the dropdown list still names the entry point). Fixed pixel column widths (Superdesign layout suggestion: Model wide enough for FHSD83x0-ULF, narrow Cluster) with no truncation or wrap; the table scrolls sideways on narrow windows. Print/Export and Word module tables gain Model, Cluster and Power columns with the same labels, single-line cells (Word no-wrap). Test test_module_columns.py 10/10 on Brent\'s file (2/10 on 02.00.002). **QA follow-up (2026-10-14):** cross-sheet Cluster hint clipped with ellipsis and full text on hover; 'No cluster display defined on any page' shows '—' on the button (full text on hover); needs-entry count and Show next skip CSS-hidden fields (a new sheet shows 18, not 19) and Show next starts from the first field on each sheet; Word export has an Arial 9 pt default font (styles.xml), fixed-layout tables and summary rows spanning the descriptive columns so nothing wraps or is clipped. Saved .html files keep their own code: re-open data via File \u2192 Import Calc. Final (QA re-check): Word module table Standby mA / Alarm mA columns 1100 twips (header no longer wraps), summary row shows 'Status:' again; offline cache renamed." },
 { rev: "004", major: "02", minor: "00", date: "261015", desc: "Per Brent. <b>Valid defaults are no longer amber-flagged</b>: Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet <i>Needs entry</i>; only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are flagged. Edit → Confirm defaults is kept but no longer needed (harmless). <b>New sheets start with no modules</b>: an empty-state guide offers Import .pl… or + Add Display / + Add Detector; the last module can now be removed (the guide returns); an empty sheet shows Needs entry and INCOMPLETE. <b>Standby (h) / Alarm (min)</b> boxes no longer shrink and cut values off on screens ≤ 1366 px (the settings row wraps instead). <b>Addressing</b>: duplicate addresses are checked per mode — Networked sheets share an address pool per SenseNET network; a Standalone sheet is its own 1–9 pool (scoped per sheet, previously per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside a Standalone sheet are still flagged. Projects mixing Networked and Standalone sheets show a <b>Mixed addressing</b> banner with Make all Networked… / Make all Standalone… and an optional <i>Also re-address all modules</i> (Networked 1…N across all sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged; confirm first). Imports (Import Calc, Import project, .pl re-import) keep addresses and list any per-mode conflicts right after import. <b>SenseNET networks</b> (per Brent): one network holds up to 127 modules; each Networked sheet has a SenseNET network number (selector on the Addressing row, SN tag in the sidebar, <i>Networked · SenseNET n</i> in print/Word/Excel settings, saved per sheet; older files default to network 1). Past 127, whole sheets (last in sheet order first) move to SenseNET 2, 3… and are addressed from 1, with a notice that a new network was added and the design must include its infrastructure; a sheet never spans networks. Duplicates are checked per network. Networked re-address numbers 1–127 on SenseNET 1 in sheet order and continues 1–127 on SenseNET 2. Imports keep networks and never move sheets on their own; an import over 127 offers Move overflow to a new SenseNET network. <b>Address change log + Undo</b> (QA F1/F2): unify / re-address, SenseNET moves and Standalone clears are logged (Edit → Address change log…, saved with the project) with before/after address and network per module, and undo in one step (Undo bar or Ctrl+Z when no field/dropdown has focus; disarmed by the next manual address/mode/network edit); auto-move only when a network's count rises past 127, otherwise a Move overflow banner; Clear file clears the log; Make all Standalone lists the addresses above 9 it will clear and reports them afterwards. <b>Confirm Settings?</b> after a .pl import (Confirm marks imported items confirmed; Revise import rolls back to the review step with choices kept). Design Basis and Ambient Temperature start on <i>- Select -</i> (amber, sheet INCOMPLETE, no de-rating until chosen); the .pl wizard requires them; saved/legacy files keep their values. Sheets with no modules show <b>Incomplete</b> for battery Ah everywhere (results card, Live Results, sidebar, print, Word, Excel; .mlproj requiredAh null + incomplete), with no battery/PSU recommendation. Calculation math and the shared engine (masd-engine.js 1.0.0) are unchanged. <b>Shared modulaser-project.js 1.4.0 (bumped from 1.3.0 for SenseNET networks: each device in .mlproj.json carries its network, the shared validator checks duplicates per network and the 127 limit per network; byte-identical in the Calculator, Toolbox and Field Report 02.00.002).</b>" },
 { rev: "005", major: "02", minor: "00", date: "261016", desc: "Per Brent (10-16, revised 5:27 PM). <b>Auto addressing.</b> <b>New build</b> (first modules in an empty project, by first .pl import or first + Add): <b>Networked or Standalone?</b> sets every sheet's mode, then <b>Auto address?</b> Yes / No (Yes: Networked 1…N in sheet order across sheets, whole sheets roll to SenseNET 2 past 127 with the infrastructure notice; Standalone 1…n per sheet). <b>Existing project</b> gaining modules (new .pl import, new sheet, modules added to a sheet, Import Calc → Merge sheets): one prompt — <b>Continue addressing per previous sheets</b> (only the new modules; Networked continues after the last address on its network, a new sheet rolls to the next network past 127; a new Standalone sheet starts at 1), <b>Manually address</b>, or <b>Re-auto address entire project</b>; new sheets take the project's mode (mixed projects keep the banner). After a .pl import the order is Confirm Settings? → (mode) → address; Revise import and linked-file re-imports don't prompt. Each automatic change is one Address change log entry with one-step Undo; quick repeated adds give one prompt (0.8 s), never stacked on another prompt. <b>Excel CAD Schedule</b>: each power supply table now has a row with that sheet's own <b>Standby time</b> (h), <b>Alarm time</b> (min) and <b>Safety margin</b> (%) (no merged cells or fills). <b>Cluster Validation Report print</b> (Brent approved): KGS palette on white, navy title bar, project summary box, Entry point / Ribbon Path / CALCULATION INVALID / VALIDATION ERROR PENDING chips, a running header (CLUSTER VALIDATION REPORT · project · Network #) and footer (app name + revision · Page n of N) on every page, repeated table headers, rows never split, no wrapping. <b>Incomplete in amber with ⚠</b> (Brent 6:07 PM): every Incomplete indication (status, empty-sheet Ah / battery / PSU recommendation, sidebar, Live Results, print stamp/tiles/tables/legend, Word cells, withheld PSU recommendation, CVR pending chip) is amber with a warning symbol — needs-entry amber on screen, #8a5a00 on #fdf3dc in print/Word; Excel exports have no fills or colour coding (plain ⚠ text); .mlproj.json keeps the plain status. Calculation math, masd-engine.js 1.0.0 and modulaser-project.js 1.4.0 unchanged." },
+{ rev: "000", major: "02", minor: "01", date: "261016", desc: "Per Brent (10-16). <b>MiniLaser ASD (FHSD8075-ULF) support.</b> Each sheet has a separate <b>Standalone ASDs</b> table (never addressed, not on SenseNET, can be on any sheet). Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA, standby = alarm. Each MiniLaser takes its own dedicated AUX circuit (max one per circuit) with the 35 mA per-circuit overhead and 3.0 A limit; more MiniLasers plus entry points than AUX outputs is a validation error recommending another power supply. I/O Expansion Modules 9-30521 (0–2, no added draw) with the 9-30520 housing added automatically; BOM by part number. <b>+ Add MiniLaser</b> opens the Pre-engineered picker (T or I shape, manual Tables 13–31) or Manual config; a hand-added MiniLaser starts with a blank fan speed, amber with ⚠ until set. <b>.pl import</b>: SOLO detectors become MiniLasers with fan speed and alarm factor from the .pl (expansions ignored with a notice; Confirm Settings? still runs). When the .pl has no alarm factor, the highest factor whose average hole sensitivity (Fire 1 × holes) is within the class limit (VEWFD 1.0, EWFD 1.5, SFD 2.0, OAP 2.18 %obs/ft) is used; if even 0 is over, 0 is set and validation fails recommending fewer holes or a redesign. DIP vs Remote configuration recommendation. MiniLasers appear on screen, in print, Word, Excel (CAD Schedule) and the Cluster Validation Report, and in .mlproj.json (miniLasers). modulaser-project.js 1.5.0, masd-engine.js 1.1.0; ModuLaser calculation math unchanged." },
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -3954,7 +3993,7 @@ function buildClusterReport(){
   const dateLabel = dateVal ? new Date(dateVal + 'T00:00:00').toLocaleDateString() : '';
 
   const clusterNums = Object.keys(byCluster).map(n => parseInt(n)).sort((a,b) => a - b);
-  if (!clusterNums.length && !commandDisplays.length){
+  if (!clusterNums.length && !commandDisplays.length && !(typeof mlCvrHtml === 'function' && mlCvrHtml())){
     container.innerHTML = '<div class="report-empty">No clusters defined yet. Add a Standard or Minimum Display to a location to start.</div>';
     return;
   }
@@ -4051,6 +4090,7 @@ function buildClusterReport(){
     html += '</tbody></table></div>';
   }
 
+  if (typeof mlCvrHtml === 'function') html += mlCvrHtml();
   html += `<div class="report-cluster-block">
     <div class="report-cluster-title">Bill of Materials — by power supply sheet</div>`;
   document.querySelectorAll('.location').forEach(locEl => {
@@ -4836,7 +4876,9 @@ function recalcLocationInner(loc){
     }
   });
 
-  const deviceTotalMa = displayMa + detectorMa;
+  // 02.01.000: MiniLasers (standalone ASD table) claim dedicated AUX circuits after the ModuLaser entry points
+  const __ml = (typeof mlRecalcHook === 'function') ? mlRecalcHook(locEl, mode, setupAuxCircuitSelect, unassignedAuxRows) : { ma: 0, auxMa: {}, flags: [], count: 0 };
+  const deviceTotalMa = displayMa + detectorMa + __ml.ma;
 
   // ---- AUX circuit current totals (Edwards builtin mode only) ----
   // circuit N's current = sum of mA for every entry point assigned to AUX-N, plus its ribbon followers.
@@ -4862,6 +4904,7 @@ function recalcLocationInner(loc){
       seg.followerRows.forEach(f => { total += rowOwnMa(f); });
       auxCircuitCurrentMa[cnum] = (auxCircuitCurrentMa[cnum] || 0) + total;
     });
+    Object.entries(__ml.auxMa).forEach(([c, ma]) => { auxCircuitCurrentMa[c] = (auxCircuitCurrentMa[c] || 0) + ma; });
   }
 
   let submode = 'custom';
@@ -4872,6 +4915,7 @@ function recalcLocationInner(loc){
   // ---- network validation flags ----
   const detectorCount = detectorRowsList.length;
   const flags = [];
+  flags.push(...__ml.flags);
 
   // ---- group ribbon-connected modules together on the sheet ----
   const devicesBody = locEl.querySelector('.devices-body');
@@ -7050,6 +7094,14 @@ function wireFeaturePack(){
 /* ===== How Do I… searchable help ===== */
 const HOWDOI_COMMON = [
   {
+    id: 'minilaser',
+    title: 'Add a MiniLaser (standalone ASD)',
+    keywords: 'minilaser fhsd8075 solo standalone asd aux circuit pre-engineered dip remote alarm factor expansion 9-30520 9-30521',
+    blurb: '+ Add MiniLaser in the sheet\'s Standalone ASDs table opens the Pre-engineered picker (manual ch.5) or Manual config. Never addressed; own AUX circuit (one per circuit); draw 120–365 mA by fan speed; I/O modules 0–2 (housing added automatically).',
+    target: 'qs-step-minilaser',
+    common: true,
+  },
+  {
     id: 'project-file',
     title: 'Send the design to the Field Report (project file)',
     keywords: 'project file mlproj json export import field report commissioning share site design diff',
@@ -7713,6 +7765,7 @@ async function plAddFiles(fileList){
     const text = await file.text();
     try {
       const parsed = plParse(text, file.name);
+      if (typeof mlAttachPl === 'function') mlAttachPl(parsed, text);   // 02.01.000 MiniLaser
       parsed.size = file.size; parsed.lastModified = file.lastModified; parsed.path = file.path || '';
       parsed.sha256 = await plSha256(text);
       parsed.linkId = 'pl-' + parsed.sha256.slice(0, 12) + '-' + plWiz.files.length;
@@ -8002,6 +8055,8 @@ async function plFinish(){
       devs.forEach(d => { link.devices[d.key] = { fp: d.fp, kind: d.kind, origName: d.origName, type: d.kind === 'display' ? d.type : 'Detector', fan: d.fan || null, zone: d.newName, group: g.origName, sheetId }; });
     });
   });
+  // 02.01.000: MiniLasers from the .pl go into each Area/Group sheet's Standalone ASD table (a sheet is created when the group has no ModuLaser modules)
+  const mlNotices = (typeof mlPlaceFromPl === 'function' && plWiz.mode !== 'update') ? mlPlaceFromPl(created, plWiz.files, s, (g, f) => { psNum++; return restoreLocation(plSavedLocation(s, `PS-${psNum}`, g.name, `${f.project} · ${f.fileName}`, [], 'pls-' + Date.now().toString(36) + '-' + (++plSheetSeq))); }) : [];
   Object.values(linkByFile).forEach(link => {
     if (plWiz.linkUpdate) return; // already in PL_LINKS
     PL_LINKS = PL_LINKS.filter(l => l.sha256 !== link.sha256).concat([link]);
@@ -8021,6 +8076,7 @@ async function plFinish(){
   refreshAllAmber(); syncPrintHeaders(); scheduleSave(); plRenderBanner();
   closePlWizard();
   // 02.00.005: Confirm Settings? first (it can roll the import back), then the auto-addressing prompts on the kept import.
+  if (mlNotices.length) await showPromptModal({ title: 'MiniLaser import notice', desc: '<ul>' + mlNotices.map(n => '<li>' + v2Esc(n) + '</li>').join('') + '</ul>', buttons: [{ label: 'OK', value: 'ok', primary: true }] });
   if (confirmable && created.length){ const cs = await plConfirmSettings(created, prevState); if (cs === 'confirm') await promptAutoAddress('import', aaPre); }
 }
 // 02.00.004 (Brent 10-16): after a .pl import, summarize the settings applied and ask to confirm them.
@@ -8034,7 +8090,7 @@ async function plConfirmSettings(created, prevState){
   const rows = [['Design Basis', s.designBasis], ['Standby', s.standbyHours + ' h'], ['Alarm', s.alarmMinutes + ' min'], ['Ambient temperature', opt('.temperature-select', s.temperature)],
     ['Safety margin', Math.round(parseFloat(s.margin) * 100) + '%'], ['NFPA 72 edition', s.nfpa72Edition === '2019minus' ? '2019 and earlier' : '2022 and later'],
     ['Power supply capacity', s.psCapacity + ' A'], ['Battery / supply mode', s.mode === 'thirdparty' ? 'Third-party' : 'Edwards A/BPS'],
-    ['Addressing', 'Chosen after Confirm (auto address or enter yourself)'], ['Imported', `${files.join(', ')} → ${created.length} sheet${created.length === 1 ? '' : 's'}, ${nMods} module${nMods === 1 ? '' : 's'}`]];
+    ['Addressing', 'Chosen after Confirm (auto address or enter yourself)'], ['Imported', `${files.join(', ')} → ${created.length} sheet${created.length === 1 ? '' : 's'}, ${nMods} module${nMods === 1 ? '' : 's'}${(typeof mlCountIn === 'function' && mlCountIn(created)) ? `, ${mlCountIn(created)} MiniLaser${mlCountIn(created) === 1 ? '' : 's'} (standalone ASD table, not addressed)` : ''}`]];
   const desc = `<p>These settings were applied to the imported sheets:</p><table class="adl-t cs-sum">${rows.map(([k, v]) => `<tr><th>${v2Esc(k)}</th><td>${v2Esc(v)}</td></tr>`).join('')}</table>
     <p class="plw-note">Confirm marks everything configured during the import as confirmed, so only fields that are genuinely empty (e.g. addresses) stay amber. Revise import returns you to the import review with your choices kept.</p>`;
   const v = await showPromptModal({ title: 'Confirm Settings?', desc, buttons: [{ label: 'Revise import', value: 'revise' }, { label: 'Confirm', value: 'confirm', primary: true }] });
@@ -8065,7 +8121,7 @@ async function plConfirmSettings(created, prevState){
     const r = _inner.apply(this, arguments);
     const l = document.getElementById('location-' + loc);
     if (l){
-      const empty = !l.querySelector('[data-role="module"]');
+      const empty = !l.querySelector('[data-role="module"],[data-role="minilaser"]');
       l.classList.toggle('sheet-no-modules', empty);
       if (empty){
         l.classList.add('recommendations-withheld');
@@ -8690,14 +8746,14 @@ function v2SheetModel(locEl){
   } else {
     batteryLabel = 'Third-party (loads exported)';
   }
-  if (!locEl.querySelector('[data-role="module"]')){ batteryAh = null; batteryLabel = '\u26A0 Incomplete — add modules'; }   // QA r3 H1
+  if (!locEl.querySelector('[data-role="module"],[data-role="minilaser"]')){ batteryAh = null; batteryLabel = '\u26A0 Incomplete — add modules'; }   // QA r3 H1
   const invalidList = Array.from(locEl.querySelectorAll('.icb-list li')).filter(li => !li.closest('[hidden]')).map(li => li.textContent.trim()).filter(Boolean);
   const flags = Array.from(locEl.querySelectorAll('.flags-list li')).filter(li => !li.closest('[hidden]')).map(li => li.textContent.trim()).filter(Boolean);
   const needs = v2NeedsFields(locEl).length;
   let status = 'pass';
   if (invalid || psRequired > 1 || (!exportMode && requiredAh > CHARGER_MAX_AH) || (batteryAh && ahPerSupply > batteryAh + 1e-9)) status = 'fail';
   else if (withheld) status = 'incomplete';
-  const noModules = !locEl.querySelector('[data-role="module"]');
+  const noModules = !locEl.querySelector('[data-role="module"],[data-role="minilaser"]');
   if (noModules){ status = status === 'fail' && !invalid ? 'incomplete' : status; }
   if (noModules && status === 'pass') status = 'incomplete';   // 02.00.004: an empty sheet is not a PASS
   const unselected = ['.design-basis-select', '.temperature-select'].some(q => { const e = locEl.querySelector(q); return e && e.value === ''; });
@@ -8902,7 +8958,7 @@ function v2RenderResultsInner(m){
       ${m.mode === 'builtin' ? `<div class="rp-row"><span>Power supply</span><b>${v2Esc(m.hwSupply || '—')}</b></div><div class="rp-row"><span>Enclosure</span><b>${v2Esc(m.hwEnclosure || '—')}</b></div>` : ''}
       <div class="rp-row"><span>Supplies required</span><b>${m.psRequired}</b></div></div>
     <div class="rp-card"><div class="rp-k">Load breakdown</div>
-      <div class="rp-row"><span>ModuLaser modules</span><b>${v2Fmt(m.moduleMa, 0)} mA</b></div>
+      <div class="rp-row"><span>ModuLaser modules</span><b>${v2Fmt(m.moduleMa - (m.mlMa || 0), 0)} mA</b></div>${m.miniLasers && m.miniLasers.length ? `<div class="rp-row"><span>MiniLaser ×${m.miniLasers.length}</span><b>${v2Fmt(m.mlMa, 0)} mA</b></div>` : ''}
       <div class="rp-row"><span>Power supply (quiescent + AUX)</span><b>${v2Fmt(m.psMa, 0)} mA</b></div>
       <div class="rp-row tot"><span>Total load</span><b>${v2Fmt(m.totalMa, 0)} mA</b></div>
       <div class="rp-row"><span>Standby capacity</span><b>${v2AhU(m, m.standbyAh)}</b></div>
@@ -9160,6 +9216,7 @@ function v2PsuPage(m, H, opts){
       <div><h2>Settings used</h2><table class="kv">${m.settings.map(([k, v]) => `<tr><td>${v2Esc(k)}</td><td>${v2Esc(v)}</td></tr>`).join('')}
       ${m.mode === 'builtin' ? `<tr><td>Recommended supply</td><td>${v2Esc(m.hwSupply || '—')}</td></tr><tr><td>Enclosure</td><td>${v2Esc(m.hwEnclosure || '—')}</td></tr>` : ''}</table></div></div>
     <h2>Modules</h2>${v2ModTable(m)}
+    ${typeof mlPrintTable === 'function' ? mlPrintTable(m) : ''}
     ${msgs ? `<h2>Validation messages</h2><div class="msgs">${msgs}</div>` : ''}
     ${level === 'standard' ? `<div class="std-math"><h2>Calculation (formulas with values)</h2>${v2MathTable(steps)}</div>` : ''}
     ${opts.bom && level !== 'full' ? `<h2>Bill of Materials</h2>${v2BomTable(m)}` : ''}
@@ -9275,6 +9332,7 @@ function v2CadRows(models){
     { const g = n => (m.settings.find(x => x[0] === n) || [])[1] || '—'; rows.push({ style: 1, cells: ['Standby time', g('Standby'), 'Alarm time', g('Alarm'), 'Safety margin', g('Safety margin')] }); }
     rows.push({ style: 2, cells: ['Zone', 'Type', 'Fan speed', 'Address', 'Standby mA', 'Alarm mA'] });
     m.modules.forEach(d => rows.push({ style: 1, cells: [d.zone || '—', d.type, d.kind === 'detector' ? (d.fan ? Number(d.fan) : '—') : 'N/A', d.addr ? Number(d.addr) : '—', d.ma, d.ma] }));
+    if (typeof mlCadRows === 'function') rows.push(...mlCadRows(m));
     rows.push({ style: 1, cells: ['PSU quiescent + AUX', '', '', '', isFinite(m.psMa) ? m.psMa : '', isFinite(m.psMa) ? m.psMa : ''] });
     rows.push({ style: 2, cells: ['Total load', '', '', '', isFinite(m.totalMa) ? m.totalMa : '', isFinite(m.totalMa) ? m.totalMa : ''] });
     rows.push({ style: 2, cells: ['Required Ah: ' + v2AhFmt(m, m.requiredAh) + (m.psRequired > 1 ? ' (' + m.psRequired + ' supplies)' : ''), 'Battery: ' + m.batteryLabel, '', '', 'PASS/FAIL', v2StatusWord(m.status)] });
@@ -9392,6 +9450,7 @@ async function v2BuildDocx(opts){
       m.modules.map(d => [d.zone || '—', moduleTypeShort(d.type), d.model || '—', d.cluster || '—', d.power || '—', d.fan || (d.kind === 'detector' ? '—' : 'N/A'), d.addr || '—', String(d.ma), String(d.ma)])
         .concat([{ cells: ['Power supply quiescent + AUX', v2Fmt(m.psMa, 0), v2Fmt(m.psMa, 0)], spans: [7, 1, 1] }, { cells: ['Total load', v2Fmt(m.totalMa, 0), v2Fmt(m.totalMa, 0)], spans: [7, 1, 1], b: true, fill: 'F7F8F9' },
           { cells: ['Required Ah: ' + v2AhU(m, m.requiredAh), 'Battery: ' + m.batteryLabel, 'Status: ' + v2StatusWord(m.status)], spans: [4, 3, 2], b: true, fill: 'F7F8F9' }]), [1650, 1100, 1350, 700, 2700, 550, 550, 1100, 1100], { right: [3, 5, 6, 7, 8], mono: [2], noWrap: true });
+    if (typeof mlDocx === 'function') body += mlDocx(m);
     if (m.invalidList.length || m.flags.length) body += v2DocxH('Validation messages') + m.invalidList.map(t => v2DocxP('■ ' + t, { color: 'AC242A', sz: 16 })).join('') + m.flags.map(t => v2DocxP('▲ ' + t, { color: '8A5A00', sz: 16 })).join('');
     const steps = v2CalcSteps(m, opts.level);
     const mathRows = steps.flatMap(st => [{ cells: [st.title, '', '', '', ''], b: true, fill: 'DCE6F0' }].concat(st.rows.map(r => [r.label, r.sym, r.sub, r.res, r.ref])));
@@ -9436,7 +9495,7 @@ wirePrintDialog();
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.4.0';
+MLP.VERSION = '1.5.0';
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -9546,8 +9605,9 @@ MLP.parsePl = function (text, fileName){
       let key = `${gname}#${idTxt !== '' ? 'id' + idTxt : 'n' + name}`;
       if (seen[key]) key += '~' + (++seen[key]); else seen[key] = 1;
       const fanN = parseInt(txt(d, 'aspiratorSpeed'), 10);
-      const rec = { key, ord: di, kind: 'detector', origName: name, typeRaw, type: MLP.DETECTOR_TYPES[typeRaw],
-        fan: (fanN >= 1 && fanN <= 16) ? fanN : null, address: txt(d, 'address'), partNumber: txt(d, 'partNumber'),
+      const isML = typeRaw === 'SOLO';   // 1.5.0: MiniLaser FHSD8075-ULF — standalone, never addressed (Brent Q1/Q2)
+      const rec = { key, ord: di, kind: isML ? 'minilaser' : 'detector', origName: name, typeRaw, type: MLP.DETECTOR_TYPES[typeRaw],
+        fan: (fanN >= 1 && fanN <= (isML ? 10 : 16)) ? fanN : null, address: isML ? '' : txt(d, 'address'), partNumber: txt(d, 'partNumber'),
         x: num0(d, 'startX') * scale, y: num0(d, 'startY') * scale, z: num0(d, 'startZ') * scale };
       rec.fp = fnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
       if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
@@ -9575,6 +9635,18 @@ MLP.parsePl = function (text, fileName){
         bends90: sd ? first(sd, 'bends90') : null, sockets: sd ? first(sd, 'sockets') : null, clips: sd ? first(sd, 'clips') : null,
         hasResults: !!sd, holes, testPoints
       };
+      if (isML){   // 1.5.0: raw flags for the alarm-factor rule (Brent Q20) and DIP/Remote advice (Q22)
+        const ints = tag => { const a = sd && kid(sd, tag); return a ? Array.from(a.children).map(c => Number(c.textContent) || 0) : null; };
+        const b90 = ints('bends90'), b45 = ints('bends45');
+        rec.pipe.afActivatedRaw = txt(d, 'alarmFactorActivated');
+        rec.pipe.bends90Total = b90 ? b90.reduce((a, b) => a + b, 0) : null;
+        rec.pipe.bends45Total = b45 ? b45.reduce((a, b) => a + b, 0) : null;
+        rec.pipe.tees = sd ? sd.getElementsByTagName('tPieceList').length ? Array.from(sd.getElementsByTagName('tPieceList')).reduce((a, t) => a + t.children.length, 0) : 0 : null;
+        const exp = kid(fl, 'expansionDatabase');
+        rec.pipe.expansionInPl = !!(exp && exp.children.length);
+        if (rec.pipe.expansionInPl) out.skipped.push(`${gname}: “${name}” — the .pl lists MiniLaser expansion items; they are not imported. Enter I/O modules by hand.`);
+        if (txt(d, 'address') && txt(d, 'address') !== '0') out.skipped.push(`${gname}: “${name}” — MiniLaser address ${txt(d, 'address')} ignored (MiniLasers are never addressed).`);
+      }
       if (!rec.pipe.tt && holes.length){ const m = Math.max(...holes.map(h => h.tt || 0)); if (m > 0) rec.pipe.tt = m; }
       g.detectors.push(rec);
     });
@@ -9731,10 +9803,13 @@ MLP.designFromPl = function (parsedList, links){
 };
 MLP.deviceFromPl = function (d, area, link, extra){
   const dev = { id: (link ? link.id : 'pl') + '|' + d.key, kind: d.kind, type: d.type, partNumber: d.partNumber || '',
-    model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : 'FHSD8330',
+    model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : d.kind === 'minilaser' ? MLP.MINILASER.model : 'FHSD8330',
     name: d.origName, plName: d.origName, area, address: '', psuId: '', fan: d.fan || null, cluster: '',
     pos: { x: +(d.x || 0).toFixed(2), y: +(d.y || 0).toFixed(2), z: +(d.z || 0).toFixed(2) },
     pl: link ? { link: link.id, file: link.name, key: d.key, fp: d.fp } : null, pipe: d.pipe || null };
+  if (d.kind === 'minilaser'){ const ml = MLP.miniLaserFromPl(d, extra && extra.perfClass);
+    Object.assign(dev, { standalone: true, network: null, ioModules: 0, minilaser: { alarmFactor: ml.alarmFactor, alarmFactorSrc: ml.alarmFactorSrc, perfClass: ml.perfClass, perfClassSrc: ml.perfClassSrc,
+      holes: ml.holes, configMethod: ml.configMethod, advice: ml.advice.text, derivation: ml.derivation, expansionInPl: ml.expansionInPl } }); }
   return Object.assign(dev, extra || {});
 };
 MLP.linkFromParsed = function (pc, sha, size, lastModified){
@@ -9747,7 +9822,7 @@ MLP.linkFromParsed = function (pc, sha, size, lastModified){
    Missing on older files → network 1. Standalone devices carry standalone:true (their own 1–9 pool per power
    supply) and network null. Addresses are unique per network, not per design. */
 MLP.MAX_PER_NETWORK = 127;
-MLP.devNetwork = d => (d && d.standalone) ? null : (parseInt(d && d.network, 10) >= 1 ? parseInt(d.network, 10) : 1);
+MLP.devNetwork = d => (d && (d.standalone || d.kind === 'minilaser')) ? null : (parseInt(d && d.network, 10) >= 1 ? parseInt(d.network, 10) : 1);
 MLP.devAddrScope = d => (d && d.standalone) ? 'sa:' + (d.psuId || '') : 'net:' + MLP.devNetwork(d);
 MLP.networkCounts = function (devices){ const c = {}; (devices || []).forEach(d => { const n = MLP.devNetwork(d); if (n != null) c[n] = (c[n] || 0) + 1; }); return c; };
 /* ---------------- validation ---------------- */
@@ -9757,6 +9832,12 @@ MLP.validateDesign = function (design){
   const byAddr = {};
   (design.devices || []).forEach(d => {
     if (!MLP.nameOk(d.name)) issues.push({ id: d.id, level: 'error', msg: `“${d.name}” is ${MLP.nameLen(d.name)} characters — the ModuLaser display shows ${MLP.NAME_MAX}.` });
+    if (d.kind && !MLP.KNOWN_KINDS.includes(d.kind)){ issues.push({ id: d.id, level: 'warn', msg: `${d.name}: unknown device kind “${d.kind}” — this app version cannot check it.` }); return; }
+    if (d.kind === 'minilaser'){ const m = d.minilaser || {};   // 1.5.0: never addressed; fan and alarm factor checks
+      if (String(d.address || '').trim()) issues.push({ id: d.id, level: 'error', msg: `${d.name}: MiniLasers are never addressed (address ${d.address} must be cleared).` });
+      if (!(d.fan >= 1 && d.fan <= 10)) issues.push({ id: d.id, level: 'incomplete', msg: `⚠ ${d.name}: MiniLaser fan speed not set (1–10).` });
+      if (m.derivation && m.derivation.fail) issues.push({ id: d.id, level: 'error', msg: `${d.name}: ${m.derivation.msg}` });
+      return; }
     const a = String(d.address == null ? '' : d.address).trim();
     if (a && a !== '0'){ const k = MLP.devAddrScope(d) + '|' + a; (byAddr[k] = byAddr[k] || []).push(d); const n = Number(a), max = d.standalone ? 9 : 127;
       if (!(n >= 1 && n <= max)) issues.push({ id: d.id, level: 'error', msg: `${d.name}: address ${a} is outside 1–${max}.` }); }
@@ -9770,10 +9851,11 @@ MLP.validateDesign = function (design){
 
 /* ---------------- diff ----------------
    Compares two design sections. Returns {project:[], psus:{added,removed,changed}, devices:{added,removed,changed}, count}. */
-const DEV_FIELDS = [['name', 'Name'], ['type', 'Type'], ['area', 'Area/Group'], ['address', 'Address'], ['network', 'SenseNET network'], ['psuId', 'Power supply'], ['fan', 'Fan speed'], ['cluster', 'Cluster'], ['model', 'Model'], ['pipeTT', 'PipeCAD transport time (s)'], ['pipeHoles', 'Sampling holes'], ['pipeLen', 'Pipe length (ft)'], ['af', 'Alarm Factor']];
+const DEV_FIELDS = [['ioModules', 'MiniLaser I/O modules'], ['mlAf', 'MiniLaser alarm factor'], ['mlMethod', 'MiniLaser configuration'], ['name', 'Name'], ['type', 'Type'], ['area', 'Area/Group'], ['address', 'Address'], ['network', 'SenseNET network'], ['psuId', 'Power supply'], ['fan', 'Fan speed'], ['cluster', 'Cluster'], ['model', 'Model'], ['pipeTT', 'PipeCAD transport time (s)'], ['pipeHoles', 'Sampling holes'], ['pipeLen', 'Pipe length (ft)'], ['af', 'Alarm Factor']];
 const PSU_FIELDS = [['name', 'Name'], ['area', 'Area/Group'], ['location', 'Location'], ['model', 'Model'], ['batteryModel', 'Battery'], ['batteryAh', 'Battery Ah'], ['batteryQty', 'Battery qty'], ['requiredAh', 'Required Ah'], ['standbyHours', 'Standby (h)'], ['alarmMinutes', 'Alarm (min)'], ['status', 'Calculator result']];
 function devFlat(d){ const p = d.pipe || {}; return { name: d.name, type: d.type, area: d.area, address: d.address || '', network: d.standalone ? 'standalone' : String(MLP.devNetwork(d)), psuId: d.psuId || '', fan: d.fan == null ? '' : String(d.fan), cluster: d.cluster || '', model: d.model || '',
-  pipeTT: p.tt == null ? '' : (+p.tt).toFixed(1), pipeHoles: p.holes ? String(p.holes.length) : '', pipeLen: p.lengthFt == null ? '' : (+p.lengthFt).toFixed(1), af: p.af == null ? '' : String(p.af) }; }
+  pipeTT: p.tt == null ? '' : (+p.tt).toFixed(1), pipeHoles: p.holes ? String(p.holes.length) : '', pipeLen: p.lengthFt == null ? '' : (+p.lengthFt).toFixed(1), af: p.af == null ? '' : String(p.af),
+  ioModules: d.ioModules == null ? '' : String(d.ioModules), mlAf: d.minilaser && d.minilaser.alarmFactor != null ? String(d.minilaser.alarmFactor) : '', mlMethod: d.minilaser ? d.minilaser.configMethod || '' : '' }; }
 function psuFlat(p){ const b = p.battery || {}; return { name: p.name, area: p.area || '', location: p.location || '', model: p.model || '', batteryModel: b.model || '', batteryAh: b.ah == null ? '' : String(b.ah), batteryQty: b.qty == null ? '' : String(b.qty),
   requiredAh: p.requiredAh == null ? '' : (+p.requiredAh).toFixed(2), standbyHours: p.standbyHours == null ? '' : String(p.standbyHours), alarmMinutes: p.alarmMinutes == null ? '' : String(p.alarmMinutes), status: p.status || '' }; }
 function diffList(oldL, newL, flat, fields){
@@ -9957,9 +10039,216 @@ MLP.perfDraft = function (perf, classesUsed){
 };
 MLP.perfStatement = perf => { if (!perf) return ''; MLP.perfMigrate(perf); const std = MLP.perfStdName(perf);
   return MLP.perfIsUl(perf.standard) ? (perf.ulConfirmed ? `${MLP.UL_STATEMENT} · Referenced standard: ${std}` : `UL 268, 7th Edition compliance NOT YET CONFIRMED by the engineer · Referenced standard: ${std}`) : `Referenced standard: ${std}${(MLP.perfPreset(perf.standard) || {}).family === 'FM' ? ' (FM requirements; not a UL 268 listing statement)' : ' (engineer-defined limits)'}`; };
+/* ---------------- MiniLaser ASD FHSD8075-ULF (1.5.0) ----------------
+   Sources: MiniLaser Installation Manual 3103175-EN Rev 001 ("M p.N" = printed page), I/O module datasheet
+   K85001-1064 ("DS p.N"), Brent 2026-10-16 decisions (plan-02.01.000-minilaser.md §2, §2.2). Real data only. */
+MLP.DETECTOR_TYPES.SOLO = 'MiniLaser';
+MLP.KNOWN_KINDS = ['detector', 'display', 'command', 'minilaser'];
+MLP.MINILASER = {
+  model: 'FHSD8075-ULF',                                   // Brent Q11: this part number only, everywhere
+  fanMa: { 1: 120, 2: 134, 3: 157, 4: 180, 5: 200, 6: 230, 7: 255, 8: 285, 9: 320, 10: 365 },   // M p.65 at 24 VDC; standby = alarm (Brent)
+  relays: [
+    { id: 'r1', label: 'R1 Fault relay (fixed)', fn: 'Fault', fixed: true, failsafe: true },   // fail-safe per Brent Q5
+    { id: 'r2', label: 'R2 Relay output 1 (Prealarm)', fn: 'Prealarm' },
+    { id: 'r3', label: 'R3 Relay output 2 (Fire Alarm)', fn: 'Fire Alarm' }],
+  input: { id: 'in1', label: 'IN1 Supervised input (15 kΩ EOL)', eolOhm: 15000 },            // M p.65, p.18 Table 7
+  expansion: { housing: '9-30520', housingDesc: 'MiniLaser Expansion Housing', module: '9-30521', moduleDesc: 'MiniLaser I/O Expansion Module',
+    maxModules: 2, outPerModule: 5, inPerModule: 2, outRating: 'latched relay, 2 A @ 30 VDC', inEol: '15 kΩ supervised' },   // DS p.1–2; no draw (Brent; not stated in DS)
+  dipFan: [2, 4, 7, 10], dipAlarmFactor: [2, 4, 6, 8],     // M p.28–29: other values need Remote configuration
+  remoteOnlyAlarmFactor: [0, 1, 3, 5, 7],                  // M Table 9 note [1]
+  /* M p.29 Table 9 */
+  table9: { 0: 'Very high · once per year · semiconductor clean room', 1: 'High · once per 5 years · computer room', 2: 'High · once per 10 years · non-smoking office',
+    3: 'High · once per 50 years · clean factory', 4: 'Medium · once per 1,000 years · warehouse', 5: 'Medium · once per 5,000 years · warehouse with diesel trucks',
+    6: 'Medium · once per 10,000 years · warehouse with diesel trucks', 7: 'Low · once per 20,000 years · warehouse with diesel trucks', 8: 'Low · once per 100,000 years · warehouse with diesel trucks' },
+  /* Brent's Alarm Factor Calculator (af-table.xlsx): detector Fire 1 level %obs/ft per alarm factor */
+  afFire1: { 8: 0.25, 7: 0.18, 6: 0.12, 5: 0.08, 4: 0.04, 3: 0.03, 2: 0.02, 1: 0.01, 0: 0.005 },
+  /* Brent 2026-10-16: more restrictive of UL and NFPA (existing suite rule); UL Open Area 2.18 */
+  afThresholds: { VEWFD: 1.0, EWFD: 1.5, SFD: 2.0, OAP: 2.18 },
+  /* M p.72 Table 35: hole sensitivity %obs/ft and transport time s per application */
+  table35: {
+    'UL 268 Ed.7 OAP': { sensMin: 1.70, sensMax: 2.18, ttMin: 6, ttMax: 43 },
+    'UL 268 Ed.7 SA Range 1': { sensMin: 0.05, sensMax: 1.00, ttMin: 3, ttMax: 60 },
+    'UL 268 Ed.7 SA Range 2': { sensMin: 0.05, sensMax: 2.18, ttMin: 3, ttMax: 43 },
+    'ULC-S529': { sensMin: 0.05, sensMax: 1.82, ttMin: 3, ttMax: 100 },
+    'FM 3230 VEWFD': { sensMaxExcl: 1.00, ttMaxExcl: 60 },
+    'FM 3230 EWFD': { sensMaxExcl: 1.50, ttMaxExcl: 90 },
+    'FM 3230 SFD': { sensMaxExcl: 2.50, ttMaxExcl: 120 } },
+  /* M p.66 */
+  pipe: { maxLenFt: { NFPA: 400, 'UL OAP': 300, 'SA-R1': 300, 'SA-R2': 200, ULC: 400 }, maxHoles: { VEWFD: 10, EWFD: 20, SFD: 35, OAP: 24, 'SA-R1': 25, 'SA-R2': 25, ULC: 35 }, firstHoleFt: 16 },
+  /* M p.27 Table 8, p.30 */
+  local: { fan: 4, alarmFactor: 4, flowDly: [120, 240], flowLevel: [20, 40], alarmDly: [5, 30] },
+  ref: 'MiniLaser Installation Manual 3103175-EN Rev 001'
+};
+MLP.isMiniLaser = d => !!(d && (d.kind === 'minilaser' || d.type === 'MiniLaser' || d.typeRaw === 'SOLO'));
+MLP.miniLaserMa = fan => MLP.MINILASER.fanMa[fan] || 0;
+/* Brent Q20/Q21: highest AF whose average hole sensitivity (Fire 1 × holes) ≤ threshold; round toward more sensitive.
+   cls: VEWFD | EWFD | SFD | OAP. Returns { af, avg, threshold, cls, fail, steps }. */
+MLP.deriveAlarmFactor = function (holes, cls){
+  const T = MLP.MINILASER.afThresholds, n = Math.max(0, parseInt(holes, 10) || 0), c = T[cls] != null ? cls : 'SFD', thr = T[c];
+  const steps = [];
+  for (let af = 8; af >= 0; af--){
+    const avg = +(MLP.MINILASER.afFire1[af] * n).toFixed(4); steps.push({ af, avg });
+    if (avg <= thr + 1e-9) return { af, avg, threshold: thr, cls: c, holes: n, fail: false, steps };
+  }
+  return { af: 0, avg: +(MLP.MINILASER.afFire1[0] * n).toFixed(4), threshold: thr, cls: c, holes: n, fail: true, steps,
+    msg: `Even alarm factor 0 gives ${(MLP.MINILASER.afFire1[0] * n).toFixed(3)} %obs/ft average hole sensitivity with ${n} holes — over the ${c} limit ${thr}. Use fewer holes or redesign the pipework.` };
+};
+/* Brent Q22: pre-engineered (T or I, ≤1 90° elbow) → DIP; otherwise DIP only if fan ∈ {2,4,7,10} AND AF ∈ {2,4,6,8}, else Remote. */
+MLP.miniLaserAdvice = function (o){
+  const M = MLP.MINILASER, fan = parseInt(o.fan, 10), af = parseInt(o.af, 10);
+  const pre = o.bends90 != null && o.bends90 <= 1 && (o.tees == null || o.tees <= 1);
+  const dipOk = M.dipFan.includes(fan) && M.dipAlarmFactor.includes(af);
+  const why = [];
+  if (!pre) why.push(o.bends90 != null ? `${o.bends90} × 90° elbows (pre-engineered allows ≤1)` : 'pipe layout unknown');
+  if (!M.dipFan.includes(fan)) why.push(`fan speed ${isFinite(fan) ? fan : '—'} is not DIP-settable (2/4/7/10)`);
+  if (!M.dipAlarmFactor.includes(af)) why.push(`alarm factor ${isFinite(af) ? af : '—'} is not DIP-settable (2/4/6/8)`);
+  const method = dipOk ? 'DIP' : 'Remote';
+  const remoteWhy = why.filter(w => !/elbow|layout/.test(w));
+  return { preEngineered: pre, method, why, text: method === 'DIP' ? (pre ? 'DIP (pre-engineered layout, manual ch.5)' : 'DIP (fan speed and alarm factor are DIP-settable)') : 'Remote (Remote.exe) — ' + (remoteWhy.join('; ') || why.join('; ')) + (pre ? '' : ' · not pre-engineered') };
+};
+/* M ch.5 pre-engineered tables 13–31. Row: [holes, transport s, AF2, AF4, AF6, AF8, diameters]; AF cell 'value:tags'
+   (V VEWFD, E EWFD, S SFD, A SA, O OAP, C ULC) or '' (not offered). Diameters: per branch for T (holes/2), per hole for I. */
+(function (){
+  const TAG = { V: 'VEWFD', E: 'EWFD', S: 'SFD', A: 'SA', O: 'OAP', C: 'ULC' };
+  const X = (s, n) => Array(n).fill(s);
+  const T = [
+    { shape: 'T', fan: 2, tables: '13–14', page: 50, lengths: [30, 60, 84, 108], rows: [
+      [2, 14, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['19/64']],
+      [4, 30, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', ['9/32', '19/64']],
+      [6, 45, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', ['1/4', '17/64', '5/16']],
+      [8, 73, '0.17:EC', '0.34:EC', '1.02:EC', '', ['3/16', '3/16', '13/64', '15/64']]] },
+    { shape: 'T', fan: 4, tables: '15–16', page: 51, lengths: [30, 60, 84, 108, 132, 156], rows: [
+      [2, 18, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['11/64']],
+      [4, 28, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('11/64', 2)],
+      [6, 45, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', X('9/64', 3)],
+      [8, 63, '0.16:EAC', '0.32:EAC', '0.96:EAC', '', X('1/8', 4)],
+      [10, 88, '0.21:EAC', '0.42:EAC', '1.26:EAC', '', X('7/64', 5)],
+      [12, 101, '0.25:S', '0.50:S', '1.50:S', '', X('7/64', 6)]] },
+    { shape: 'T', fan: 7, tables: '17–18', page: 52, lengths: [30, 60, 84, 108, 132, 156, 180], rows: [
+      [2, 15, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['9/64']],
+      [4, 15, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SA', ['17/64', '9/32']],
+      [6, 32, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', X('9/64', 3)],
+      [8, 45, '0.16:VAC', '0.32:VAC', '0.96:VAC', '', X('1/8', 4)],
+      [10, 62, '0.20:EC', '0.40:EC', '1.20:EC', '', X('7/64', 5)],
+      [12, 86, '0.24:EC', '0.48:EC', '1.44:EC', '', X('3/32', 6)],
+      [14, 95, '0.29:SC', '0.58:SC', '1.74:SC', '', X('3/32', 7)]] },
+    { shape: 'T', fan: 10, tables: '19–20', page: 53, lengths: [30, 60, 84, 108, 132, 156, 180], rows: [
+      [2, 14, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['5/32']],
+      [4, 19, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('5/32', 2)],
+      [6, 30, '0.12:VAC', '0.24:VAC', '0.72:VAC', '', X('1/8', 3)],
+      [8, 43, '0.16:VAC', '0.32:VAC', '0.96:VAC', '', X('7/64', 4)],
+      [10, 62, '0.20:EC', '0.40:EC', '1.20:EC', '', X('3/32', 5)],
+      [12, 91, '0.24:SC', '0.48:SC', '1.44:SC', '', X('5/64', 6)],
+      [14, 99, '0.28:SC', '0.56:SC', '1.68:SC', '', X('5/64', 7)]] },
+    { shape: 'I', fan: 2, tables: '21–22', page: 55, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200], rows: [
+      [1, 4, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 13, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('17/64', 2)],
+      [3, 28, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('1/4', 3)],
+      [4, 34, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('13/64', 4)],
+      [5, 53, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('3/16', 4).concat(['13/64'])],
+      [6, 66, '0.13:EC', '0.26:EC', '0.78:EC', '', X('5/32', 5).concat(['11/64'])],
+      [7, 75, '0.15:EC', '0.30:EC', '0.90:EC', '', X('5/32', 6).concat(['11/64'])],
+      [8, 89, '0.17:EC', '0.34:EC', '1.02:EC', '', X('9/64', 6).concat(X('5/32', 2))],
+      [9, 95, '0.20:SC', '0.40:SC', '1.20:SC', '', X('1/8', 6).concat(X('9/64', 2), ['3/16'])],
+      [10, 113, '0.23:S', '0.46:S', '1.38:S', '', X('1/8', 7).concat(X('9/64', 2), ['5/32'])]] },
+    { shape: 'I', fan: 4, tables: '23–24', page: 56, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220], rows: [
+      [1, 3, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 13, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('3/16', 2)],
+      [3, 23, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('5/32', 3)],
+      [4, 34, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('9/64', 4)],
+      [5, 46, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('1/8', 5)],
+      [6, 64, '0.12:EC', '0.24:EC', '0.72:EC', '', X('7/64', 6)],
+      [7, 77, '0.15:EC', '0.30:EC', '0.90:EC', '', X('3/32', 6).concat(['7/64'])],
+      [8, 82, '0.17:EC', '0.34:EC', '1.02:EC', '', X('3/32', 7).concat(['7/64'])],
+      [9, 102, '0.19:S', '0.38:S', '1.14:S', '', X('3/32', 8).concat(['7/64'])],
+      [10, 105, '0.23:S', '0.46:S', '1.38:S', '', X('3/32', 5).concat(X('7/64', 5))],
+      [11, 117, '0.24:S', '0.48:S', '1.44:S', '', ['3/32'].concat(X('7/64', 9), ['1/8'])]] },
+    { shape: 'I', fan: 7, tables: '25–26', page: 58, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240], rows: [
+      [1, 2, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 10, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('3/16', 2)],
+      [3, 25, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('1/8', 3)],
+      [4, 37, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('7/64', 4)],
+      [5, 56, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('3/32', 5)],
+      [6, 60, '0.12:VC', '0.24:VC', '0.72:VC', '', X('3/32', 6)],
+      [7, 74, '0.15:EC', '0.30:EC', '0.90:EC', '', X('5/64', 6).concat(['3/32'])],
+      [8, 78, '0.17:EC', '0.34:EC', '1.02:EC', '', X('5/64', 7).concat(['3/32'])],
+      [9, 83, '0.19:EC', '0.38:EC', '1.14:EC', '', X('5/64', 8).concat(['3/32'])],
+      [10, 97, '0.21:S', '0.42:S', '1.26:S', '', X('5/64', 9).concat(['3/32'])],
+      [11, 103, '0.26:S', '0.52:S', '1.56:S', '', X('3/32', 3).concat(X('7/64', 8))],
+      [12, 111, '0.30:S', '0.60:S', '1.80:S', '', X('5/64', 2).concat(X('3/32', 3), X('7/64', 7))]] },
+    { shape: 'I', fan: 10, tables: '27–28', page: 60, lengths: [20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300], rows: [
+      [1, 2, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['7/16']],
+      [2, 8, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', X('3/16', 2)],
+      [3, 21, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', X('1/8', 3)],
+      [4, 32, '0.08:VAC', '0.16:VAC', '0.48:VAC', '2.00:SAO', X('7/64', 4)],
+      [5, 44, '0.10:VAC', '0.20:VAC', '0.60:VAC', '2.50:S', X('3/32', 5)],
+      [6, 68, '0.12:EC', '0.24:EC', '0.72:EC', '', X('5/64', 6)],
+      [7, 73, '0.14:EC', '0.28:EC', '0.84:EC', '', X('5/64', 7)],
+      [8, 82, '0.16:EC', '0.32:EC', '0.96:EC', '', X('5/64', 8)],
+      [9, 90, '0.18:EC', '0.36:EC', '1.08:EC', '', X('5/64', 9)],
+      [10, 98, '0.21:SC', '0.42:SC', '1.26:SC', '', X('5/64', 10)],
+      [11, 94, '0.24:SC', '0.48:SC', '1.44:SC', '', X('3/32', 11)],
+      [12, 105, '0.27:S', '0.54:S', '1.62:S', '', X('3/32', 12)],
+      [13, 111, '0.35:S', '0.70:S', '2.10:S', '', X('5/64', 5).concat(X('3/32', 8))],
+      [14, 113, '0.32:S', '0.64:S', '1.92:S', '', X('5/64', 2).concat(X('3/32', 2), ['7/64'], X('1/8', 8), ['9/64'])],
+      [15, 113, '0.35:S', '0.70:S', '2.10:S', '', X('5/64', 3).concat(['3/32', '7/64'], X('1/8', 8), X('9/64', 2))]] },
+    { shape: 'I225', fan: 10, tables: '29–31', page: 62, lengths: Array.from({ length: 25 }, (_, i) => 9 * (i + 1)), rows: [
+      [1, 2, '0.02:VAC', '0.04:VAC', '0.12:VAC', '0.50:VAC', ['5/16']],
+      [2, 2, '0.04:VAC', '0.08:VAC', '0.24:VAC', '1.00:VAC', ['19/64', '5/16']],
+      [3, 3, '0.06:VAC', '0.12:VAC', '0.36:VAC', '1.50:EAC', ['17/64', '19/64', '5/16']],
+      [4, 5, '0.09:VAC', '0.18:VAC', '0.54:VAC', '2.25:S', ['15/64', '17/64', '5/16', '5/16']],
+      [5, 6, '0.14:VAC', '0.28:VAC', '0.84:VAC', '', ['3/16', '3/16', '3/16', '1/4', '5/16']],
+      [6, 8, '0.19:VAC', '0.38:VAC', '1.14:EAC', '', X('3/16', 4).concat(['17/64', '5/16'])],
+      [7, 10, '0.21:VAC', '0.42:VAC', '1.26:EAC', '', X('11/64', 4).concat(['7/32', '5/16', '5/16'])],
+      [8, 13, '0.26:VAC', '0.52:VAC', '1.56:SAC', '', X('9/64', 4).concat(['13/64'], X('5/16', 3))],
+      [9, 16, '0.30:VAC', '0.60:VAC', '1.80:SAC', '', X('9/64', 5).concat(['13/64'], X('5/16', 3))],
+      [10, 18, '0.26:VAC', '0.52:VAC', '1.56:SAC', '', ['1/8', '9/64', '9/64', '5/32', '11/64', '3/16', '7/32', '7/32', '15/64', '5/16']],
+      [11, 20, '0.30:VAC', '0.60:VAC', '1.80:SAO', '', ['7/64', '1/8', '1/8', '9/64', '5/32', '11/64', '3/16', '13/64', '13/64', '13/64', '5/16']],
+      [12, 21, '0.32:VAC', '0.64:VAC', '1.92:SAO', '', X('7/64', 3).concat(['1/8', '9/64', '9/64', '5/32'], X('11/64', 4), ['1/4'])],
+      [13, 25, '0.34:VAC', '0.68:VAC', '2.04:SAO', '', ['3/32', '7/64', '7/64', '7/64', '1/8', '9/64', '9/64', '5/32', '11/64', '11/64', '11/64', '3/16', '9/32']],
+      [14, 28, '0.38:VAC', '0.76:VAC', '2.28:S', '', ['3/32'].concat(X('7/64', 3), ['1/8', '1/8', '9/64', '5/32', '11/64', '3/16', '3/16', '3/16', '13/64', '5/16'])],
+      [15, 31, '0.49:VAC', '0.98:VAC', '', '', ['3/32', '3/32', '7/64', '7/64', '1/8', '1/8', '9/64', '5/32'].concat(X('13/64', 4), ['7/32', '15/64', '5/16'])],
+      [16, 34, '0.44:VAC', '0.88:VAC', '', '', X('3/32', 4).concat(['7/64', '7/64', '1/8', '9/64', '5/32', '5/32'], X('11/64', 4), ['3/16', '5/16'])],
+      [17, 37, '0.46:VAC', '0.92:VAC', '', '', ['5/64'].concat(X('3/32', 4), ['7/64', '7/64', '1/8', '9/64'], X('5/32', 4), ['11/64', '11/64', '3/16', '5/16'])],
+      [18, 36, '0.49:VAC', '0.98:VAC', '', '', X('5/64', 3).concat(X('3/32', 4), ['7/64', '7/64'], X('9/64', 5), ['5/32', '5/32', '5/32', '17/64'])],
+      [19, 47, '0.54:VAC', '1.08:EC', '', '', X('5/64', 3).concat(X('3/32', 3), ['7/64', '7/64', '1/8', '9/64', '9/64'], X('5/32', 4), ['11/64', '11/64', '3/16', '5/16'])],
+      [20, 47, '0.54:VAC', '1.08:EC', '', '', X('5/64', 4).concat(X('3/32', 4), ['7/64', '1/8'], X('9/64', 5), ['9/64', '5/32', '5/32', '11/64', '5/16'])],
+      [21, 52, '0.58:VAC', '1.16:EC', '', '', X('5/64', 5).concat(X('3/32', 3), ['7/64'], X('1/8', 3), X('9/64', 3), X('9/64', 3), ['5/32', '11/64', '5/16'])],
+      [22, 52, '0.59:VAC', '1.18:EC', '', '', X('5/64', 6).concat(X('3/32', 3), ['7/64', '1/8', '1/8'], X('9/64', 3), X('9/64', 3), ['5/32', '11/64', '3/16', '5/16'])],
+      [23, 58, '0.69:VAC', '1.38:EC', '', '', X('5/64', 7).concat(['3/32', '3/32'], X('7/64', 3), X('1/8', 3), X('1/8', 3), X('9/64', 3), ['5/32', '5/16'])],
+      [24, 59, '0.70:VAC', '1.40:EC', '', '', X('5/64', 8).concat(['3/32', '3/32'], X('7/64', 5), X('1/8', 6), ['9/64', '9/64', '5/16'])],
+      [25, 59, '0.85:VAC', '1.70:SC', '', '', X('5/64', 9).concat(['3/32', '3/32'], X('7/64', 4), X('7/64', 6), ['1/8', '1/8', '3/16', '5/16'])]] }
+  ];
+  const cell = s => { if (!s) return null; const [v, t] = s.split(':'); return { avg: Number(v), classes: t.split('').map(c => TAG[c]) }; };
+  MLP.MINILASER.preEngineered = T.map(t => ({ shape: t.shape, fan: t.fan, tables: t.tables, page: t.page, rows: t.rows.map(r => {
+    const perBranch = t.shape === 'T' ? r[0] / 2 : r[0];
+    return { holes: r[0], transport: r[1], af: { 2: cell(r[2]), 4: cell(r[3]), 6: cell(r[4]), 8: cell(r[5]) }, diameters: r[6],
+      lengthFt: t.lengths[perBranch - 1], lengthNote: t.shape === 'T' ? 'per branch' : 'total' }; }) }));
+})();
+MLP.preEngTable = (shape, fan) => MLP.MINILASER.preEngineered.find(t => t.shape === shape && t.fan === +fan) || null;
+MLP.preEngLookup = function (shape, fan, holes, af){
+  const t = MLP.preEngTable(shape, fan); if (!t) return null;
+  const r = t.rows.find(x => x.holes === +holes); if (!r) return null;
+  const a = af != null ? r.af[af] : null;
+  return { table: t, row: r, af: a, dip: { fan: +fan, alarmFactor: af != null ? +af : null }, cite: `M Tables ${t.tables}, printed p.${t.page}` };
+};
+/* parsed .pl detector → MiniLaser design fields (Brent Q18/Q20/Q22). cls = intended performance class or null. */
+MLP.miniLaserFromPl = function (rec, cls){
+  const p = rec.pipe || {}, holes = (p.holes || []).length;
+  const tt = MLP.TT_TO_CLASS[p.maxTransit];
+  const useCls = cls || tt || 'SFD';
+  const clsSrc = cls ? 'project' : tt ? 'pl maxTransitTime' : 'default SFD/OAP – NFPA 72 (suite default preset)';
+  let af, afSrc, derivation = null;
+  if (p.afActivatedRaw === 'true' && p.af != null){ af = p.af; afSrc = 'pl'; }
+  else { derivation = MLP.deriveAlarmFactor(holes, useCls); af = derivation.af; afSrc = 'derived'; }
+  const advice = MLP.miniLaserAdvice({ fan: rec.fan, af, bends90: p.bends90Total, tees: p.tees });
+  return { fan: rec.fan, alarmFactor: af, alarmFactorSrc: afSrc, derivation, perfClass: useCls, perfClassSrc: clsSrc, holes, advice,
+    configMethod: advice.method, expansionInPl: !!p.expansionInPl };
+};
 root.MLP = MLP;
 if (typeof module !== 'undefined' && module.exports) module.exports = MLP;
 })(typeof window !== 'undefined' ? window : globalThis);
+
 </script><script id="mlp-calc">
 /* ===================== 02.00.001 — ModuLaser project file (.mlproj.json) =====================
    File → Export project… / Import project…. The calculator owns the `design` section; the Field Report's
@@ -10121,5 +10410,276 @@ function mlpImportProjectText(text, name){
 })();
 
 </script><!--MLP-END-->
+<!--ML-BEGIN--><script id="ml-calc">
+/* MiniLaser ASD (FHSD8075-ULF) — Battery Calculator / MASD Engineering Toolbox layer (02.01.000 / 00.02.000).
+   Byte-identical in both apps. Standalone ASD table per sheet: never addressed, own dedicated AUX circuit (max 1 per circuit),
+   35 mA per circuit, 3.0 A per circuit, 6/8 A totals; draw by fan speed (M p.65), standby = alarm. Brent 2026-10-16. */
+(function mlStyle(){
+  const st = document.createElement('style'); st.id = 'ml-css';
+  st.textContent = `.ml-card{margin:14px 0 6px;border:1px solid var(--line,#2a3441);border-radius:8px;padding:10px 12px;background:var(--surface,rgba(255,255,255,.02))}
+.ml-card .ml-h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.ml-card .ml-t{font-weight:600;font-size:13px;letter-spacing:.02em}
+.ml-card .ml-note{font-size:11px;color:var(--muted,#8b98a8);margin:0 0 6px}
+.ml-table{width:100%;border-collapse:collapse;font-size:12px}
+.ml-table th{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted,#8b98a8);text-align:left;padding:4px 4px;border-bottom:1px solid var(--line,#2a3441);white-space:nowrap}
+.ml-table td{padding:3px 4px;border-bottom:1px solid var(--line2,#222b36);vertical-align:middle;white-space:nowrap}
+.ml-table select,.ml-table input{font-size:12px;max-width:150px}
+.ml-table .ml-zone{width:128px}.ml-table .circuit-source{width:118px}
+.ml-chip{display:inline-block;font-size:10px;padding:1px 6px;border-radius:9px;border:1px solid var(--line,#2a3441);color:var(--muted,#8b98a8)}
+.ml-adv{font-size:11px;max-width:260px;white-space:normal!important}
+.ml-empty{font-size:11.5px;color:var(--muted,#8b98a8);padding:6px 2px}
+.ml-pe{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center}
+.ml-pe-box{background:var(--surface,#12171e);color:var(--ink,#e6edf3);border:1px solid var(--line,#2a3441);border-radius:10px;padding:16px 18px;width:min(640px,94vw);font-size:12.5px}
+.ml-pe-box h3{margin:0 0 8px;font-size:15px}.ml-pe-box label{display:inline-block;margin:4px 10px 4px 0}
+.ml-pe-box table{border-collapse:collapse;margin-top:8px;width:100%}.ml-pe-box td{padding:2px 6px;border-bottom:1px solid var(--line2,#222b36)}
+.ml-pe-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+@media print{.ml-card{display:none}}`;
+  document.head.appendChild(st);
+})();
+const ML_CLASSES = ['VEWFD', 'EWFD', 'SFD', 'OAP'];
+let mlRowSeq = 0;
+function mlEsc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function mlCardHtml(loc){
+  return `<div class="ml-card" data-ml-card="${loc}">
+    <div class="ml-h"><div class="ml-t">Standalone ASDs (MiniLaser FHSD8075-ULF)</div><button type="button" class="btn btn-sm ml-add" onclick="mlUiAdd('${loc}')">+ Add MiniLaser</button></div>
+    <p class="ml-note">Not on SenseNET and never addressed. Each MiniLaser needs its own dedicated AUX circuit (one per circuit, shared with nothing). Draw by fan speed, standby = alarm (MiniLaser manual p.65). I/O expansion modules (9-30521) add no draw; the 9-30520 housing is added to the BOM automatically.</p>
+    <div style="overflow-x:auto"><table class="ml-table"><thead><tr><th>Zone</th><th>Setup</th><th>Fan</th><th>Alarm factor</th><th>Class</th><th>Config</th><th style="text-align:right">Standby / Alarm mA</th><th>AUX circuit</th><th>Circuit source</th><th>I/O modules</th><th>Recommendation</th><th></th></tr></thead>
+    <tbody class="ml-body"></tbody></table></div><div class="ml-empty">No MiniLasers on this sheet.</div></div>`;
+}
+(function hookTemplate(){
+  const _lt = locationTemplate;
+  locationTemplate = function (loc){ const h = _lt.apply(this, arguments); return h.replace(`<div class="network-flags" id="flags-${loc}"`, mlCardHtml(loc) + `<div class="network-flags" id="flags-${loc}"`); };
+})();
+function mlOpts(vals, sel, blank){ return (blank ? `<option value=""${sel === '' || sel == null ? ' selected' : ''}>- Select -</option>` : '') + vals.map(v => `<option value="${v[0]}"${String(v[0]) === String(sel) ? ' selected' : ''}>${mlEsc(v[1])}</option>`).join(''); }
+/* data: { zone, setup:'pre'|'manual'|'pl', fan, af, afSrc, cls, method, io, circuitSource, auxCircuitNum, plKey, holes, pre:{...}, derivation:{...}, bends90, tees } */
+function mlAddRow(loc, data){
+  const locEl = document.getElementById('location-' + loc); if (!locEl) return null;
+  data = data || {}; const id = 'ml-row-' + loc + '-' + (++mlRowSeq);
+  const tr = document.createElement('tr'); tr.dataset.role = 'minilaser'; tr.id = id;
+  const setup = data.setup || 'pre';
+  tr.innerHTML = `<td><input class="ml-zone" maxlength="16" value="${mlEsc(data.zone || '')}" placeholder="Zone (16 max)"></td>
+    <td><select class="ml-setup" title="Pre-engineered: settings from the manual's chapter 5 tables. Manual: you configure everything (non-pre-engineered installs). From .pl: values from the PipeCAD project file.">${mlOpts([['pre', 'Pre-engineered'], ['manual', 'Manual config']].concat(setup === 'pl' ? [['pl', 'From .pl']] : []), setup)}</select> <button type="button" class="btn btn-sm ml-pick" title="Pick a pre-engineered layout (manual ch.5, Tables 13–31)">Pick…</button></td>
+    <td><select class="ml-fan">${mlOpts(Object.keys(MINILASER_FAN_MA).map(k => [k, k]), data.fan == null ? '' : String(data.fan), true)}</select></td>
+    <td><select class="ml-af" title="ClassiFire alarm factor (manual Table 9; DIP 2/4/6/8, others Remote only)">${mlOpts([0, 1, 2, 3, 4, 5, 6, 7, 8].map(k => [k, k + (MLP.MINILASER.dipAlarmFactor.includes(k) ? '' : ' (Remote)')]), data.af == null ? '' : String(data.af), true)}</select></td>
+    <td><select class="ml-class" title="Intended performance class used for the alarm-factor rule">${mlOpts(ML_CLASSES.map(c => [c, c]), data.cls || 'SFD')}</select></td>
+    <td><select class="ml-method">${mlOpts([['DIP', 'DIP'], ['Remote', 'Remote']], data.method || '', true)}</select></td>
+    <td class="ml-ma" style="text-align:right">—</td>
+    <td><select class="aux-circuit-num"></select></td>
+    <td><input class="circuit-source" value="${mlEsc(data.circuitSource || '')}" placeholder="e.g. PS-1 AUX-3"></td>
+    <td><select class="ml-io" title="MiniLaser I/O Expansion Modules 9-30521 (5 latched relays 2 A @ 30 VDC + 2 supervised inputs 15 kΩ each; max 2 per housing)">${mlOpts([[0, '0'], [1, '1'], [2, '2']], data.io == null ? 0 : data.io)}</select></td>
+    <td class="ml-adv"></td>
+    <td><button type="button" class="btn btn-sm ml-del" title="Remove MiniLaser">✕</button></td>`;
+  const keep = { plKey: data.plKey || '', holes: data.holes == null ? '' : data.holes, afSrc: data.afSrc || '', bends90: data.bends90 == null ? '' : data.bends90, tees: data.tees == null ? '' : data.tees };
+  Object.entries(keep).forEach(([k, v]) => { tr.dataset[k] = v; });
+  if (data.pre) tr.dataset.pre = JSON.stringify(data.pre);
+  if (data.derivation) tr.dataset.derivation = JSON.stringify(data.derivation);
+  if (data.auxCircuitNum) tr.querySelector('.aux-circuit-num').dataset.desiredValue = data.auxCircuitNum;
+  if (data.circuitSourceEdited) tr.querySelector('.circuit-source').dataset.userEdited = '1';
+  locEl.querySelector('.ml-body').appendChild(tr);
+  mlWireRow(tr, loc);
+  return tr;
+}
+function mlWireRow(tr, loc){
+  const re = () => { recalcLocation(loc); if (typeof refreshAllAmber === 'function') refreshAllAmber(); scheduleSave(); if (typeof v2Refresh === 'function') v2Refresh(); };
+  tr.querySelector('.ml-del').onclick = () => { tr.remove(); re(); };
+  tr.querySelector('.ml-pick').onclick = () => mlOpenPicker(tr, loc);
+  tr.querySelector('.circuit-source').addEventListener('input', e => { e.target.dataset.userEdited = '1'; });
+  tr.querySelector('.ml-af').addEventListener('change', () => { tr.dataset.afSrc = 'manual'; delete tr.dataset.derivation; });
+  tr.querySelector('.ml-class').addEventListener('change', () => { if (tr.dataset.afSrc === 'derived' && tr.dataset.holes !== ''){ const d = MLP.deriveAlarmFactor(+tr.dataset.holes, tr.querySelector('.ml-class').value); tr.querySelector('.ml-af').value = String(d.af); tr.dataset.derivation = JSON.stringify(d); } });
+  tr.querySelector('.ml-setup').addEventListener('change', e => { if (e.target.value === 'pre') mlOpenPicker(tr, loc); });
+  tr.querySelectorAll('input, select').forEach(el => el.addEventListener('change', re));
+}
+function mlUiAdd(loc, noPicker){ const tr = mlAddRow(loc, { setup: 'pre' }); recalcLocation(loc); if (typeof refreshAllAmber === 'function') refreshAllAmber(); scheduleSave(); if (typeof v2Refresh === 'function') v2Refresh();
+  if (!noPicker) mlOpenPicker(tr, loc);   // Brent: Pre-engineered picker is the default; Cancel → manual configuration (fan stays blank, amber)
+  return tr; }
+function mlRowData(tr){
+  const q = s => tr.querySelector(s); const num = v => v === '' || v == null ? null : Number(v);
+  let pre = null, der = null; try { pre = tr.dataset.pre ? JSON.parse(tr.dataset.pre) : null; } catch (e){} try { der = tr.dataset.derivation ? JSON.parse(tr.dataset.derivation) : null; } catch (e){}
+  return { zone: q('.ml-zone').value, setup: q('.ml-setup').value, fan: num(q('.ml-fan').value), af: num(q('.ml-af').value), afSrc: tr.dataset.afSrc || '', cls: q('.ml-class').value,
+    method: q('.ml-method').value, io: parseInt(q('.ml-io').value, 10) || 0, circuitSource: q('.circuit-source').value, circuitSourceEdited: q('.circuit-source').dataset.userEdited === '1',
+    auxCircuitNum: q('.aux-circuit-num').value, plKey: tr.dataset.plKey || '', holes: num(tr.dataset.holes), bends90: num(tr.dataset.bends90), tees: num(tr.dataset.tees), pre, derivation: der };
+}
+function mlRows(locEl){ return Array.from(locEl.querySelectorAll('[data-role="minilaser"]')); }
+function mlCountIn(locs){ return (locs || []).reduce((n, loc) => n + document.querySelectorAll(`#location-${loc} [data-role="minilaser"]`).length, 0); }
+/* recalc hook — called from recalcLocationInner after the ModuLaser entry points have claimed their AUX circuits */
+function mlRecalcHook(locEl, mode, setupAux, unassignedAuxRows){
+  const rows = mlRows(locEl), out = { ma: 0, auxMa: {}, flags: [], count: rows.length };
+  const card = locEl.querySelector('.ml-card'); if (card) card.querySelector('.ml-empty').hidden = rows.length > 0;
+  if (!rows.length) return out;
+  const overflow = [];
+  rows.forEach(tr => {
+    const d = mlRowData(tr), ma = MASD_ENGINE.miniLaserMa(d.fan);
+    out.ma += ma;
+    tr.querySelector('.ml-ma').textContent = d.fan ? `${ma} / ${ma}` : '⚠ fan?';
+    const auxSel = tr.querySelector('.aux-circuit-num');
+    if (mode === 'builtin'){
+      setupAux(tr);
+      const i = unassignedAuxRows.indexOf(tr); if (i >= 0){ unassignedAuxRows.splice(i, 1); overflow.push(tr); }
+      const c = parseInt(auxSel.value, 10); if (c >= 1) out.auxMa[c] = (out.auxMa[c] || 0) + ma;
+    } else { auxSel.hidden = true; }
+    const adv = (d.fan && d.af != null) ? MLP.miniLaserAdvice({ fan: d.fan, af: d.af, bends90: d.setup === 'pre' && d.pre ? 0 : d.bends90, tees: d.setup === 'pre' && d.pre ? 0 : d.tees }) : null;
+    tr.querySelector('.ml-adv').innerHTML = adv ? mlEsc(d.setup === 'pre' && d.pre ? `DIP — pre-engineered ${d.pre.shape}-shape, fan ${d.pre.fan}, ${d.pre.holes} holes (${d.pre.cite})` : adv.text) : '<span class="inc-flag">\u26A0 Incomplete — set fan speed and alarm factor</span>';
+    if (adv && !tr.querySelector('.ml-method').value){ tr.querySelector('.ml-method').value = adv.method; }
+    const label = d.zone || 'MiniLaser';
+    if (!String(tr.querySelector('.circuit-source').value).trim() && mode === 'builtin' && parseInt(auxSel.value, 10) >= 1) out.flags.push(`MiniLaser ${label}: circuit source missing (e.g., "PS-1 AUX-3").`);
+    if (d.derivation && d.derivation.fail) out.flags.push(`MiniLaser ${label}: alarm factor set to 0 — even AF 0 gives ${d.derivation.avg} %obs/ft average hole sensitivity with ${d.derivation.holes} holes (over the ${d.derivation.cls} limit ${d.derivation.threshold}). Recommend fewer holes or a redesign.`);
+  });
+  const entryPoints = Array.from(locEl.querySelectorAll('[data-role="module"] .aux-circuit-num')).filter(s => !s.hidden && s.value).length;
+  if (mode === 'builtin' && overflow.length){
+    const N = rows.length, M = entryPoints, need = N + M, K = need - MAX_AUX_BUILTIN;
+    out.flags.push(`${N} MiniLaser(s) + ${M} entry point(s) need ${need} AUX circuits; this supply has ${MAX_AUX_BUILTIN}. Each MiniLaser needs its own dedicated AUX circuit. No catalog power supply has more AUX outputs — add a power supply (new sheet) and move ${K} device(s).`);
+  }
+  if (mode !== 'builtin'){
+    const custom = parseFloat((locEl.querySelector('.aux-circuits-custom') || {}).value) || 0;
+    const M = Array.from(locEl.querySelectorAll('[data-role="module"]')).filter(r => { const t = MODULE_TYPES[r.querySelector('.type-select').value] || {}; return t.kind !== 'detector' || r.querySelector('.power-select').value === 'own'; }).length;
+    if (rows.length + M > custom) out.flags.push(`${rows.length} MiniLaser(s) + ${M} entry point(s) need ${rows.length + M} AUX circuits; ${custom} entered for this third-party supply — use a supply with ≥${rows.length + M} AUX outputs or add one.`);
+  }
+  return out;
+}
+/* save / restore */
+(function hookState(){
+  const _ser = serializeLocation;
+  serializeLocation = function (locEl){ const o = _ser.apply(this, arguments); const ml = mlRows(locEl).map(mlRowData); if (ml.length) o.miniLasers = ml; return o; };
+  const _res = restoreLocation;
+  restoreLocation = function (saved){ const loc = _res.apply(this, arguments); (saved && saved.miniLasers || []).forEach(d => mlAddRow(loc, d)); if (saved && saved.miniLasers && saved.miniLasers.length) recalcLocationInner(loc); return loc; };
+})();
+/* BOM: FHSD8075-ULF + housing (auto, one per MiniLaser with modules) + 9-30521 modules — part number only for expansions (Brent Q19) */
+function mlBomRows(locEl){
+  const rows = mlRows(locEl).map(mlRowData); if (!rows.length) return [];
+  const io = rows.reduce((n, r) => n + (r.io || 0), 0), housings = rows.filter(r => r.io > 0).length, X = MLP.MINILASER.expansion;
+  const out = [{ qty: rows.length, manufacturer: 'Edwards', partNumber: MINILASER_MODEL, description: 'MiniLaser aspirating smoke detector (standalone)' }];
+  if (housings) out.push({ qty: housings, manufacturer: '—', partNumber: X.housing, description: X.housingDesc });
+  if (io) out.push({ qty: io, manufacturer: '—', partNumber: X.module, description: `${X.moduleDesc} (5 relays + 2 inputs each)` });
+  return out;
+}
+(function hookBom(){
+  const _b = buildBOM;
+  buildBOM = function (locEl){ const rows = _b.apply(this, arguments); const add = mlBomRows(locEl); if (!add.length) return rows;
+    const models = Object.values(MODULE_TYPES).map(t => t.model); let i = 0; while (i < rows.length && models.includes(rows[i].partNumber)) i++; rows.splice(i, 0, ...add); return rows; };
+})();
+/* print / Word / Excel / CVR models */
+function mlModel(locEl){
+  return mlRows(locEl).map(tr => { const d = mlRowData(tr), ma = MASD_ENGINE.miniLaserMa(d.fan), aux = tr.querySelector('.aux-circuit-num');
+    return { zone: d.zone, model: MINILASER_MODEL, fan: d.fan, ma, af: d.af, afSrc: d.afSrc, cls: d.cls, method: d.method, io: d.io, aux: aux && !aux.hidden && aux.value ? 'AUX ' + pad2(aux.value) : '', src: d.circuitSource, adv: (tr.querySelector('.ml-adv') || {}).textContent || '' }; });
+}
+(function hookModel(){
+  const _m = v2SheetModel;
+  v2SheetModel = function (locEl){ const m = _m.apply(this, arguments); m.miniLasers = mlModel(locEl); m.mlMa = m.miniLasers.reduce((a, x) => a + x.ma, 0); return m; };
+})();
+const ML_INC = '\u26A0 Incomplete';
+function mlCellVals(x){ return [x.zone || ML_INC, x.model, x.fan ? String(x.fan) : ML_INC, x.af == null ? ML_INC : String(x.af), x.method || ML_INC, x.aux || '—', x.src || '—', String(x.io), x.fan ? String(x.ma) : ML_INC, x.fan ? String(x.ma) : ML_INC]; }
+const ML_HEAD = ['Zone', 'Model', 'Fan', 'Alarm factor', 'Config', 'AUX circuit', 'Circuit source', 'I/O modules', 'Standby mA', 'Alarm mA'];
+function mlPrintTable(m){
+  if (!m.miniLasers || !m.miniLasers.length) return '';
+  const td = v => v === ML_INC ? `<td><span class="inc-flag">${v}</span></td>` : `<td>${v2Esc(v)}</td>`;
+  return `<h2>Standalone ASDs — not on SenseNET, not addressed</h2><table class="mods ml-print"><thead><tr>${ML_HEAD.map(h => `<th>${h}</th>`).join('')}</tr></thead><tbody>${m.miniLasers.map(x => `<tr>${mlCellVals(x).map(td).join('')}</tr>`).join('')}</tbody></table>`;
+}
+function mlDocx(m){
+  if (!m.miniLasers || !m.miniLasers.length) return '';
+  return v2DocxH('Standalone ASDs — not on SenseNET, not addressed') + v2DocxTable(ML_HEAD, m.miniLasers.map(mlCellVals), [1500, 1300, 500, 800, 900, 900, 1500, 700, 850, 850], { right: [2, 3, 7, 8, 9], mono: [1], noWrap: true });
+}
+function mlCadRows(m){
+  if (!m.miniLasers || !m.miniLasers.length) return [];
+  return [{ style: 3, cells: ['Standalone ASDs'] }, { style: 2, cells: ['Zone', 'Model', 'Fan speed', 'Alarm factor', 'Standby mA', 'Alarm mA', 'AUX circuit', 'I/O modules'] }]
+    .concat(m.miniLasers.map(x => ({ style: 1, cells: [x.zone || ML_INC, x.model, x.fan ? x.fan : ML_INC, x.af == null ? ML_INC : x.af, x.fan ? x.ma : ML_INC, x.fan ? x.ma : ML_INC, x.aux || '—', x.io] })));
+}
+function mlCvrHtml(){
+  let html = '';
+  document.querySelectorAll('.location').forEach(locEl => {
+    const list = mlModel(locEl); if (!list.length) return;
+    const label = [locEl.querySelector('.ps-name').value.trim(), locEl.querySelector('.ps-location').value.trim()].filter(Boolean).join(' — ') || ('Sheet ' + locEl.dataset.loc);
+    html += `<div class="report-segment-title">${mlEsc(label)}</div><table class="report-table"><thead><tr><th>Zone</th><th>Model</th><th>Fan</th><th>mA</th><th>AUX circuit</th><th>Circuit source</th><th>I/O modules</th></tr></thead><tbody>`
+      + list.map(x => `<tr><td>${x.zone ? mlEsc(x.zone) : '<span class="inc-flag">' + ML_INC + '</span>'}</td><td>${x.model}</td><td>${x.fan || '<span class="inc-flag">' + ML_INC + '</span>'}</td><td>${x.fan ? x.ma : '—'}</td><td><span class="report-chip ep">Dedicated AUX</span> ${mlEsc(x.aux || '—')}</td><td>${mlEsc(x.src || '—')}</td><td>${x.io}</td></tr>`).join('') + '</tbody></table>';
+  });
+  return html ? `<div class="report-cluster-block"><div class="report-cluster-title">Standalone ASDs — not on SenseNET, not addressed</div>${html}</div>` : '';
+}
+/* Pre-engineered picker (manual ch.5 Tables 13–31): shape → fan → holes → alarm factor; only valid table entries offered */
+function mlOpenPicker(tr, loc){
+  const PE = MLP.MINILASER.preEngineered, cur = (() => { try { return JSON.parse(tr.dataset.pre || 'null'); } catch (e){ return null; } })() || {};
+  const ov = document.createElement('div'); ov.className = 'ml-pe';
+  ov.innerHTML = `<div class="ml-pe-box" role="dialog" aria-label="Pre-engineered MiniLaser layout"><h3>Pre-engineered layout (MiniLaser manual ch.5)</h3>
+    <div><label>Shape <select class="pe-shape">${[['T', 'T-shaped'], ['I', 'I-shaped'], ['I225', 'I-shaped 225 ft (fan 10)']].map(s => `<option value="${s[0]}">${s[1]}</option>`).join('')}</select></label>
+    <label>Fan speed <select class="pe-fan"></select></label><label>Holes <select class="pe-holes"></select></label><label>Alarm factor <select class="pe-af"></select></label></div>
+    <div class="pe-out"></div><div class="ml-pe-foot"><button type="button" class="btn btn-sm pe-cancel">Cancel</button><button type="button" class="btn btn-sm btn-primary pe-ok">Apply</button></div></div>`;
+  document.body.appendChild(ov);
+  const $ = s => ov.querySelector(s);
+  const fill = (sel, vals, keep) => { sel.innerHTML = vals.map(v => `<option value="${v}">${v}</option>`).join(''); if (keep != null && vals.map(String).includes(String(keep))) sel.value = String(keep); };
+  const upd = (lvl) => {
+    if (lvl <= 0) fill($('.pe-fan'), PE.filter(t => t.shape === $('.pe-shape').value).map(t => t.fan), cur.fan);
+    const tb = MLP.preEngTable($('.pe-shape').value, $('.pe-fan').value);
+    if (lvl <= 1) fill($('.pe-holes'), tb.rows.map(r => r.holes), cur.holes);
+    const r = tb.rows.find(x => x.holes === +$('.pe-holes').value);
+    if (lvl <= 2) fill($('.pe-af'), [2, 4, 6, 8].filter(a => r.af[a]), cur.af);
+    const a = r.af[+$('.pe-af').value];
+    $('.pe-out').innerHTML = `<table><tr><td>Pipe length</td><td>${r.lengthFt} ft ${r.lengthNote}</td></tr><tr><td>Hole diameters (in.)</td><td>${r.diameters.join(', ')}</td></tr><tr><td>Transport time</td><td>${r.transport} s</td></tr>
+      <tr><td>Average sensitivity</td><td>${a.avg.toFixed(2)} %obs/ft · ${a.classes.join(' | ')}</td></tr><tr><td>DIP settings</td><td>Fan speed ${tb.fan} · Alarm factor ${$('.pe-af').value}</td></tr><tr><td>Source</td><td>MiniLaser manual Tables ${tb.tables}, printed p.${tb.page}</td></tr></table>`;
+  };
+  if (cur.shape) $('.pe-shape').value = cur.shape;
+  upd(0);
+  $('.pe-shape').onchange = () => upd(0); $('.pe-fan').onchange = () => upd(1); $('.pe-holes').onchange = () => upd(2); $('.pe-af').onchange = () => upd(3);
+  $('.pe-cancel').onclick = () => { ov.remove(); if (!tr.dataset.pre) tr.querySelector('.ml-setup').value = 'manual'; };
+  $('.pe-ok').onclick = () => {
+    const lk = MLP.preEngLookup($('.pe-shape').value, +$('.pe-fan').value, +$('.pe-holes').value, +$('.pe-af').value);
+    const pre = { shape: lk.table.shape, fan: lk.table.fan, holes: lk.row.holes, af: lk.dip.alarmFactor, lengthFt: lk.row.lengthFt, lengthNote: lk.row.lengthNote, diameters: lk.row.diameters, transport: lk.row.transport, avg: lk.af.avg, classes: lk.af.classes, cite: lk.cite };
+    tr.dataset.pre = JSON.stringify(pre); tr.dataset.holes = pre.holes; tr.dataset.afSrc = 'pre-engineered'; delete tr.dataset.derivation;
+    tr.querySelector('.ml-setup').value = 'pre'; tr.querySelector('.ml-fan').value = String(pre.fan); tr.querySelector('.ml-af').value = String(pre.af); tr.querySelector('.ml-method').value = 'DIP';
+    ov.remove(); recalcLocation(loc); if (typeof refreshAllAmber === 'function') refreshAllAmber(); scheduleSave(); if (typeof v2Refresh === 'function') v2Refresh();
+  };
+}
+/* .pl import: keep MiniLasers out of the ModuLaser PSU wizard; enrich with MLP (alarm factor rule, DIP/Remote advice) */
+function mlAttachPl(parsed, text){
+  if (!parsed.groups.some(g => g.miniLasers && g.miniLasers.length) || typeof MLP === 'undefined') return;
+  let full = null; try { full = MLP.parsePl(text, parsed.fileName); } catch (e){ full = null; }
+  parsed.groups.forEach((g, gi) => (g.miniLasers || []).forEach(r => {
+    const fg = full && full.groups[gi]; const fr = fg && fg.detectors.find(d => d.key === r.key);
+    r.ml = fr ? MLP.miniLaserFromPl(fr, null) : null; r.pipe = fr ? fr.pipe : null;
+  }));
+  parsed.mlNotices = full ? full.skipped.filter(s => /MiniLaser/.test(s)) : [];
+}
+function mlPlaceFromPl(created, files, settings, makeSheet){
+  const notices = [];
+  plIncludedGroups().forEach(({ f, g }) => {
+    (g.miniLasers || []).forEach((r, i) => {
+      let loc = created.find(l => { const e = document.getElementById('location-' + l); return e && e.querySelector('.ps-location').value === g.name; });
+      if (loc == null){ loc = makeSheet(g, f); created.push(loc); }
+      const ml = r.ml || {}, p = r.pipe || {};
+      mlAddRow(loc, { zone: MLP.shortName(r.origName), setup: 'pl', fan: r.fan, af: ml.alarmFactor, afSrc: ml.alarmFactorSrc, cls: ml.perfClass, method: ml.configMethod,
+        io: 0, plKey: (f.linkId || '') + '|' + r.key, holes: ml.holes, derivation: ml.derivation, bends90: p.bends90Total, tees: p.tees });
+      if (ml.expansionInPl) notices.push(`${g.name}: “${r.origName}” — expansion items in the .pl are not imported; add I/O modules by hand.`);
+    });
+    (f.mlNotices || []).forEach(n => { if (!notices.includes(n)) notices.push(n); });
+  });
+  return notices;
+}
+/* project file (.mlproj.json, modulaser-project 1.5.0): MiniLasers travel as design.devices[] kind 'minilaser' */
+(function hookDesign(){
+  if (typeof mlpBuildDesign !== 'function') return;
+  const _d = mlpBuildDesign;
+  mlpBuildDesign = function (){
+    const des = _d.apply(this, arguments);
+    const linkById = {}; (typeof PL_LINKS !== 'undefined' ? PL_LINKS : []).forEach(l => { linkById[l.id] = l; });
+    Array.from(document.querySelectorAll('.location')).forEach((locEl, i) => {
+      const psuId = locEl.dataset.plSheetId || ('sheet-' + (i + 1)), area = (locEl.querySelector('.ps-location') || {}).value || '';
+      mlRows(locEl).forEach((tr, j) => {
+        const d = mlRowData(tr), aux = tr.querySelector('.aux-circuit-num');
+        const [linkId, key] = d.plKey ? [d.plKey.slice(0, d.plKey.indexOf('|')), d.plKey.slice(d.plKey.indexOf('|') + 1)] : ['', ''];
+        const link = linkById[linkId]; let pipe = null;
+        const cache = (typeof MLP_PIPE_CACHE !== 'undefined' && link) ? MLP_PIPE_CACHE[link.name] : null;
+        if (cache) cache.groups.forEach(g => g.detectors.forEach(x => { if (x.key === key) pipe = x.pipe; }));
+        des.devices.push({ id: d.plKey || (psuId + ':ml' + (j + 1)), kind: 'minilaser', type: 'MiniLaser', model: MINILASER_MODEL, partNumber: '', name: d.zone, plName: '', area,
+          address: '', network: null, standalone: true, psuId, fan: d.fan, cluster: '', ma: MASD_ENGINE.miniLaserMa(d.fan), ioModules: d.io,
+          minilaser: { alarmFactor: d.af, alarmFactorSrc: d.afSrc, perfClass: d.cls, configMethod: d.method, setup: d.setup, holes: d.holes, pre: d.pre, derivation: d.derivation,
+            auxCircuit: aux && !aux.hidden ? aux.value : '', circuitSource: d.circuitSource },
+          pl: link ? { link: linkId, file: link.name, key } : null, pipe });
+      });
+    });
+    const cfg = (typeof MLP_CARRY !== 'undefined' && MLP_CARRY.config) || {}; des.devices.forEach(x => { if (x.kind === 'minilaser' && cfg[x.id]) x.config = cfg[x.id]; });
+    return des;
+  };
+})();
+function mlEnsureCards(){ document.querySelectorAll('.location').forEach(l => { if (l.querySelector('.ml-card')) return; const fl = l.querySelector('.network-flags'); if (fl) fl.insertAdjacentHTML('beforebegin', mlCardHtml(l.dataset.loc)); }); }
+mlEnsureCards();
+
+</script><!--ML-END-->
 </body>
 </html>
