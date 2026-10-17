@@ -5,7 +5,7 @@
    MASD_ENGINE_VERSION and the revision of BOTH apps, with matching
    Revision-log notes that name the engine version.
    ===================================================================== */
-const MASD_ENGINE_VERSION = '1.0.0';
+const MASD_ENGINE_VERSION = '1.1.0';
 const MASD_ENGINE = {
   version: MASD_ENGINE_VERSION,
   /* BS 5839-1 Annex E: D = 1 when the battery 20-hour rate (Ah / 20) meets the alarm current, else 1.75. */
@@ -26,7 +26,11 @@ const MASD_ENGINE = {
     return ((standbyHours * (totalMa / 1000)) + ((alarmMinutes / 60) * (totalMa / 1000))) * (1 + margin);
   },
   suppliesRequired(requiredAh, sizeAh){ return sizeAh > 0 ? Math.max(1, Math.ceil(requiredAh / sizeAh)) : 1; },
-  detectorMa(fan, psuVolts){ return (psuVolts === 18 ? FAN_SPEED_MA_18V : FAN_SPEED_MA)[fan] || 0; }
+  detectorMa(fan, psuVolts){ return (psuVolts === 18 ? FAN_SPEED_MA_18V : FAN_SPEED_MA)[fan] || 0; },
+  /* 1.1.0 MiniLaser FHSD8075-ULF: one figure per fan speed (M p.65, 24 VDC) — standby = alarm (Brent 2026-10-16). Blank fan → 0 (amber needs-entry). */
+  miniLaserMa(fan){ return MINILASER_FAN_MA[fan] || 0; },
+  /* AUX circuits needed on a sheet: one per ModuLaser entry point plus one dedicated circuit per MiniLaser (Brent Q2/Q3). */
+  auxNeeded(entryPoints, miniLasers){ return (entryPoints || 0) + (miniLasers || 0); }
 };
 
 /* ---------------- reference data ---------------- */
@@ -43,6 +47,10 @@ const FAN_SPEED_MA = {1:218,2:234,3:255,4:279,5:301,6:330,7:363,8:393,9:431,10:4
 // see the Help menu's Module Current Draw Reference for the documented sourcing.
 const FAN_SPEED_MA_18V = {1:250,2:279,3:305,4:330,5:358,6:380,7:430,8:465,9:517,10:566,11:615,12:685,13:733,14:786,15:872,16:1021};
 
+/* 1.1.0 MiniLaser ASD — standalone, never addressed, own dedicated AUX circuit, not a MODULE_TYPES entry (no address/cluster/ribbon). */
+const MINILASER_MODEL = 'FHSD8075-ULF';
+const MINILASER_FAN_MA = {1:120,2:134,3:157,4:180,5:200,6:230,7:255,8:285,9:320,10:365};
+const MINILASER_HOUSING = '9-30520', MINILASER_IO_MODULE = '9-30521', MINILASER_MAX_IO = 2;
 const QUIESCENT_MA = 70;
 const AUX_MA_PER_CIRCUIT = 35;
 const MAX_AUX_BUILTIN = 4;
@@ -173,7 +181,7 @@ function plParse(text, fileName){
   const floors = floorDb ? Array.from(floorDb.children).filter(c => c.tagName === 'Floor') : [];
   floors.forEach((fl, gi) => {
     const gname = plTxt(fl, 'name') || `Area ${gi + 1}`;
-    const g = { idx: gi, origName: gname, name: gname, include: true, detectors: [], displays: [], psus: [] };
+    const g = { idx: gi, origName: gname, name: gname, include: true, detectors: [], displays: [], psus: [], miniLasers: [] };
     const seen = {};
     const ddb = plKid(fl, 'detectorDatabase');
     (ddb ? Array.from(ddb.children).filter(c => c.tagName === 'Detector') : []).forEach((d, di) => {
@@ -188,6 +196,10 @@ function plParse(text, fileName){
         address: plTxt(d, 'address'),
         x: plNum(d, 'startX') * scale, y: plNum(d, 'startY') * scale, z: plNum(d, 'startZ') * scale };
       rec.fp = plFnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
+      if (typeRaw === 'SOLO'){   // 1.1.0: MiniLaser — kept out of the ModuLaser PSU/cluster suggestion; placed in the sheet's Standalone ASD table
+        rec.kind = 'minilaser'; rec.type = 'MiniLaser'; rec.address = ''; rec.fan = (fan >= 1 && fan <= 10) ? fan : null;
+        g.miniLasers.push(rec); return;
+      }
       if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
       g.detectors.push(rec);
     });
@@ -212,6 +224,7 @@ function plParse(text, fileName){
 /* ---------- battery math (mirrors recalcLocationInner, Edwards A/BPS, 1 AUX circuit) ---------- */
 function plDeviceMa(dev){
   if (dev.kind === 'display') return (MODULE_TYPES[dev.type] || {}).ma || 0;
+  if (dev.kind === 'minilaser') return MINILASER_FAN_MA[dev.fan] || 0;
   return FAN_SPEED_MA[dev.fan] || FAN_SPEED_MA[16];
 }
 function plRequiredAh(devices, s){
