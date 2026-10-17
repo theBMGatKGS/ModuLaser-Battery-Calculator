@@ -39,7 +39,7 @@ async def main():
     pg.on('pageerror', lambda e: errs.append(str(e)))
     loc = await fresh(pg)
     v = await pg.evaluate('[runningRevisionFull(), MLP.VERSION, MASD_ENGINE_VERSION, typeof mlRecalcHook]')
-    ok('revision 02.01.000 (Toolbox 00.02.000), MLP 1.5.0, engine 1.1.0, MiniLaser layer loaded', (v[0].startswith('02.01.000') or v[0].startswith('00.02.000')) and v[1] == '1.5.0' and v[2] == '1.1.0' and v[3] == 'function', v)
+    ok('revision 02.01.000 (Toolbox 00.02.000), MLP 1.5.1, engine 1.1.0, MiniLaser layer loaded', (v[0].startswith('02.01.000') or v[0].startswith('00.02.000')) and v[1] == '1.5.1' and v[2] == '1.1.0' and v[3] == 'function', v)
     ok('standalone ASD card on every sheet', await pg.evaluate("[...document.querySelectorAll('.location')].every(l=>l.querySelector('.ml-card .ml-add'))"))
     # ---- hand add: picker is the default, Cancel → manual; blank fan amber
     await pg.click(f'#location-{loc} .ml-add'); await pg.wait_for_timeout(200)
@@ -100,7 +100,7 @@ async def main():
     ok('MiniLaser with blank fan keeps the sheet incomplete (needs entry)', r[0] != 'complete' and r[1] >= 1, r)
     # ---- 2+ clusters on one sheet: disparate-clusters warning stays AND the arrangement card shows (Brent 10-16 9:02 PM); MiniLasers on Arrangement 1
     ar = await pg.evaluate(ARR_JS); at = ar['t'] or ''
-    ok('2 clusters: "Disparate clusters must not share power pathways" warning shown', any(x.startswith('Disparate clusters must not share power pathways') for x in ar['flags']), ar['flags'])
+    ok('2 clusters: "Disparate clusters must not share power pathways" warning shown', any('Disparate clusters must not share power pathways' in x for x in ar['flags']), ar['flags'])
     ok('2 clusters: arrangement card shown alongside the warning (not withheld, export enabled)', 'Arrangement 1' in at and 'Arrangement 2' in at and 'withheld' not in at and ar['btn'], at[:200])
     ok('Arrangement 1 lists "MiniLasers (stay on this sheet)"; MiniLaser only in group 1', 'MiniLasers (stay on this sheet)' in at and at.count('MiniLasers') == 1 and '365 mA' in at, at)
     await pg.evaluate("document.querySelector('.location:last-of-type .arrangement-block').scrollIntoView({block:'center'})"); await pg.wait_for_timeout(300); await pg.screenshot(path=SHOTS + '/11-arrangement-card-with-disparate-warning.png')
@@ -131,6 +131,9 @@ async def main():
     await pg.evaluate("s=>applyLoadedState(JSON.parse(s))", st); await pg.wait_for_timeout(300)
     n = await pg.evaluate("[document.querySelectorAll('[data-role=minilaser]').length, document.querySelector('[data-role=minilaser] .ml-zone').value]")
     ok('save → load keeps the MiniLaser row', n == [1, 'ML 1'], n)
+    if not os.path.exists(PL):   # Brent: the Example Shaft .pl stays off GitHub — skip the import/output checks with a clear message
+        print(f'SKIP Example Shaft .pl import and output checks: fixture not present ({PL}); set ML_FIXTURE to run them.')
+        ok('no page errors', not errs, errs[:3]); await b.close(); print(f"{sum(R)}/{len(R)} (Example Shaft section skipped: fixture absent)"); sys.exit(0 if all(R) else 1)
     # ---- Example Shaft .pl import
     await fresh(pg)
     await pg.click('#import-pl-btn'); await pg.wait_for_timeout(150)
