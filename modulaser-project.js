@@ -621,6 +621,29 @@ MLP.miniLaserAdvice = function (o){
   const method = (pre || dipOk) ? 'DIP' : 'Remote';
   return { preEngineered: pre, method, why, text: method === 'DIP' ? (pre ? 'DIP (pre-engineered layout, manual ch.5)' : 'DIP (fan speed and alarm factor are DIP-settable)') : 'Remote (Remote.exe) — ' + why.join('; ') + ' · not pre-engineered' };
 };
+/* QA F1: M p.66 pipe limits (MLP.MINILASER.pipe). key = MiniLaser class (VEWFD|EWFD|SFD|OAP) or a Table 35 application name.
+   Returns { holesMax, lenMax, holesKey, lenKey } — NFPA classes use the NFPA length (400 ft); UL OAP / SA ranges and ULC use theirs. */
+MLP.miniLaserPipeLimits = function (key){
+  const P = MLP.MINILASER.pipe, k = String(key || '');
+  let hk, lk;
+  if (/ULC/.test(k)){ hk = 'ULC'; lk = 'ULC'; }
+  else if (/Range 2|SA-R2/.test(k)){ hk = 'SA-R2'; lk = 'SA-R2'; }
+  else if (/Range 1|SA-R1/.test(k)){ hk = 'SA-R1'; lk = 'SA-R1'; }
+  else if (/OAP/.test(k)){ hk = 'OAP'; lk = 'UL OAP'; }
+  else if (/VEWFD/.test(k)){ hk = 'VEWFD'; lk = 'NFPA'; }
+  else if (/EWFD/.test(k)){ hk = 'EWFD'; lk = 'NFPA'; }
+  else { hk = 'SFD'; lk = 'NFPA'; }
+  return { holesMax: P.maxHoles[hk], lenMax: P.maxLenFt[lk], holesKey: hk, lenKey: lk, firstHoleFt: P.firstHoleFt };
+};
+/* errors[] for holes over the class maximum, pipe longer than allowed, and (when known) first hole farther than 16 ft (M ch.5 / p.66). */
+MLP.miniLaserPipeCheck = function (o){
+  const L = MLP.miniLaserPipeLimits(o.key), errors = [];
+  const h = Number(o.holes), len = Number(o.lengthFt), fh = Number(o.firstHoleFt);
+  if (o.holes != null && o.holes !== '' && isFinite(h) && h > L.holesMax) errors.push(`${h} sampling holes exceeds the ${L.holesKey} maximum of ${L.holesMax} holes per pipe (MiniLaser manual p.66)`);
+  if (o.lengthFt != null && o.lengthFt !== '' && isFinite(len) && len > L.lenMax + 1e-9) errors.push(`pipe length ${+len.toFixed(1)} ft exceeds the ${L.lenKey} maximum of ${L.lenMax} ft (MiniLaser manual p.66)`);
+  if (o.firstHoleFt != null && o.firstHoleFt !== '' && isFinite(fh) && fh > L.firstHoleFt + 1e-9) errors.push(`first sampling hole ${+fh.toFixed(1)} ft from the detector — the manual specifies ${L.firstHoleFt} ft (5 m) (MiniLaser manual ch.5)`);
+  return { ok: !errors.length, errors, limits: L };
+};
 /* M ch.5 pre-engineered tables 13–31. Row: [holes, transport s, AF2, AF4, AF6, AF8, diameters]; AF cell 'value:tags'
    (V VEWFD, E EWFD, S SFD, A SA, O OAP, C ULC) or '' (not offered). Diameters: per branch for T (holes/2), per hole for I. */
 (function (){
@@ -766,7 +789,8 @@ MLP.miniLaserFromPl = function (rec, cls){
   if (p.afActivatedRaw === 'true' && p.af != null){ af = p.af; afSrc = 'pl'; }
   else { derivation = MLP.deriveAlarmFactor(holes, useCls); af = derivation.af; afSrc = 'derived'; }
   const advice = MLP.miniLaserAdvice({ fan: rec.fan, af, preEngineered: false });   // .pl import: non-pre-engineered by default (Brent)
-  return { fan: rec.fan, alarmFactor: af, alarmFactorSrc: afSrc, derivation, perfClass: useCls, perfClassSrc: clsSrc, holes, advice,
+  const pipeCheck = MLP.miniLaserPipeCheck({ key: useCls, holes, lengthFt: p.lengthFt });   // QA F1: M p.66
+  return { fan: rec.fan, alarmFactor: af, alarmFactorSrc: afSrc, derivation, perfClass: useCls, perfClassSrc: clsSrc, holes, advice, pipeCheck,
     configMethod: advice.method, expansionInPl: !!p.expansionInPl };
 };
 root.MLP = MLP;

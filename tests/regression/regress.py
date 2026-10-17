@@ -6,8 +6,14 @@ MLP_OUT=_os.environ.get('MLP_TEST_OUT') or _tf.mkdtemp(prefix='mlp-test-')   # a
 def _od(*p):
     d=_os.path.join(MLP_OUT,*p); _os.makedirs(d,exist_ok=True); return d.rstrip('/')+'/'
 
-subprocess.run('cd /workspace/ModuLaser-Battery-Calculator && git show main:modulaser_battery_calculator.html > '+_od('plbuild')+'base.html',shell=True,check=True)
-URLS={'base':'file://'+_od('plbuild')+'base.html','new':'file:///workspace/ModuLaser-Battery-Calculator/modulaser_battery_calculator.html'}
+# QA F3: test the commit under test, not the live checkout. REPO = this repo (from this file's path), BASE_REV (default main) is the
+# reference build, NEW_REV (e.g. HEAD or a commit id) pins the build under test; or pass APP=<file url>. Default: the working tree file.
+REPO=_os.path.abspath(_os.path.join(_os.path.dirname(__file__),'..','..'))
+def _export(rev, name):
+    p=_od('plbuild')+name; subprocess.run(['git','-C',REPO,'show',rev+':modulaser_battery_calculator.html'],stdout=open(p,'w'),check=True); return 'file://'+p
+NEW=(_export(_os.environ['NEW_REV'],'new.html') if _os.environ.get('NEW_REV') else _os.environ.get('APP') or 'file://'+REPO+'/modulaser_battery_calculator.html')
+URLS={'base':_export(_os.environ.get('BASE_REV','main'),'base.html'),'new':NEW}
+print('base', URLS['base'], 'new', URLS['new'])
 SCEN=[('NFPA 72 Voice','77','0.25',[5,9]),('BS 5839-1 Category M/L','50','0.25',[16,16,3]),('UFC 3-600-01 FA/MNS','32','0.30',[12])]
 JS='''async ([basis,temp,margin,fans])=>{
  const loc=document.querySelector('.location'); const id=loc.dataset.loc;
