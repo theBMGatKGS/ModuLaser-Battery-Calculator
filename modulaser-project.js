@@ -304,25 +304,25 @@ MLP.designId = function (design){
 
 /* Build a design section straight from parsed .pl files (Field Report without a calc file).
    PSUs come only from the Battery Calculator; .pl PSU/Battery entries are placement only. */
-MLP.designFromPl = function (parsedList, links){
+MLP.designFromPl = function (parsedList, links, perf){
   const devices = [], areas = [];
   parsedList.forEach((pc, fi) => {
     const link = links[fi];
     pc.groups.forEach(g => {
       if (!areas.includes(g.name)) areas.push(g.name);
-      g.displays.concat(g.detectors).forEach(d => devices.push(MLP.deviceFromPl(d, g.name, link)));
+      g.displays.concat(g.detectors).forEach(d => devices.push(MLP.deviceFromPl(d, g.name, link, undefined, perf)));
     });
   });
   return { owner: 'pl-import', rev: '', updatedAt: new Date().toISOString(), plLinks: links, areas, psus: [], devices,
     placement: parsedList.map((pc, fi) => ({ link: links[fi].id, groups: pc.groups.map(g => ({ area: g.name, psus: g.psus, batteries: g.batteries })) })) };
 };
-MLP.deviceFromPl = function (d, area, link, extra){
+MLP.deviceFromPl = function (d, area, link, extra, perf){
   const dev = { id: (link ? link.id : 'pl') + '|' + d.key, kind: d.kind, type: d.type, partNumber: d.partNumber || '',
     model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : d.kind === 'minilaser' ? MLP.MINILASER.model : 'FHSD8330',
     name: d.origName, plName: d.origName, area, address: '', psuId: '', fan: d.fan || null, cluster: '',
     pos: { x: +(d.x || 0).toFixed(2), y: +(d.y || 0).toFixed(2), z: +(d.z || 0).toFixed(2) },
     pl: link ? { link: link.id, file: link.name, key: d.key, fp: d.fp } : null, pipe: d.pipe || null };
-  if (d.kind === 'minilaser'){ const ml = MLP.miniLaserFromPl(d, extra && extra.perfClass);
+  if (d.kind === 'minilaser'){ const ml = MLP.miniLaserFromPl(d, extra && extra.perfClass ? extra.perfClass : MLP.miniLaserClass(perf, area));
     Object.assign(dev, { standalone: true, network: null, ioModules: 0, minilaser: { alarmFactor: ml.alarmFactor, alarmFactorSrc: ml.alarmFactorSrc, perfClass: ml.perfClass, perfClassSrc: ml.perfClassSrc,
       holes: ml.holes, configMethod: ml.configMethod, advice: ml.advice.text, derivation: ml.derivation, expansionInPl: ml.expansionInPl } }); }
   return Object.assign(dev, extra || {});
@@ -608,18 +608,18 @@ MLP.deriveAlarmFactor = function (holes, cls){
   return { af: 0, avg: +(MLP.MINILASER.afFire1[0] * n).toFixed(4), threshold: thr, cls: c, holes: n, fail: true, steps,
     msg: `Even alarm factor 0 gives ${(MLP.MINILASER.afFire1[0] * n).toFixed(3)} %obs/ft average hole sensitivity with ${n} holes — over the ${c} limit ${thr}. Use fewer holes or redesign the pipework.` };
 };
-/* Brent Q22: pre-engineered (T or I, ≤1 90° elbow) → DIP; otherwise DIP only if fan ∈ {2,4,7,10} AND AF ∈ {2,4,6,8}, else Remote. */
+/* Brent Q22 + 2026-10-16 rule: a MiniLaser is pre-engineered only when the user says so (picker, or the "Pre-engineered" override on an
+   imported unit). A .pl import is NON-pre-engineered by default — pre-engineered units need no PipeCAD design — and elbow/tee counts no longer
+   decide it. Pre-engineered → DIP (manual ch.5). Otherwise DIP only if fan ∈ {2,4,7,10} AND AF ∈ {2,4,6,8}, else Remote. */
 MLP.miniLaserAdvice = function (o){
   const M = MLP.MINILASER, fan = parseInt(o.fan, 10), af = parseInt(o.af, 10);
-  const pre = o.bends90 != null && o.bends90 <= 1 && (o.tees == null || o.tees <= 1);
+  const pre = o.preEngineered === true;
   const dipOk = M.dipFan.includes(fan) && M.dipAlarmFactor.includes(af);
   const why = [];
-  if (!pre) why.push(o.bends90 != null ? `${o.bends90} × 90° elbows (pre-engineered allows ≤1)` : 'pipe layout unknown');
   if (!M.dipFan.includes(fan)) why.push(`fan speed ${isFinite(fan) ? fan : '—'} is not DIP-settable (2/4/7/10)`);
   if (!M.dipAlarmFactor.includes(af)) why.push(`alarm factor ${isFinite(af) ? af : '—'} is not DIP-settable (2/4/6/8)`);
-  const method = dipOk ? 'DIP' : 'Remote';
-  const remoteWhy = why.filter(w => !/elbow|layout/.test(w));
-  return { preEngineered: pre, method, why, text: method === 'DIP' ? (pre ? 'DIP (pre-engineered layout, manual ch.5)' : 'DIP (fan speed and alarm factor are DIP-settable)') : 'Remote (Remote.exe) — ' + (remoteWhy.join('; ') || why.join('; ')) + (pre ? '' : ' · not pre-engineered') };
+  const method = (pre || dipOk) ? 'DIP' : 'Remote';
+  return { preEngineered: pre, method, why, text: method === 'DIP' ? (pre ? 'DIP (pre-engineered layout, manual ch.5)' : 'DIP (fan speed and alarm factor are DIP-settable)') : 'Remote (Remote.exe) — ' + why.join('; ') + ' · not pre-engineered' };
 };
 /* M ch.5 pre-engineered tables 13–31. Row: [holes, transport s, AF2, AF4, AF6, AF8, diameters]; AF cell 'value:tags'
    (V VEWFD, E EWFD, S SFD, A SA, O OAP, C ULC) or '' (not offered). Diameters: per branch for T (holes/2), per hole for I. */
@@ -748,15 +748,24 @@ MLP.preEngLookup = function (shape, fan, holes, af){
   return { table: t, row: r, af: a, dip: { fan: +fan, alarmFactor: af != null ? +af : null }, cite: `M Tables ${t.tables}, printed p.${t.page}` };
 };
 /* parsed .pl detector → MiniLaser design fields (Brent Q18/Q20/Q22). cls = intended performance class or null. */
+/* Brent-approved (2026-10-16) class order for the alarm-factor rule: Area/Group class → project class → SFD.
+   perf = Performance Criteria (perf.standard + optional perf.areas[a] override). Returns { cls, src }. */
+MLP.miniLaserClass = function (perf, area){
+  const clsOf = id => { const p = MLP.perfPreset(id); return p && p.cls && MLP.MINILASER.afThresholds[p.cls] != null ? p.cls : ''; };
+  const a = perf && area && perf.areas && perf.areas[area];
+  if (a && a.enabled && clsOf(a.standard)) return { cls: clsOf(a.standard), src: 'area' };
+  if (perf && clsOf(perf.standard)) return { cls: clsOf(perf.standard), src: 'project' };
+  return { cls: 'SFD', src: 'default SFD' };
+};
 MLP.miniLaserFromPl = function (rec, cls){
   const p = rec.pipe || {}, holes = (p.holes || []).length;
-  const tt = MLP.TT_TO_CLASS[p.maxTransit];
-  const useCls = cls || tt || 'SFD';
-  const clsSrc = cls ? 'project' : tt ? 'pl maxTransitTime' : 'default SFD/OAP – NFPA 72 (suite default preset)';
+  const ci = cls && typeof cls === 'object' ? cls : (cls ? { cls, src: 'project' } : { cls: 'SFD', src: 'default SFD' });
+  const useCls = MLP.MINILASER.afThresholds[ci.cls] != null ? ci.cls : 'SFD';
+  const clsSrc = useCls === ci.cls ? ci.src : 'default SFD';
   let af, afSrc, derivation = null;
   if (p.afActivatedRaw === 'true' && p.af != null){ af = p.af; afSrc = 'pl'; }
   else { derivation = MLP.deriveAlarmFactor(holes, useCls); af = derivation.af; afSrc = 'derived'; }
-  const advice = MLP.miniLaserAdvice({ fan: rec.fan, af, bends90: p.bends90Total, tees: p.tees });
+  const advice = MLP.miniLaserAdvice({ fan: rec.fan, af, preEngineered: false });   // .pl import: non-pre-engineered by default (Brent)
   return { fan: rec.fan, alarmFactor: af, alarmFactorSrc: afSrc, derivation, perfClass: useCls, perfClassSrc: clsSrc, holes, advice,
     configMethod: advice.method, expansionInPl: !!p.expansionInPl };
 };

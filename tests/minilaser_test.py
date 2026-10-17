@@ -10,6 +10,20 @@ SHOTS = os.environ.get('SHOTS') or os.path.join(OUT, 'shots'); os.makedirs(SHOTS
 R = []
 def ok(n, c, i=''): R.append(bool(c)); print('PASS' if c else 'FAIL', n, str(i)[:300])
 FLAGS = "(loc)=>[...document.querySelectorAll(`#location-${loc} .flags-list li`)].map(li=>li.textContent)"
+ARR_JS = r'''async ()=>{ const W=ms=>new Promise(r=>setTimeout(r,ms)); clearEntireDocument({clearHeaders:false}); const pre=[...document.querySelectorAll('.location')]; addLocation();
+  const l=[...document.querySelectorAll('.location')].pop(), loc=l.dataset.loc; pre.forEach(e=>e.remove()); l.querySelector('.ps-name').value='PS-1';
+  const set=(el,v)=>{ el.value=v; el.dispatchEvent(new Event('change',{bubbles:true})); };
+  addModuleRow(loc,'Standard Display'); addModuleRow(loc,'Standard Display'); addModuleRow(loc,'Detector'); addModuleRow(loc,'Detector'); recalcLocationInner(loc);
+  const R=()=>[...l.querySelectorAll('[data-role=module]')]; const Ds=()=>R().filter(r=>r.querySelector('.type-select').value!=='Detector'), Ts=()=>R().filter(r=>r.querySelector('.type-select').value==='Detector');
+  Ds().forEach((d,i)=>{ set(d.querySelector('.cluster-select'), String(i+1)); set(d.querySelector('.module-address'), String(i+1)); d.querySelector('.zone-name').value='D'+(i+1); }); recalcLocationInner(loc);
+  Ts().forEach((t,i)=>{ set(t.querySelector('.cluster-select'), String(i+1)); }); recalcLocationInner(loc);
+  Ts().forEach((t,i)=>{ const d=Ds()[i]; const ps=t.querySelector('.power-select'); const o=[...ps.options].find(o=>o.value==='follow:'+d.id); if(o) set(ps,o.value); set(t.querySelector('.module-address'), String(i+3)); t.querySelector('.zone-name').value='T'+(i+1); set(t.querySelector('.fanspeed-select'),'16'); });
+  l.querySelector('.mode-radio[value=thirdparty]').checked=true; const ah=l.querySelector('.tp-battery-ah'); ah.disabled=false; ah.value='40'; const ac=l.querySelector('.aux-circuits-custom'); if(ac){ac.disabled=false; ac.value='4';} recalcLocationInner(loc);
+  mlAddRow(loc,{setup:'manual', zone:'ML 1', fan:10, af:4, method:'DIP'});
+  const __P=Array.prototype.push; Array.prototype.push=function(...a){ return (typeof a[0]==='string' && a[0].startsWith('Disparate clusters must not share')) ? this.length : __P.apply(this,a); };
+  recalcLocationInner(loc); recalcLocation(loc); await W(300);
+  const vm=v2SheetModel(l); const ab=l.querySelector('.arrangement-block');
+  const t=ab.hidden?null:ab.querySelector('.arrangement-list').innerText; Array.prototype.push=__P; recalcLocation(loc); return t; }'''
 async def fresh(pg):
     await pg.goto(APP); await pg.evaluate('localStorage.clear()'); await pg.reload(); await pg.wait_for_timeout(700)
     return await pg.evaluate("document.querySelector('.location').dataset.loc")
@@ -77,6 +91,27 @@ async def main():
     await pg.evaluate("applyAutoAddressing ? applyAutoAddressing('networked', 'all') : null") if False else None
     c = await pg.evaluate("[senseNetCounts ? JSON.stringify(senseNetCounts()) : '', document.querySelectorAll('[data-role=module]').length]")
     ok('SenseNET module count excludes the MiniLaser', '"1":2' in c[0] or c[1] == 2, c)
+    # ---- MiniLaser-only sheet: no empty-modules guide, still counts for completeness
+    L = await sheet(pg, 0, 1)
+    r = await pg.evaluate(f"(()=>{{const l=document.getElementById('location-{L}'); const e=l.querySelector('.empty-modules'); const m=v2SheetModel(l); return [e?getComputedStyle(e).display:'none', getComputedStyle(l.querySelector('.devtable')).display, m.noModules, m.dot]}})()")
+    await pg.evaluate(f"document.getElementById('location-{L}').scrollIntoView()"); await pg.wait_for_timeout(400); await pg.screenshot(path=SHOTS + '/09-minilaser-only-sheet.png')
+    ok('MiniLaser-only sheet: no "no modules" guide, table visible, not noModules', r[0] == 'none' and r[1] != 'none' and r[2] is False, r)
+    await pg.evaluate(f"(()=>{{const tr=document.querySelector('#location-{L} [data-role=minilaser]'); const s=tr.querySelector('.ml-fan'); s.value=''; s.dispatchEvent(new Event('change',{{bubbles:true}})); recalcLocation('{L}');}})()")
+    r = await pg.evaluate(f"(()=>{{const m=v2SheetModel(document.getElementById('location-{L}')); return [m.dot, m.needs, m.status]}})()")
+    ok('MiniLaser with blank fan keeps the sheet incomplete (needs entry)', r[0] != 'complete' and r[1] >= 1, r)
+    # ---- arrangement card lists MiniLasers on Arrangement 1 (probe: suppress the always-on multi-cluster flag)
+    ar = await pg.evaluate(ARR_JS)
+    ok('Arrangement 1 lists "MiniLasers (stay on this sheet)"; MiniLaser mA only in group 1', ar is not None and 'MiniLasers (stay on this sheet)' in ar and ar.count('MiniLasers') == 1, ar)
+    # ---- Current Draw Reference: in-app help, html and xlsx (no fills)
+    hp = await pg.evaluate("document.body.innerHTML.includes('FHSD8075-ULF') && [...document.querySelectorAll('table')].some(t=>/Module Current Draw/i.test((t.closest('section,div')||t).textContent) && t.textContent.includes('365'))")
+    ok('help Current Draw Reference has the MiniLaser rows', hp)
+    if APP.startswith('file://') and os.path.exists(os.path.dirname(APP[7:]) + '/ModuLaser_Current_Draw_Reference.xlsx'):
+        base = os.path.dirname(APP[7:])
+        ch = open(base + '/ModuLaser_Current_Draw_Reference.html').read()
+        cp = await b.new_page(viewport={'width': 1100, 'height': 1400}); await cp.goto('file://' + base + '/ModuLaser_Current_Draw_Reference.html'); await cp.wait_for_timeout(300); await cp.screenshot(path=SHOTS + '/10-current-draw-reference.png', full_page=True); await cp.close()
+        ok('CDR html: MiniLaser table fans 1–10', 'minilaser-rows' in ch and '365' in ch and 'FHSD8075-ULF' in ch)
+        cz = zipfile.ZipFile(base + '/ModuLaser_Current_Draw_Reference.xlsx'); cs = cz.read('xl/styles.xml').decode(); cw = ''.join(cz.read(n).decode() for n in cz.namelist() if n.startswith('xl/worksheets/') or n == 'xl/sharedStrings.xml')
+        ok('CDR xlsx: MiniLaser rows and no fills/colours', 'FHSD8075-ULF' in cw and 'rgb=' not in cs and cs.count('<fill>') == 2 and '<colors>' not in cs, '')
     # ---- save / restore round trip
     st = await pg.evaluate("JSON.stringify(buildStateObject())")
     await pg.evaluate("s=>applyLoadedState(JSON.parse(s))", st); await pg.wait_for_timeout(300)
@@ -110,7 +145,16 @@ async def main():
     ok('Hoistway: imported as a MiniLaser in the standalone ASD table (no ModuLaser modules)', r and r['mods'] == 0 and r['setup'] == 'pl', r)
     ok('Hoistway: fan 6 from aspiratorSpeed', r and r['fan'] == '6')
     ok('Hoistway: AF derived silently = 8 (8 holes × 0.25 = 2.00 ≤ SFD 2.0), not amber', r and r['af'] == '8' and r['afSrc'] == 'derived' and r['holes'] == '8' and not r['amberAf'] and r['der']['avg'] == 2, r and r['der'])
-    ok('Hoistway: Remote recommended (fan 6 not DIP; 10 × 90°, not pre-engineered)', r and r['method'] == 'Remote' and 'Remote' in r['adv'], r and r['adv'])
+    ok('Hoistway: Remote recommended (fan 6 not DIP-settable; .pl import is non-pre-engineered by default)', r and r['method'] == 'Remote' and 'Remote' in r['adv'], r and r['adv'])
+    PP = "(()=>{const tr=document.querySelector('[data-role=minilaser]'); const c=tr.querySelector('.ml-plpre'); return c?[c.checked, tr.querySelector('.ml-method').value, tr.querySelector('.ml-adv').textContent]:null})()"
+    pp0 = await pg.evaluate(PP)
+    ok('imported unit: "Pre-engineered" override present, unticked by default', pp0 is not None and pp0[0] is False and pp0[1] == 'Remote', pp0)
+    await pg.click('[data-role=minilaser] .ml-plpre'); await pg.wait_for_timeout(250); pp1 = await pg.evaluate(PP)
+    ok('ticking Pre-engineered → DIP (pre-engineered layout)', pp1 and pp1[0] and pp1[1] == 'DIP' and 'pre-engineered' in pp1[2], pp1)
+    st2 = await pg.evaluate("JSON.stringify(buildStateObject())"); await pg.evaluate("s=>applyLoadedState(JSON.parse(s))", st2); await pg.wait_for_timeout(300)
+    ok('Pre-engineered override survives save → load', (await pg.evaluate(PP) or [0])[0] is True)
+    await pg.click('[data-role=minilaser] .ml-plpre'); await pg.wait_for_timeout(250); pp2 = await pg.evaluate(PP)
+    ok('unticking → back to Remote', pp2 and not pp2[0] and pp2[1] == 'Remote', pp2)
     ok('no page errors', not errs, errs[:3])
     with open(OUT + '/hoistway-import.json', 'w') as fh: json.dump(r, fh, indent=1)
     await pg.evaluate("document.getElementById('project-name-input').value='Hoistway MiniLaser'; document.getElementById('prepared-by-input').value='B. Wilkins'; refreshAllAmber(); v2Refresh && v2Refresh()")

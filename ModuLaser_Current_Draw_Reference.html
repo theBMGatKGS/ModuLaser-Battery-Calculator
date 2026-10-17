@@ -87,6 +87,14 @@
         </thead>
         <tbody id="detector-rows"></tbody>
       </table>
+
+      <div class="section-label">MiniLaser ASD (standalone) — by Fan Speed</div>
+      <table>
+        <thead>
+          <tr><th>Module Type</th><th>Model</th><th class="num">Standby (24 VDC)</th><th class="num">Alarm (24 VDC, calculator)</th></tr>
+        </thead>
+        <tbody id="minilaser-rows"></tbody>
+      </table>
     </div>
 
     <div class="notes">
@@ -96,6 +104,8 @@
         <li>Display rows are collapsed to a single current value each, per the calculator's own model (which does not distinguish TFT or LEDS state) — the TFT-On/LEDS-On (highest-draw) state was used to select the corresponding 18V figure.</li>
         <li><b>¹ Minimum Display:</b> the manufacturer worksheet publishes only the LEDS-Off state for this display (no TFT) at 18V — no LEDS-On figure is available in the source data, so 242 mA is the highest published value rather than a true TFT-On/LEDS-On worst case.</li>
         <li><b>² Command Display:</b> no separate current-draw entry exists for this display in the source manufacturer table. This reuses the Standard Display figure, consistent with the calculator's own treatment of both display types as electrically identical (FHSD8310-ULF and FHSD8320-ULF share the same 232 mA rating in the calculator).</li>
+        <li><b>MiniLaser (FHSD8075-ULF):</b> current at 24 VDC from the MiniLaser Installation Manual; alarm draw = fan-speed draw (standby = alarm). No 18V figure is published for the MiniLaser. Each MiniLaser is on its own dedicated AUX circuit (35 mA per-circuit overhead, 3.0 A limit).</li>
+        <li><b>MiniLaser I/O Expansion Module (9-30521) and Expansion Housing (9-30520):</b> no current draw published; treated as no added draw (per Brent, 2026-10-16).</li>
       </ol>
     </div>
 
@@ -112,6 +122,15 @@ tbody.innerHTML = fan18v.map((v18, i) => `
     <td class="model">FHSD8330-ULF</td>
     <td class="num">${v18} mA</td>
     <td class="num">${fan24v[i]} mA</td>
+  </tr>
+`).join('');
+const mlFan = [120,134,157,180,200,230,255,285,320,365];
+document.getElementById('minilaser-rows').innerHTML = mlFan.map((v, i) => `
+  <tr>
+    <td>MiniLaser (Fan Speed ${i+1})</td>
+    <td class="model">FHSD8075-ULF</td>
+    <td class="num">${v} mA</td>
+    <td class="num">${v} mA</td>
   </tr>
 `).join('');
 </script>
