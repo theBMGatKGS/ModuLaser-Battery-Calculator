@@ -10,7 +10,7 @@ regenerate this file from it rather than hand-editing both.
 
 ## 02.01 — 2026-10-16
 
-### 02.01.000 — 2026-10-16 (not yet released)
+### 02.01.000 — 2026-10-16 (released 2026-10-17; QA/Auditor GO on c59a78c)
 - **MiniLaser ASD (FHSD8075-ULF) support (Brent 10-16).** Each sheet has a separate **Standalone ASDs** table: a MiniLaser is never addressed, isn't on SenseNET and can be on any sheet. Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA (standby = alarm).
 - **Dedicated AUX circuit per MiniLaser.** One MiniLaser per AUX circuit, never shared, with the 35 mA per-circuit overhead and 3.0 A per-circuit limit. When there are more MiniLasers plus entry points than AUX outputs, validation fails and recommends adding a power supply.
 - **I/O Expansion Modules.** Choose 0–2 × 9-30521 per MiniLaser (no added draw). The 9-30520 housing is added automatically when the count is above 0, and the BOM lists both by part number.
