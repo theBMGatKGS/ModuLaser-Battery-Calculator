@@ -6,7 +6,7 @@
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
-## What's new in 02.01.000 (not yet released)
+## What's new in 02.01.000 (released 2026-10-17)
 
 - **MiniLaser ASD (FHSD8075-ULF) support (Brent 10-16).** Each sheet has a separate **Standalone ASDs** table: a MiniLaser is never addressed, isn't on SenseNET and can be on any sheet. Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA (standby = alarm).
 - **Dedicated AUX circuit per MiniLaser.** One MiniLaser per AUX circuit, never shared, with the 35 mA per-circuit overhead and 3.0 A per-circuit limit. When there are more MiniLasers plus entry points than AUX outputs, validation fails and recommends adding a power supply.

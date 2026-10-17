@@ -2,7 +2,7 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
-## v02.01.000 — MiniLaser ASD support (2026-10-16) · not yet released
+## v02.01.000 — MiniLaser ASD support (2026-10-16) · released 2026-10-17
 
 ### Recent improvements
 - **MiniLaser ASD (FHSD8075-ULF) support (Brent 10-16).** Each sheet has a separate **Standalone ASDs** table: a MiniLaser is never addressed, isn't on SenseNET and can be on any sheet. Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA (standby = alarm).
@@ -21,7 +21,10 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 - **MiniLaser detection class from a .pl (Brent-approved):** area override → project standard → SFD. Max transport time is no longer used. **A MiniLaser imported from a .pl is non-pre-engineered by default** (Brent: pre-engineered units don't need a PipeCAD design), so elbow/tee counts no longer decide it. The recommendation is DIP only when the fan is 2/4/7/10 and the AF is 2/4/6/8, otherwise Remote. Tick **Pre-engineered** on an imported row to override; DIP is then recommended (saved with the project and carried in `.mlproj.json` as `minilaser.preEngineered`).
 
 ### QA audit
-- Pending.
+- **QA/Auditor verdict: GO** (Delta review 4, 2026-10-17, on Calculator c59a78c / Toolbox e3dfb68 / Report b7cbadb; `qa/qa-report-02.01.000.md`). No blocking findings.
+- **Findings fixed before release:** F1 MiniLaser pipe limits (manual p.66) enforced; F3/F4 test hygiene (fixture tests report SKIPPED, fail with `REQUIRE_FIXTURES=1`; repo-under-test defaults); F5 40% flow wording (PASS with a warning note); F6 print font; F8 Disparate-clusters made a warning only (sheet can pass; nothing withheld); dead A/BPS branch removed; `modulaser-project.js` 1.5.1; side-panel flag vs warning styling; service-worker cache bumps; README versions.
+- **Suites green:** minilaser 48, disparate 13, 0204 43, addrlog 27, auto_address 47, cad 6, confirm 24, cvr 12, empty 17, g1 13, amber 22, columns 24, needs_entry 14, sensenet 30, v2 64, regress 3/3.
+- **Remaining non-blocking nits:** `mlp_sync_test` silently skips `/workspace/mlp` when it's absent and doesn't compare the engine build source; the Calculator root build registers a `sw.js` that isn't present at the repo root (pwa/ and docs/ builds have one; predates this release).
 
 ## v02.00.005 — Auto addressing, CAD Schedule settings (2026-10-16) · released 2026-10-16
 
