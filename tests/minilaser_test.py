@@ -20,10 +20,9 @@ ARR_JS = r'''async ()=>{ const W=ms=>new Promise(r=>setTimeout(r,ms)); clearEnti
   Ts().forEach((t,i)=>{ const d=Ds()[i]; const ps=t.querySelector('.power-select'); const o=[...ps.options].find(o=>o.value==='follow:'+d.id); if(o) set(ps,o.value); set(t.querySelector('.module-address'), String(i+3)); t.querySelector('.zone-name').value='T'+(i+1); set(t.querySelector('.fanspeed-select'),'16'); });
   l.querySelector('.mode-radio[value=thirdparty]').checked=true; const ah=l.querySelector('.tp-battery-ah'); ah.disabled=false; ah.value='40'; const ac=l.querySelector('.aux-circuits-custom'); if(ac){ac.disabled=false; ac.value='4';} recalcLocationInner(loc);
   mlAddRow(loc,{setup:'manual', zone:'ML 1', fan:10, af:4, method:'DIP'});
-  const __P=Array.prototype.push; Array.prototype.push=function(...a){ return (typeof a[0]==='string' && a[0].startsWith('Disparate clusters must not share')) ? this.length : __P.apply(this,a); };
-  recalcLocationInner(loc); recalcLocation(loc); await W(300);
+    recalcLocationInner(loc); recalcLocation(loc); await W(300);
   const vm=v2SheetModel(l); const ab=l.querySelector('.arrangement-block');
-  const t=ab.hidden?null:ab.querySelector('.arrangement-list').innerText; Array.prototype.push=__P; recalcLocation(loc); return t; }'''
+  const t=ab.hidden?null:ab.querySelector('.arrangement-list').innerText; return {t, flags: vm.flags, btn: !!(ab.querySelector('button')&&!ab.querySelector('button').disabled)}; }'''
 async def fresh(pg):
     await pg.goto(APP); await pg.evaluate('localStorage.clear()'); await pg.reload(); await pg.wait_for_timeout(700)
     return await pg.evaluate("document.querySelector('.location').dataset.loc")
@@ -99,9 +98,12 @@ async def main():
     await pg.evaluate(f"(()=>{{const tr=document.querySelector('#location-{L} [data-role=minilaser]'); const s=tr.querySelector('.ml-fan'); s.value=''; s.dispatchEvent(new Event('change',{{bubbles:true}})); recalcLocation('{L}');}})()")
     r = await pg.evaluate(f"(()=>{{const m=v2SheetModel(document.getElementById('location-{L}')); return [m.dot, m.needs, m.status]}})()")
     ok('MiniLaser with blank fan keeps the sheet incomplete (needs entry)', r[0] != 'complete' and r[1] >= 1, r)
-    # ---- arrangement card lists MiniLasers on Arrangement 1 (probe: suppress the always-on multi-cluster flag)
-    ar = await pg.evaluate(ARR_JS)
-    ok('Arrangement 1 lists "MiniLasers (stay on this sheet)"; MiniLaser mA only in group 1', ar is not None and 'MiniLasers (stay on this sheet)' in ar and ar.count('MiniLasers') == 1, ar)
+    # ---- 2+ clusters on one sheet: disparate-clusters warning stays AND the arrangement card shows (Brent 10-16 9:02 PM); MiniLasers on Arrangement 1
+    ar = await pg.evaluate(ARR_JS); at = ar['t'] or ''
+    ok('2 clusters: "Disparate clusters must not share power pathways" warning shown', any(x.startswith('Disparate clusters must not share power pathways') for x in ar['flags']), ar['flags'])
+    ok('2 clusters: arrangement card shown alongside the warning (not withheld, export enabled)', 'Arrangement 1' in at and 'Arrangement 2' in at and 'withheld' not in at and ar['btn'], at[:200])
+    ok('Arrangement 1 lists "MiniLasers (stay on this sheet)"; MiniLaser only in group 1', 'MiniLasers (stay on this sheet)' in at and at.count('MiniLasers') == 1 and '365 mA' in at, at)
+    await pg.evaluate("document.querySelector('.location:last-of-type .arrangement-block').scrollIntoView({block:'center'})"); await pg.wait_for_timeout(300); await pg.screenshot(path=SHOTS + '/11-arrangement-card-with-disparate-warning.png')
     # ---- Current Draw Reference: in-app help, html and xlsx (no fills)
     hp = await pg.evaluate("document.body.innerHTML.includes('FHSD8075-ULF') && [...document.querySelectorAll('table')].some(t=>/Module Current Draw/i.test((t.closest('section,div')||t).textContent) && t.textContent.includes('365'))")
     ok('help Current Draw Reference has the MiniLaser rows', hp)
@@ -111,7 +113,19 @@ async def main():
         cp = await b.new_page(viewport={'width': 1100, 'height': 1400}); await cp.goto('file://' + base + '/ModuLaser_Current_Draw_Reference.html'); await cp.wait_for_timeout(300); await cp.screenshot(path=SHOTS + '/10-current-draw-reference.png', full_page=True); await cp.close()
         ok('CDR html: MiniLaser table fans 1–10', 'minilaser-rows' in ch and '365' in ch and 'FHSD8075-ULF' in ch)
         cz = zipfile.ZipFile(base + '/ModuLaser_Current_Draw_Reference.xlsx'); cs = cz.read('xl/styles.xml').decode(); cw = ''.join(cz.read(n).decode() for n in cz.namelist() if n.startswith('xl/worksheets/') or n == 'xl/sharedStrings.xml')
-        ok('CDR xlsx: MiniLaser rows and no fills/colours', 'FHSD8075-ULF' in cw and 'rgb=' not in cs and cs.count('<fill>') == 2 and '<colors>' not in cs, '')
+        ok('CDR xlsx: MiniLaser rows, no fills, explicit black font only (QA F6)', 'FHSD8075-ULF' in cw and set(re.findall(r'rgb="([0-9A-F]+)"', cs)) == {'FF000000'} and 'theme=' not in cs and cs.count('<font>') == cs.count('<color rgb="FF000000"/>') and cs.count('<fill>') == 2 and '<colors>' not in cs, '')
+    # ---- QA F1: M p.66 pipe limits enforced on .pl rows (20 holes VEWFD fails; 10 OK; 450 ft fails)
+    L = await sheet(pg, 0, 0)
+    f1 = await pg.evaluate("""(loc)=>{ const F=()=>[...document.querySelectorAll(`#location-${loc} .flags-list li`)].map(li=>li.textContent).filter(t=>/manual p.66/.test(t));
+      const tr=mlAddRow(loc,{setup:'pl', zone:'P1', fan:4, af:2, cls:'VEWFD', holes:20, lengthFt:120, method:'DIP'}); recalcLocation(loc); const a=F();
+      tr.dataset.holes='10'; recalcLocation(loc); const b=F(); tr.dataset.lengthFt='450'; recalcLocation(loc); const c=F();
+      const pre=mlAddRow(loc,{setup:'pre', zone:'PE', fan:4, af:8, holes:40, pre:{shape:'I',fan:4,holes:4,cite:'T23'}}); tr.dataset.lengthFt='100'; recalcLocation(loc); const d=F();
+      return [a,b,c,d]; }""", L)
+    ok('F1: 20 holes on VEWFD → validation flag (max 10, manual p.66)', len(f1[0]) == 1 and 'maximum of 10' in f1[0][0], f1[0])
+    ok('F1: 10 holes on VEWFD → no pipe-limit flag', f1[1] == [], f1[1])
+    ok('F1: 450 ft pipe → flag (NFPA max 400 ft)', any('400 ft' in x for x in f1[2]), f1[2])
+    ok('F1: pre-engineered picker rows are exempt (manual tables)', f1[3] == [], f1[3])
+    L = await sheet(pg, 2, 1)   # restore the 2-display + 1-MiniLaser sheet for the save/load check
     # ---- save / restore round trip
     st = await pg.evaluate("JSON.stringify(buildStateObject())")
     await pg.evaluate("s=>applyLoadedState(JSON.parse(s))", st); await pg.wait_for_timeout(300)

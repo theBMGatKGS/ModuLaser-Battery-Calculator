@@ -138,7 +138,9 @@ async def main():
         await pg.click('#menu-help-btn'); await pg.click('#revision-log-menu-btn'); await pg.wait_for_timeout(300)
         await pg.screenshot(path=SH+'10-help-revision-log.png')
         rl=await pg.evaluate("document.querySelector('#about-amendments-body tr td').textContent")
-        ok('revision log top entry 02.00.000, older entries keep 01.x', rl=='02.01.000' and await pg.evaluate("[...document.querySelectorAll('#about-amendments-body tr td:first-child')].some(t=>t.textContent==='01.05.009')") and not await pg.evaluate("[...document.querySelectorAll('#about-amendments-body tr td:first-child')].some(t=>t.textContent.startsWith('01.06'))"))
+        is_tb = (await pg.evaluate("runningRevisionFull()")).startswith('00.')   # QA F4: the Toolbox's own log is 00.x
+        if is_tb: ok('revision log top entry 00.02.000 (Toolbox)', rl=='00.02.000', rl)
+        else: ok('revision log top entry 02.01.000, older entries keep 01.x', rl=='02.01.000' and await pg.evaluate("[...document.querySelectorAll('#about-amendments-body tr td:first-child')].some(t=>t.textContent==='01.05.009')") and not await pg.evaluate("[...document.querySelectorAll('#about-amendments-body tr td:first-child')].some(t=>t.textContent.startsWith('01.06'))"))
         await pg.click('#help-close-btn')
         # wizard step 4 screenshot
         await pg.click('#import-pl-btn'); await pick_step1(pg); await pg.click('#plw-next'); await pg.set_input_files('#plw-file',[T+'Example Deck A-D2.pl',T+'NFPA318-Fab-Ceiling.pl']); await pg.wait_for_timeout(600)
