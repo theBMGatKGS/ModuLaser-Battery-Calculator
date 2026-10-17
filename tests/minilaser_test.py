@@ -133,7 +133,8 @@ async def main():
     ok('save → load keeps the MiniLaser row', n == [1, 'ML 1'], n)
     if not os.path.exists(PL):   # Brent: the Hoistway .pl stays off GitHub — skip the import/output checks with a clear message
         print(f'SKIP Hoistway .pl import and output checks: fixture not present ({PL}); set ML_FIXTURE to run them.')
-        ok('no page errors', not errs, errs[:3]); await b.close(); print(f"{sum(R)}/{len(R)} (Hoistway section skipped: fixture absent)"); sys.exit(0 if all(R) else 1)
+        req = os.environ.get('REQUIRE_FIXTURES') == '1'
+        ok('no page errors', not errs, errs[:3]); await b.close(); print(f"{sum(R)}/{len(R)} passed, SKIPPED: Hoistway section (fixture absent)" + (' — REQUIRE_FIXTURES=1, failing' if req else '')); sys.exit(1 if (req or not all(R)) else 0)
     # ---- Hoistway .pl import
     await fresh(pg)
     await pg.click('#import-pl-btn'); await pg.wait_for_timeout(150)

@@ -36,6 +36,10 @@ async def main():
     ok('arrangement card shown (2 arrangements), export enabled', 'Arrangement 1' in A['card'] and 'Arrangement 2' in A['card'] and 'withheld' not in A['card'] and A['btn'], A['card'][:160])
     ok('BOM shown when the card is shown (model + on-screen table, not withheld)', A['bom'] and 'withheld' not in A['bomScreen'].lower(), A['bomScreen'][:160])
     ok('no MiniLaser row without MiniLasers', 'MiniLasers' not in A['card'])
+    SP = await pg.evaluate("""()=>{ if (typeof v2Refresh==='function') v2Refresh(); const w=[...document.querySelectorAll('.rp-msg')].map(e=>[e.className, e.textContent.slice(0,40)]);
+      return { msgs: w, cnt: [...document.querySelectorAll('.sb-cnt')].map(e=>e.textContent) }; }""")
+    ok('side panel: the warning is amber (rp-msg warn), not styled as a failure', any('warn' in c and 'Disparate' in t for c, t in SP['msgs']) and not any('flag' in c.split() and 'Disparate' in t for c, t in SP['msgs']), SP['msgs'])
+    ok('sidebar failure count excludes the warning', SP['cnt'] == [], SP['cnt'])
     # (1b) same sheet with a big enough battery (1 supply): the sheet PASSES with the warning
     P = await pg.evaluate("""(loc)=>{ const l=document.getElementById('location-'+loc); const ah=l.querySelector('.tp-battery-ah'); ah.disabled=false; ah.value='200'; const bs=l.querySelector('.design-basis-select'); bs.value=[...bs.options].map(o=>o.value).find(v=>/NFPA 72 Voice/.test(v))||bs.options[1].value; applyDesignBasis(loc); l.querySelector('.temperature-select').value='77'; l.querySelectorAll('.fanspeed-select').forEach(x=>{ if(x.closest('tr').querySelector('.type-select').value==='Detector'){ x.value='1'; } }); recalcLocationInner(loc); recalcLocation(loc); }""", loc)
     P = await pg.evaluate(ST, loc)
@@ -49,6 +53,11 @@ async def main():
       const r1=F(), auto=ent.map(a=>a.value); set(ent[1], ent[0].value); recalcLocationInner(loc); recalcLocation(loc); return [r1, auto, F(), ent.map(a=>a.value), [...ent[1].options].filter(o=>o.disabled).map(o=>o.value)]; }""", loc)
     ok('A/BPS 2 clusters: no disparate warning; each cluster gets its own AUX circuit', B[0] is False and B[1][0] != B[1][1], B)
     ok('A/BPS: a circuit already used is disabled for the other entry point, so a shared pathway is impossible', B[2] is False and B[3][0] != B[3][1] and B[3][0] in B[4], B)
+    # real validation flag → distinct "flag" style and counted
+    RF = await pg.evaluate("""(loc)=>{ const l=document.getElementById('location-'+loc); const a=l.querySelector('[data-role=module] .module-address'); const ad=[...l.querySelectorAll('[data-role=module] .module-address')];
+      ad[1].value=ad[0].value; ad[1].dispatchEvent(new Event('change',{bubbles:true})); recalcLocationInner(loc); recalcLocation(loc); if (typeof v2Refresh==='function') v2Refresh();
+      return { msgs: [...document.querySelectorAll('.rp-msg')].map(e=>[e.className, e.textContent.slice(0,50)]), cnt: [...document.querySelectorAll('.sb-cnt')].map(e=>e.textContent) }; }""", loc)
+    ok('real validation flag (duplicate address) → rp-msg flag style, counted in the sidebar', any('flag' in c.split() for c, t in RF['msgs']) and RF['cnt'] and int(RF['cnt'][0]) >= 1, RF)
     ok('no page errors', not errs, errs[:3])
     await b.close()
   print(f"{sum(R)}/{len(R)} passed"); sys.exit(0 if all(R) else 1)
