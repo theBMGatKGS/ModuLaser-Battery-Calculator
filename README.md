@@ -61,7 +61,7 @@ Recent improvements (QA/Auditor PASS/GO on Calculator 57230cc; all suites green)
 ## What's new in 02.00.000
 
 - **Web / PWA (live):** https://thebmgatkgs.github.io/ModuLaser-Battery-Calculator/ — open in a browser, or install it (Chrome/Edge install icon; iPhone/iPad Safari → Share → Add to Home Screen). Works offline after the first visit.
-- **Windows installer:** [ModuLaser.Battery.Calculator.Setup.02.00.000.exe](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/download/v02.00.000/ModuLaser.Battery.Calculator.Setup.02.00.000.exe) — release [v02.00.000](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/tag/v02.00.000) (x64 NSIS, unsigned; SmartScreen may prompt).
+- **Windows installer:** [ModuLaser.Battery.Calculator.Setup.02.02.000.exe](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/download/v02.02.000/ModuLaser.Battery.Calculator.Setup.02.02.000.exe) — release [v02.02.000](https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/tag/v02.02.000) (x64 NSIS, unsigned; SmartScreen may prompt). SHA-256 `366bf21c9c54ba45b288258effa8d4bee754cb6c3d0442b800b9705c91cf4422`.
 
 Calculator revision **02.00.000_261013**. Major version 02.00 folds in the unreleased 01.06.000 work. **Calculation math is unchanged** — the same scenarios give identical Ah and BOM results to 01.05.009 (verified by the automated test suite).
 

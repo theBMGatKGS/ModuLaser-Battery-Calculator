@@ -4,6 +4,12 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 
 ## v02.02.000 — Brands, ASD-160 and printable Quick Start (2026-10-19) · released 2026-10-19
 
+### Download / Open
+- **Web / PWA (live):** https://thebmgatkgs.github.io/ModuLaser-Battery-Calculator/ — open in a browser, or install it (Chrome/Edge install icon; iPhone/iPad Safari → Share → Add to Home Screen). Works offline after the first visit.
+- **Windows installer:** **ModuLaser.Battery.Calculator.Setup.02.02.000.exe** — Windows x64 NSIS installer (unsigned; SmartScreen may prompt: More info → Run anyway)
+  - Direct: https://github.com/theBMGatKGS/ModuLaser-Battery-Calculator/releases/download/v02.02.000/ModuLaser.Battery.Calculator.Setup.02.02.000.exe
+  - SHA-256: `366bf21c9c54ba45b288258effa8d4bee754cb6c3d0442b800b9705c91cf4422`
+
 ### Recent improvements
 - **Manual battery or capacity pick turns Auto Battery Sizing off** (with a toast); the controls stay selectable in Auto.
 - **Networked ASD-160s count toward the 127-module SenseNET limit** and share the network's addresses (duplicates flagged).
