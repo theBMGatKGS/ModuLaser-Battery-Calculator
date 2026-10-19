@@ -10,6 +10,12 @@ regenerate this file from it rather than hand-editing both.
 
 ## 02.02 — 2026-10-19
 
+### 02.02.001 — 2026-10-19 (local build, not released)
+- **Printed Quick Start reworked** (Help ▸ Print Quick Start, Brent 10-19): new Step 3 **Choose your path** — A Import PipeCAD .pl, B Create manually, C Combination (import, then add/edit manual sheets) — as full-width rows with legible screenshots.
+- Header: larger white brand logo (Edwards or Kidde Commercial), revision in the subtitle.
+- Print screenshots in a complementary light theme (same layout and KGS accents); on-screen Help stays dark. 3 letter pages. Example data only (synthetic .pl).
+- Help: Quick Start step, How Do I and a new FAQ (import vs manual vs both). No calculation change (MLP 1.6.0, engine 1.2.0). Service-worker cache `modulaser-calc-v55`.
+
 ### 02.02.000 — 2026-10-19 (released 2026-10-19; QA/Auditor GO on 4f4c5e5)
 - **Manual battery or capacity pick turns Auto Battery Sizing off** (with a toast); the controls stay selectable in Auto.
 - **Networked ASD-160s count toward the 127-module SenseNET limit** and share the network's addresses (duplicates flagged).

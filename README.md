@@ -6,6 +6,10 @@
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
+## What's new in 02.02.001 (local build, not released)
+
+Printed Quick Start (Help → Print Quick Start): Step 3 **Choose your path** — import a PipeCAD .pl, create manually, or a combination — with legible full-width screenshots; larger white brand logo with the revision in the header; light print screenshots (on-screen Help stays dark); 3 letter pages. No calculation change.
+
 ## What's new in 02.02.000 (released 2026-10-19)
 
 Edwards and Kidde Commercial brands, ASD-160 (Micra25 / Senator 25) support, AUX/ribbon rules (max 4 AUX per supply; max 4 detectors + 1 display per ribbon run), and a printable Quick Start (Help → Print Quick Start). See RELEASE_NOTES.md.
@@ -129,8 +133,8 @@ everything works before you build an installer.
 ## Build an installer
 
 ```
-npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.02.000.exe
-npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.02.000.dmg
+npm run build:win     # → dist/ModuLaser.Battery.Calculator.Setup.02.02.001.exe
+npm run build:mac     # → dist/ModuLaser.Battery.Calculator.Setup.02.02.001.dmg
 npm run build:all     # both, if your machine can build both (see note below)
 ```
 
@@ -153,7 +157,7 @@ on a `macos-latest` runner — happy to help set that up if you want it.
 
 The app has a Help → About menu item (and on macOS, the standard app menu's
 "About ModuLaser Battery Calculator" too) showing the revision and author —
-currently Revision `02.02.000_261019`, authored by The BMG. These are set
+currently Revision `02.02.001_261019`, authored by The BMG. These are set
 as constants at the top of `main.js` (`APP_REVISION`, `APP_AUTHOR`) —
 update them there whenever you cut a new revision, and keep them matching
 the calculator's own title-bar Revision/Date cells and its "About" section

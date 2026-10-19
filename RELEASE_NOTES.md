@@ -2,6 +2,17 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
+## v02.02.001 — Printed Quick Start: choose your path (2026-10-19) · not released
+
+### Recent improvements
+- **Printed Quick Start (Help ▸ Print Quick Start), per Brent 10-19.** Step 3 **Choose your path** shows the three ways to build a calc — **A** import a PipeCAD .pl, **B** create the sheets manually, **C** a combination (import, then add or edit manual sheets) — each as a full-width row with a legible screenshot.
+- The header carries the larger white Edwards (or Kidde Commercial) logo, with the revision in the subtitle.
+- Print screenshots use a complementary light theme with the same layout and KGS accents; on-screen Help stays dark. The printout is 3 letter pages. All screenshots use example data.
+- No calculation change.
+
+### QA audit
+- Pending: QA/Auditor review of 02.02.001 (Calculator) / 00.03.001 (Toolbox).
+
 ## v02.02.000 — Brands, ASD-160 and printable Quick Start (2026-10-19) · released 2026-10-19
 
 ### Download / Open

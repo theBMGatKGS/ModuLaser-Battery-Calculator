@@ -13,7 +13,7 @@ async def main():
     ok('Help menu has Print Quick Start', await pg.evaluate("!!document.querySelector('[aria-labelledby=menu-help-btn] #qs-print-btn') && document.getElementById('qs-print-btn').textContent==='Print Quick Start'"))
     if TB:
       qh=open(os.path.join(os.path.dirname(APP.replace('file://','')),'quickstart.html')).read()
-      ok('Toolbox quickstart.html: 02.02.000 screenshots, 00.03.000, new AUX/ribbon rule', qh.count('data-shot="02.02.000"')>=2 and '00.03.000' in qh and '4 detectors + 1 display per ribbon run' in qh)
+      ok('Toolbox quickstart.html: 02.02.000 screenshots, 00.03.001, new AUX/ribbon rule', qh.count('data-shot="02.02.000"')>=2 and '00.03.001' in qh and '4 detectors + 1 display per ribbon run' in qh)
       tbm=await pg.evaluate("[...document.querySelectorAll('img[data-qs-slot=\"view-menu\"], img[data-qs-slot=\"11-confirm-defaults\"]')].map(i=>i.dataset.shotSrc||'')")
       ok('Toolbox Help shows the Toolbox’s own View and Edit menus (QA F10)', tbm and all(x in ('tb-view-menu','tb-edit-menu') for x in tbm), tbm)
       ok('Toolbox in-app Quick Start has the screenshots', await pg.evaluate("document.querySelectorAll('#help-tb-quickstart img.tbq-shot').length")>=2)
@@ -63,6 +63,8 @@ async def main():
       kh=await pg.evaluate("qsQuickStartHtml()"); KW=await pg.evaluate("APP_BRAND_LOGOS['kidde-commercial-white']")
       ok('02.02.001: Kidde Commercial selected → Kidde white logo in the header', KW and f'src="{KW}"' in kh and 'Kidde Commercial ModuLaser Battery Calculator' in kh)
       await pg.evaluate("document.querySelector(\"#brand-seg button[data-v='edwards']\").click()"); await pg.wait_for_timeout(200)
+    rv=await pg.evaluate("mlpCalcRev()"); ok('02.02.001: print header shows the running revision', f'Rev {rv}' in html and ('00.03.001_261019' if TB else '02.02.001_261019') in rv, rv)
+    ok('02.02.001: Help Quick Start step, How Do I and FAQ describe the printout (path A/B/C, light screenshots)', await pg.evaluate("(()=>{const q=document.getElementById('qs-step-print-quickstart').parentElement.textContent, h=HOWDOI_COMMON.find(x=>x.id==='print-quickstart').blurb; return /Choose your path/.test(q) && /light theme/.test(q) && /Choose your path/.test(h) && [...document.querySelectorAll('#help-faq .q')].some(e=>/import a PipeCAD [.]pl or build the calc manually/.test(e.textContent))})()"))
     ok('Print Quick Start uses a hidden iframe document', await pg.evaluate("(()=>{const f=document.getElementById('qs-print-frame'); return !!f && f.contentDocument.querySelectorAll('.page').length==="+str(NP)+"})()"))
     ok('no page errors', not errs, errs)
     await b.close()
