@@ -10,13 +10,13 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.5.1';   // 1.5.1: MiniLaser pipe limits (M p.66) — miniLaserPipeLimits / miniLaserPipeCheck
+MLP.VERSION = '1.6.0';   // 1.6.0: brand catalog (Edwards | Kidde Commercial), ASD-160 kind (MICRA25), hash defaults. 1.5.1: MiniLaser pipe limits (M p.66)
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
 MLP.NAME_MAX = 16;                 // ModuLaser display shows 16 characters, spaces included
 MLP.M_TO_FT = 3.28084;
-MLP.DETECTOR_TYPES = { MULTISENSE: 'Detector', MODULASER_DETECTOR: 'Detector' };
+MLP.DETECTOR_TYPES = { MULTISENSE: 'Detector', MODULASER_DETECTOR: 'Detector', MICRA25: 'ASD-160' };
 MLP.DISPLAY_PARTS = { '0': 'Standard Display', '1': 'Minimum Display', '2': 'Command Display' };
 MLP.DISPLAY_MODELS = { 'Standard Display': 'FHSD8310', 'Minimum Display': 'FHSD8300', 'Command Display': 'FHSD8320' };
 MLP.TT_TO_CLASS = { 60: 'VEWFD', 90: 'EWFD', 120: 'SFD' };
@@ -121,8 +121,9 @@ MLP.parsePl = function (text, fileName){
       if (seen[key]) key += '~' + (++seen[key]); else seen[key] = 1;
       const fanN = parseInt(txt(d, 'aspiratorSpeed'), 10);
       const isML = typeRaw === 'SOLO';   // 1.5.0: MiniLaser FHSD8075-ULF — standalone, never addressed (Brent Q1/Q2)
-      const rec = { key, ord: di, kind: isML ? 'minilaser' : 'detector', origName: name, typeRaw, type: MLP.DETECTOR_TYPES[typeRaw],
-        fan: (fanN >= 1 && fanN <= (isML ? 10 : 16)) ? fanN : null, address: isML ? '' : txt(d, 'address'), partNumber: txt(d, 'partNumber'),
+      const isASD = typeRaw === 'MICRA25' || txt(d, 'DetectorType') === 'MICRA25';   // 1.6.0: ASD-160 / Micra25 / Senator 25
+      const rec = { key, ord: di, kind: isML ? 'minilaser' : isASD ? 'asd160' : 'detector', origName: name, typeRaw, type: MLP.DETECTOR_TYPES[typeRaw],
+        fan: isASD ? null : (fanN >= 1 && fanN <= (isML ? 10 : 16)) ? fanN : null, address: isML ? '' : txt(d, 'address'), partNumber: txt(d, 'partNumber'),
         x: num0(d, 'startX') * scale, y: num0(d, 'startY') * scale, z: num0(d, 'startZ') * scale };
       rec.fp = fnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
       if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }
@@ -133,7 +134,7 @@ MLP.parsePl = function (text, fileName){
         const c = ['X', 'Y', 'Z'].map(a => [num(pp, 'start' + a), num(pp, 'end' + a)]);
         if (c.every(([a, b]) => a != null && b != null)) len += Math.hypot(...c.map(([a, b]) => b - a));
         kids(kid(pp, 'holeDatabase'), 'Hole').forEach(h => {
-          const o = { i: txt(h, 'index'), size: num(h, 'holeSize'), flow: num(h, 'holeFlowRate'), tt: num(h, 'transitTime'), sens: num(h, 'holeSensitivity') == null ? null : num(h, 'holeSensitivity') * sensScale };
+          const o = { i: txt(h, 'index'), endcap: /Endcap/i.test(h.getAttribute('xsi:type') || h.getAttribute('type') || ''), name: txt(h, 'name'), size: num(h, 'holeSize'), flow: num(h, 'holeFlowRate'), tt: num(h, 'transitTime'), sens: num(h, 'holeSensitivity') == null ? null : num(h, 'holeSensitivity') * sensScale };
           (txt(h, 'isTestPoint') === 'true' ? testPoints : holes).push(o);
         });
       }));
@@ -150,6 +151,7 @@ MLP.parsePl = function (text, fileName){
         bends90: sd ? first(sd, 'bends90') : null, sockets: sd ? first(sd, 'sockets') : null, clips: sd ? first(sd, 'clips') : null,
         hasResults: !!sd, holes, testPoints
       };
+      if (isASD){ rec.pipe.resultsValid = sd ? txt(sd, 'resultsValid') : ''; rec.pipe.balanceMinLimit = num(d, 'balanceMinLimit') != null ? num(d, 'balanceMinLimit') : num(rootEl, 'balanceMinLimit'); rec.pipe.afActivatedRaw = txt(d, 'alarmFactorActivated'); rec.pipe.description = txt(props, 'Description'); }
       if (isML){   // 1.5.0: raw flags for the alarm-factor rule (Brent Q20) and DIP/Remote advice (Q22)
         const ints = tag => { const a = sd && kid(sd, tag); return a ? Array.from(a.children).map(c => Number(c.textContent) || 0) : null; };
         const b90 = ints('bends90'), b45 = ints('bends45');
@@ -274,7 +276,7 @@ MLP.verifyChangesAgainstPl = function (changes, parsed, devices){
 /* ---------------- project document ---------------- */
 MLP.blank = function (){
   return { format: MLP.FORMAT, schemaVersion: MLP.SCHEMA_VERSION, savedAt: '', savedBy: null,
-    project: { name: '', location: '', designer: '', company: '', building: '', networkNumber: '', preparedBy: '', date: '' },
+    project: { name: '', location: '', designer: '', company: '', building: '', networkNumber: '', preparedBy: '', date: '', brand: '' },
     design: null, site: null, changes: [], approvals: {} };
 };
 MLP.isProject = o => !!(o && o.format === MLP.FORMAT && typeof o.schemaVersion === 'number');
@@ -293,7 +295,16 @@ MLP.stringify = function (doc, app, rev, user){
 /* SHA-256 over canonical JSON of the whole design (volatile keys excluded): tamper-evident.
    design.id keeps the old 32-bit FNV identity hash as a short display id only. */
 MLP.HASH_DROP = ['hash', 'id', 'updatedAt', 'importedAt'];
-MLP.designHash = function (design){ return design ? 'sha256:' + sha256hex(canon(design, MLP.HASH_DROP)) : ''; };
+/* 1.6.0 (B3a): new fields at their defaults are stripped before hashing, so an unchanged 02.01.000 file keeps its hash. */
+MLP.HASH_DEFAULTS = { brand: 'edwards', variant: '120', accessories: [], facuSource: false, ulOptIn: false, psVariant: '120', psTamper: false, psSeismic: false, cabinetUserSet: false, tpFacuSource: false, tpFacuUserSet: false };
+function stripDefaults(v){
+  if (Array.isArray(v)) return v.map(stripDefaults);
+  if (v && typeof v === 'object'){ const o = {}; Object.keys(v).forEach(k => { const d = MLP.HASH_DEFAULTS[k], x = v[k];
+    if (d !== undefined && (Array.isArray(d) ? Array.isArray(x) && !x.length : x === d)) return; if (k === 'powerSource' || k === 'tpPowerSource') { if (x == null || x === '') return; } o[k] = stripDefaults(x); }); return o; }
+  return v;
+}
+MLP.stripDefaults = stripDefaults;
+MLP.designHash = function (design){ return design ? 'sha256:' + sha256hex(canon(stripDefaults(design), MLP.HASH_DROP)) : ''; };
 MLP.siteHash = function (site){ return site ? 'sha256:' + sha256hex(canon(site, ['hash', 'updatedAt'])) : ''; };
 MLP.designId = function (design){
   if (!design) return '';
@@ -318,13 +329,15 @@ MLP.designFromPl = function (parsedList, links, perf){
 };
 MLP.deviceFromPl = function (d, area, link, extra, perf){
   const dev = { id: (link ? link.id : 'pl') + '|' + d.key, kind: d.kind, type: d.type, partNumber: d.partNumber || '',
-    model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : d.kind === 'minilaser' ? MLP.MINILASER.model : 'FHSD8330',
+    model: d.kind === 'display' ? MLP.DISPLAY_MODELS[d.type] || '' : d.kind === 'minilaser' ? MLP.MINILASER.model : d.kind === 'asd160' ? MLP.partFor('edwards', 'asd160') : 'FHSD8330',
     name: d.origName, plName: d.origName, area, address: '', psuId: '', fan: d.fan || null, cluster: '',
     pos: { x: +(d.x || 0).toFixed(2), y: +(d.y || 0).toFixed(2), z: +(d.z || 0).toFixed(2) },
     pl: link ? { link: link.id, file: link.name, key: d.key, fp: d.fp } : null, pipe: d.pipe || null };
   if (d.kind === 'minilaser'){ const ml = MLP.miniLaserFromPl(d, extra && extra.perfClass ? extra.perfClass : MLP.miniLaserClass(perf, area));
     Object.assign(dev, { standalone: true, network: null, ioModules: 0, minilaser: { alarmFactor: ml.alarmFactor, alarmFactorSrc: ml.alarmFactorSrc, perfClass: ml.perfClass, perfClassSrc: ml.perfClassSrc,
       holes: ml.holes, configMethod: ml.configMethod, advice: ml.advice.text, derivation: ml.derivation, expansionInPl: ml.expansionInPl } }); }
+  if (d.kind === 'asd160'){ const ev = MLP.asd160Evaluate(d, perf, area); Object.assign(dev, { standalone: false, network: 1, relayCard: false,
+    asd160: { alarmFactor: ev.af.af, alarmFactorSrc: ev.af.src, perfClass: ev.cls.cls, perfClassSrc: ev.cls.src, ul: ev.ul, holes: ev.counts.sampling, holesAll: ev.counts.all, worstHole: ev.worst, transport: ev.transport, issues: ev.issues } }); }
   return Object.assign(dev, extra || {});
 };
 MLP.linkFromParsed = function (pc, sha, size, lastModified){
@@ -348,6 +361,8 @@ MLP.validateDesign = function (design){
   (design.devices || []).forEach(d => {
     if (!MLP.nameOk(d.name)) issues.push({ id: d.id, level: 'error', msg: `“${d.name}” is ${MLP.nameLen(d.name)} characters — the ModuLaser display shows ${MLP.NAME_MAX}.` });
     if (d.kind && !MLP.KNOWN_KINDS.includes(d.kind)){ issues.push({ id: d.id, level: 'warn', msg: `${d.name}: unknown device kind “${d.kind}” — this app version cannot check it.` }); return; }
+    if (d.kind === 'asd160' && d.standalone && String(d.address || '').trim()) issues.push({ id: d.id, level: 'error', msg: `${d.name}: a stand-alone ASD-160 is never addressed (address ${d.address} must be cleared).` });
+    if (d.kind === 'asd160' && d.asd160 && d.asd160.issues) d.asd160.issues.forEach(x => issues.push({ id: d.id, level: x.level, msg: `${d.name}: ${x.msg}` }));
     if (d.kind === 'minilaser'){ const m = d.minilaser || {};   // 1.5.0: never addressed; fan and alarm factor checks
       if (String(d.address || '').trim()) issues.push({ id: d.id, level: 'error', msg: `${d.name}: MiniLasers are never addressed (address ${d.address} must be cleared).` });
       if (!(d.fan >= 1 && d.fan <= 10)) issues.push({ id: d.id, level: 'incomplete', msg: `⚠ ${d.name}: MiniLaser fan speed not set (1–10).` });
@@ -394,7 +409,7 @@ MLP.diffDesign = function (oldD, newD){
   return { project, devices, psus, count };
 };
 MLP.diffProject = function (oldP, newP){
-  const keys = ['name', 'location', 'designer', 'company', 'building', 'networkNumber'];
+  const keys = ['name', 'location', 'designer', 'company', 'building', 'networkNumber', 'brand'];
   return keys.filter(k => (newP || {})[k] && String((oldP || {})[k] || '') !== String(newP[k])).map(k => ({ f: k, old: (oldP || {})[k] || '', new: newP[k] }));
 };
 MLP.diffHtml = function (diff, esc){
@@ -501,7 +516,7 @@ MLP.perfPresetLimits = function (id){
   MLP.PERF_CLASSES.forEach(c => { out[c] = p && p.family === 'FM' ? { sens: MLP.FM_LIMITS[c].sens, tt: MLP.FM_LIMITS[c].tt, target: MLP.SENS_TARGETS[c], ref: MLP.FM_REF, confirmed: false, src: 'prefill' } : MLP.perfLimitBlank(); });
   return out;
 };
-MLP.perfScopeInit = (o, id) => { o.standard = id; o.ulConfirmed = false; o.limits = MLP.perfPresetLimits(id); o.codeReqs = MLP.perfCodeReqs(id); return o; };
+MLP.perfScopeInit = (o, id) => { o.standard = id; o.ulConfirmed = false; delete o.ulOptIn; o.limits = MLP.perfPresetLimits(id); o.codeReqs = MLP.perfCodeReqs(id); return o; };
 MLP.perfBlank = () => Object.assign(MLP.perfScopeInit({ standardOther: '', areas: {}, narrative: '', narrativeDraft: '', eorName: '', specRef: '', definedBy: '', definedAt: '' }, 'SFD/OAP – NFPA 72'), { statement: '', market: 'UL' });
 /* migrate 1.2.0 drafts (market/basis) to presets */
 MLP.perfMigrate = function (perf){
@@ -558,7 +573,7 @@ MLP.perfStatement = perf => { if (!perf) return ''; MLP.perfMigrate(perf); const
    Sources: MiniLaser Installation Manual 3103175-EN Rev 001 ("M p.N" = printed page), I/O module datasheet
    K85001-1064 ("DS p.N"), Brent 2026-10-16 decisions (plan-02.01.000-minilaser.md §2, §2.2). Real data only. */
 MLP.DETECTOR_TYPES.SOLO = 'MiniLaser';
-MLP.KNOWN_KINDS = ['detector', 'display', 'command', 'minilaser'];
+MLP.KNOWN_KINDS = ['detector', 'display', 'command', 'minilaser', 'asd160'];
 MLP.MINILASER = {
   model: 'FHSD8075-ULF',                                   // Brent Q11: this part number only, everywhere
   fanMa: { 1: 120, 2: 134, 3: 157, 4: 180, 5: 200, 6: 230, 7: 255, 8: 285, 9: 320, 10: 365 },   // M p.65 at 24 VDC; standby = alarm (Brent)
@@ -795,6 +810,263 @@ MLP.miniLaserFromPl = function (rec, cls){
   return { fan: rec.fan, alarmFactor: af, alarmFactorSrc: afSrc, derivation, perfClass: useCls, perfClassSrc: clsSrc, holes, advice, pipeCheck,
     configMethod: advice.method, expansionInPl: !!p.expansionInPl };
 };
+
+/* ======================= 1.6.0: brand catalog (plan rev 4.23b §B3/B4/B5) ======================= */
+MLP.BRAND_DEFAULT = 'edwards';
+MLP.BRANDS = {
+  'edwards': { id: 'edwards', label: 'Edwards', manufacturer: 'Edwards', supplyLabel: 'Edwards A/BPS',
+    reportTitle: 'Edwards ModuLaser MASD — Field Report', chip: 'EDWARDS', cabinetDefault: 'edwards' },
+  'kidde-commercial': { id: 'kidde-commercial', label: 'Kidde Commercial', manufacturer: 'Kidde Commercial', supplyLabel: 'Kidde Commercial APS/EBPS',
+    reportTitle: 'Kidde Commercial ModuLaser MASD — Field Report', chip: 'KIDDE COMMERCIAL', cabinetDefault: 'spaceage' }
+};
+MLP.brandOf = b => (b && MLP.BRANDS[b]) ? b : MLP.BRAND_DEFAULT;      // missing/unknown → Edwards (old files)
+MLP.PARTS = {
+  minDisplay: { edwards: 'FHSD8300-ULF', 'kidde-commercial': '9-30780-KID-ULF', desc: 'Minimum Display' },
+  stdDisplay: { edwards: 'FHSD8310-ULF', 'kidde-commercial': '9-30781-KID-ULF', desc: 'Standard Display' },
+  cmdDisplay: { edwards: 'FHSD8320-ULF', 'kidde-commercial': '9-30782-KID-ULF', desc: 'Command Display' },
+  detector:   { edwards: 'FHSD8330-ULF', 'kidde-commercial': '9-30783-KID-ULF', desc: 'Detector Module' },
+  minilaser:  { edwards: 'FHSD8075-ULF', 'kidde-commercial': '9-30501-KID-ULF', desc: 'MiniLaser aspirating smoke detector' },
+  asd160:     { edwards: 'FHSD8025-7-ULF', 'kidde-commercial': '9-30671-7-KID-ULF', desc: 'ASD-160 aspirating smoke detector (Micra25 / Senator 25)' },
+  mlHousing:  { both: '9-30520', desc: 'MiniLaser expansion housing', fixedMfr: '—' },
+  mlIo:       { both: '9-30521', desc: 'MiniLaser I/O module', fixedMfr: '—' },
+  asdRelay:   { both: '33-30436A', desc: 'ASD-160 relay card (Pre-Alarm, Aux, Fire 2)' },
+  tamper:     { both: '3-TAMP', desc: 'Tamper switch' },
+  apsEq:      { both: 'APSEQ', desc: 'Seismic kit (APS)' },
+  bpsEq:      { both: 'BPSEQ', desc: 'Seismic kit (BPS)' },
+  bc1Eq:      { both: 'BC-1EQ', desc: 'Seismic kit (BC-1)' },
+  bc1:        { both: 'BC-1', desc: 'Battery cabinet (2 batteries up to 40 Ah)' },
+  bc2:        { both: 'BC-2', desc: 'Battery cabinet (up to 17 Ah)' },
+  ssu00507:   { both: 'SSU00507', desc: 'Battery cabinet', fixedMfr: 'Space Age Electronics' },
+  rcc7r:      { both: '3-RCC7R', desc: 'Battery cabinet', fixedMfr: 'Edwards' },
+  bats:       { both: '3-BATS', desc: 'Battery shelf', fixedMfr: 'Edwards' },
+  // catalog only — never in a BOM (B3)
+  grommets: { both: '9-30794', catalogOnly: true }, angled: { both: '9-30795', catalogOnly: true }, straight: { both: '9-30796', catalogOnly: true },
+  filter6: { both: '9-30699N-P', catalogOnly: true }, bpsCvr: { both: 'BPS-CVR', catalogOnly: true }, mnBrkt: { both: 'MN-BRKT3F', catalogOnly: true }
+};
+MLP.MODULE_PART_KEY = { 'Minimum Display': 'minDisplay', 'Standard Display': 'stdDisplay', 'Command Display': 'cmdDisplay', 'Detector': 'detector' };
+MLP.partFor = function (brand, key){ const p = MLP.PARTS[key]; if (!p) return ''; return p.both || p[MLP.brandOf(brand)]; };
+MLP.manufacturerFor = function (brand, key){ const p = MLP.PARTS[key]; if (p && p.fixedMfr) return p.fixedMfr; return MLP.BRANDS[MLP.brandOf(brand)].manufacturer; };
+/* Translate any brand-catalog P/N to the other brand (used on brand switch and by the Report's part-number basis). */
+MLP.translatePart = function (pn, toBrand){
+  const s = String(pn || '').trim(); if (!s) return s;
+  for (const k of Object.keys(MLP.PARTS)){ const p = MLP.PARTS[k]; if (p.both) continue;
+    if (p.edwards === s || p['kidde-commercial'] === s) return p[MLP.brandOf(toBrand)]; }
+  for (const fam of ['APS', 'BPS']) for (const a of [6, 10]) for (const v of MLP.SUPPLY_VARIANTS){
+    for (const b of Object.keys(MLP.BRANDS)) if (MLP.supplyPart(b, fam, a, v).pn === s) return MLP.supplyPart(toBrand, fam, a, v).pn; }
+  return s;
+};
+MLP.SUPPLY_VARIANTS = ['120', '220', 'ulc'];
+MLP.SUPPLY_VARIANT_LABELS = { '120': '120V', '220': '220V', 'ulc': 'ULC' };
+/* B4 table. Explicit lookup — replaces supply.replace('6A','10A'). */
+MLP.supplyPart = function (brand, family, amps, variant){
+  const b = MLP.brandOf(brand), a = Number(amps) === 10 ? 10 : 6, v = MLP.SUPPLY_VARIANTS.indexOf(variant) >= 0 ? variant : '120';
+  const fam = String(family || 'BPS').toUpperCase().indexOf('APS') >= 0 ? 'APS' : 'BPS';
+  let pn, note = '';
+  if (fam === 'APS'){ pn = v === '220' ? `APS${a}A/230` : `APS${a}A`; if (v === 'ulc') note = 'No ULC variant listed'; }
+  else pn = v === '220' ? `BPS${a}A/230` : v === 'ulc' ? `BPS${a}AC` : (b === 'kidde-commercial' ? `EBPS${a}A` : `BPS${a}A`);
+  return { pn, note, family: fam, amps: a, variant: v, desc: `Power supply (${a} A)` + (v === '120' ? '' : ' ' + MLP.SUPPLY_VARIANT_LABELS[v]) };
+};
+MLP.supplyCapacityLabel = (brand, amps, variant) => `${MLP.supplyPart(brand, 'APS', amps, variant).pn} / ${MLP.supplyPart(brand, 'BPS', amps, variant).pn}`;
+/* Batteries (two per supply). Ah from the catalog, never parsed from the P/N (C5). 12V6A5 manual-only (C1 #58). */
+MLP.BATTERIES = {
+  '12V6A5': { ah: 7.2, family: 'BPS', fit: 'supply', manualOnly: true },
+  '12V10A': { ah: 10.5, family: 'BPS', fit: 'supply' },
+  '12V17A': { ah: 18, family: 'APS', fit: 'supply' },
+  '12V24A': { ah: 26, family: 'APS', fit: 'supply' },
+  '12V40A': { ah: 40, family: 'BPS', fit: 'bc1' },
+  '12V50A': { ah: 50, family: 'BPS', fit: 'cabinet' },
+  '12V65A': { ah: 65, family: 'BPS', fit: 'cabinet' }
+};
+MLP.batteries = MLP.BATTERIES;
+MLP.BATTERY_SMALL_ADVISORY = '12V6A5 is likely too small for ASD projects';
+MLP.KIDDE_DM_NOTICE = 'Ordering requires authorization from the Kidde District Manager first.';
+MLP.FACU_ADVISORY = 'FACU powers the ASDs — confirm the FACU power supply and batteries carry this load (not sized here).';
+/* Enclosure for a battery: in-supply / BC-1 / cabinet (SSU00507 or 3-RCC7R[+3-BATS]); cabinet default by brand. */
+MLP.enclosureFor = function (brand, model, cabinet){
+  const bt = MLP.BATTERIES[model]; if (!bt) return null;
+  if (bt.fit === 'supply') return { key: null, label: 'None — fits in supply enclosure', parts: [] };
+  if (bt.fit === 'bc1') return { key: 'bc1', label: 'BC-1', parts: ['bc1'] };
+  const c = cabinet === 'edwards' || cabinet === 'spaceage' ? cabinet : MLP.BRANDS[MLP.brandOf(brand)].cabinetDefault;
+  if (c === 'spaceage') return { key: 'spaceage', label: 'SSU00507', parts: ['ssu00507'] };
+  return model === '12V65A' ? { key: 'edwards', label: '3-RCC7R + 3-BATS (battery shelf)', parts: ['rcc7r', 'bats'], kiddeDm: MLP.brandOf(brand) === 'kidde-commercial' }
+                            : { key: 'edwards', label: '3-RCC7R', parts: ['rcc7r'], kiddeDm: MLP.brandOf(brand) === 'kidde-commercial' };
+};
+/* Per-supply BOM lines (B5). opts: { brand, battery, amps, family, variant, cabinet, tamper, seismic, supplies } */
+MLP.supplyBom = function (o){
+  const brand = MLP.brandOf(o.brand), n = o.supplies || 1, out = [], mf = MLP.BRANDS[brand].manufacturer;
+  const bt = MLP.BATTERIES[o.battery];
+  const fam = o.family || (bt ? bt.family : 'BPS');
+  const sp = MLP.supplyPart(brand, fam, o.amps, o.variant);
+  out.push({ qty: n, manufacturer: mf, partNumber: sp.pn, description: sp.desc, note: sp.note });
+  const enc = bt ? MLP.enclosureFor(brand, o.battery, o.cabinet) : null;
+  if (enc) enc.parts.forEach(k => out.push({ qty: n, manufacturer: MLP.manufacturerFor(brand, k), partNumber: MLP.partFor(brand, k), description: MLP.PARTS[k].desc }));
+  if (bt) out.push({ qty: 2 * n, manufacturer: mf, partNumber: o.battery, description: `Standby battery, 12 VDC, ${bt.ah} Ah` });
+  if (o.tamper) out.push({ qty: n, manufacturer: mf, partNumber: '3-TAMP', description: MLP.PARTS.tamper.desc });
+  if (o.seismic){ out.push({ qty: n, manufacturer: mf, partNumber: sp.family === 'APS' ? 'APSEQ' : 'BPSEQ', description: MLP.PARTS[sp.family === 'APS' ? 'apsEq' : 'bpsEq'].desc });
+    if (enc && enc.key === 'bc1') out.push({ qty: n, manufacturer: mf, partNumber: 'BC-1EQ', description: MLP.PARTS.bc1Eq.desc }); }
+  return out;
+};
+/* B4a price rule BPS6A + BC-2 → APS6A: ships OFF, prices blank (C1 #52). */
+MLP.PRICES = {};
+MLP.priceRuleBps6aBc2 = function (){ return null; };
+
+/* ======================= 1.6.0: ASD-160 (Micra25 / Senator 25), kind 'asd160' ======================= */
+MLP.ASD160 = { model: 'ASD-160', aliases: ['ASD-160', 'ASD160', 'Micra25', 'MICRA25', 'Senator 25'], ma: 250, voltsMin: 21.6, voltsMax: 26.4,
+  ulSens: 1.28, ulTt: 120, ulHoles: 10, ulLengthFt: 160, maxLengthFt: 165, maxTt: 120,
+  rangeMin: 0.00914, rangeMax: 7.62, tol: 0.00023, ref: 'Senator 25 Installers Handbook 10-3511-505-SN25-10 REV 010',
+  relayBase: ['Fire', 'Fault'], relayCard: ['Pre-Alarm', 'Aux', 'Fire 2'] };
+MLP.isAsd160Label = s => /^(asd-?160|micra ?25|senator ?25)$/i.test(String(s || '').trim());
+MLP.ASD160_FM_LIMITS = { VEWFD: { sens: 1.00, tt: 60 }, EWFD: { sens: 1.50, tt: 90 }, SFD: { sens: 3.5, tt: 120 } };
+MLP.ASD160_LEVELS = [
+  { key: 'alert', label: 'Aux', setting: 'E17', list: [10, 9, 8, 7, 6, 5, 4, 3, 2], def: 2 },
+  { key: 'action', label: 'Pre-Alarm', setting: 'E16', list: [8, 7, 6, 5, 4, 3], def: 5 },
+  { key: 'fire1', label: 'Fire', setting: 'E15', list: [10, 9, 8], def: 10 },
+  { key: 'fire2', label: 'Fire 2', setting: null, list: null, def: null }
+];
+MLP.ASD160_WORKSHEET = "Brent's Alarm Factor Calculator (af-table.xlsx) H12/H13";
+MLP.asd160ToM = v => v / 0.3048;
+MLP.asd160InRange = v => v != null && isFinite(v) && v >= MLP.ASD160.rangeMin - MLP.ASD160.tol - 1e-12 && v <= MLP.ASD160.rangeMax + MLP.ASD160.tol + 1e-12;
+/* §7b trigger (C1 #28/#29): NFPA-family preset, or FM/Custom with ulOptIn. No perf → perfBlank (SFD/OAP – NFPA 72, C1 #30). */
+MLP.asd160Scope = function (perf, area){
+  const p = perf || MLP.perfBlank(); const s = MLP.perfScope(p, area);
+  return { standard: s.standard, ulOptIn: !!s.ulOptIn, limits: s.limits || null, isDefault: !perf, preset: MLP.perfPreset(s.standard) || null };
+};
+MLP.asd160IsUl = function (perf, area){
+  const sc = MLP.asd160Scope(perf, area);
+  if (MLP.perfIsUl(sc.standard)) return true;
+  const fam = sc.preset && sc.preset.family;
+  return !!sc.ulOptIn && (fam === 'FM' || fam === 'Custom');
+};
+const ASD_CLS_FROM_PRESET = id => /VEWFD/.test(id) ? 'VEWFD' : /EWFD/.test(id) ? 'EWFD' : /SFD|OAP/.test(id) ? 'SFD' : null;
+/* Description token (suggestion only) */
+MLP.asd160DescHint = function (desc){
+  const d = String(desc || '').toUpperCase(), r = {};
+  if (/UL ?268/.test(d)) r.standard = 'UL 268'; else if (/FM ?3230/.test(d)) r.standard = 'FM 3230'; else if (/ULC-?S529/.test(d)) r.standard = 'ULC-S529';
+  if (/VEWFD/.test(d)) r.cls = 'VEWFD'; else if (/EWFD/.test(d)) r.cls = 'EWFD'; else if (/SFD|STANDARD FIRE|OAP/.test(d)) r.cls = 'SFD';
+  return r;
+};
+/* Class source order (C1 #50): maxTransitTime (exact 60/90/120) → Description hint → user pick. */
+MLP.asd160Class = function (pipe, userCls){
+  if (userCls) return { cls: userCls, src: 'user' };
+  const t = pipe && pipe.maxTransit; const c = (t === 60 || t === 90 || t === 120) ? MLP.TT_TO_CLASS[t] : null;
+  if (c) return { cls: c === 'OAP' ? 'SFD' : c, src: `maxTransitTime ${t} s` };
+  const h = MLP.asd160DescHint(pipe && pipe.description);
+  if (h.cls) return { cls: h.cls, src: 'Description (suggestion)' };
+  return { cls: null, src: 'none' };
+};
+/* R-AF4 / G6a hole counts */
+MLP.asd160Holes = function (pipe){
+  const holes = (pipe && pipe.holes) || [], tps = (pipe && pipe.testPoints) || [];
+  const isTp = h => /test ?point/i.test(h.name || '');
+  const sampling = holes.filter(h => !(h.size === 0) && !isTp(h));
+  const tpAll = tps.concat(holes.filter(isTp)).filter(h => h.size !== 0);
+  return { sampling, testPoints: tpAll, all: holes.length + tps.length };
+};
+/* §8a transport: field target = longest sampling hole; benchmark = slowest test point (else the field target hole) */
+MLP.asd160Transport = function (pipe){
+  const h = MLP.asd160Holes(pipe), mx = arr => arr.filter(x => x.tt != null).reduce((a, x) => (!a || x.tt > a.tt) ? x : a, null);
+  const tgt = mx(h.sampling), bench = mx(h.testPoints) || tgt;
+  return { target: tgt ? tgt.tt : (pipe && pipe.tt != null ? pipe.tt : null), targetHole: tgt ? tgt.i : '', bench: bench ? bench.tt : null, benchHole: bench ? bench.i : '' };
+};
+/* Limits for this unit's scope (§7b table) */
+MLP.asd160Limits = function (perf, area, cls){
+  const A = MLP.ASD160, ul = MLP.asd160IsUl(perf, area), sc = MLP.asd160Scope(perf, area);
+  if (ul){
+    if (MLP.perfIsUl(sc.standard)){ const c = ASD_CLS_FROM_PRESET(sc.standard) || 'SFD', n = MLP.NFPA_LIMITS[c] || {};
+      const sens = n.sens != null ? Math.min(A.ulSens, n.sens) : A.ulSens, tt = n.tt != null ? Math.min(A.ulTt, n.tt) : A.ulTt;
+      return { ul: true, cls: c, sens, tt, sensBy: sens < A.ulSens ? 'nfpa' : 'ul', ttBy: tt < A.ulTt ? 'nfpa' : 'ul', nfpaRef: c === 'SFD' ? 'NFPA 72' : 'NFPA 76', nfpaCite: n.ref, standard: sc.standard, isDefault: sc.isDefault }; }
+    return { ul: true, cls: cls || null, sens: A.ulSens, tt: A.ulTt, sensBy: 'ul', ttBy: 'ul', optIn: true, standard: sc.standard, isDefault: sc.isDefault };
+  }
+  const fam = sc.preset && sc.preset.family;
+  if (fam === 'FM'){ const l = cls && MLP.ASD160_FM_LIMITS[cls]; return { ul: false, fm: true, cls, sens: l ? l.sens : null, tt: l ? l.tt : null, standard: sc.standard }; }
+  const ul2 = sc.limits && cls && sc.limits[cls];
+  return { ul: false, cls, sens: ul2 && ul2.sens != null ? ul2.sens : null, tt: ul2 && ul2.tt != null ? ul2.tt : null, custom: true, standard: sc.standard };
+};
+/* R-AF2/R-AF3: AF nearest the .pl sensitivity without exceeding it, then step down until AF × sampling holes ≤ cap. */
+MLP.asd160DeriveAf = function (sens, nHoles, cap){
+  const t = MLP.MINILASER.afFire1; let af = null;
+  for (let a = 8; a >= 0; a--) if (sens == null || t[a] <= sens + 1e-12){ af = a; break; }
+  if (af == null) af = 0;
+  if (cap != null) while (af > 0 && t[af] * nHoles > cap + 1e-12) af--;
+  const fail = cap != null && t[af] * nHoles > cap + 1e-12;
+  return { af, fire1: t[af], holeSens: +(t[af] * nHoles).toFixed(4), fail };
+};
+const r2 = v => v == null ? '—' : (+v).toFixed(v < 0.1 ? 4 : 2).replace(/0+$/, '').replace(/\.$/, '');
+/* Full evaluation of one ASD-160 (rec from parsePl, or a device with .pipe). Issues: level 'error' | 'warn' | 'advisory' | 'incomplete'. */
+MLP.asd160Evaluate = function (rec, perf, area, opts){
+  const A = MLP.ASD160, o = opts || {}, pipe = rec.pipe || {}, issues = [];
+  const counts = MLP.asd160Holes(pipe), n = counts.sampling.length;
+  const worstH = counts.sampling.filter(h => h.sens != null).reduce((a, h) => (!a || h.sens > a.sens) ? h : a, null);
+  const worst = worstH ? worstH.sens : null;
+  const cls = MLP.asd160Class(pipe, o.cls);
+  const lim = MLP.asd160Limits(perf, area, cls.cls);
+  const transport = MLP.asd160Transport(pipe);
+  const sens = pipe.designSens;
+  const plAf = pipe.af, activated = String(pipe.afActivatedRaw || '').toLowerCase() === 'true';
+  let af;
+  if (activated && plAf != null) af = { af: plAf, src: '.pl', fire1: MLP.MINILASER.afFire1[plAf], fail: lim.sens != null && MLP.MINILASER.afFire1[plAf] * n > lim.sens + 1e-12 };
+  else { const d = MLP.asd160DeriveAf(sens, n, lim.sens); af = Object.assign(d, { src: 'derived per Brent rule' }); }
+  const len = pipe.lengthFt != null ? pipe.lengthFt : null;
+  const tt = transport.target;
+  const gov = by => by === 'nfpa' ? `UL 268 7th edition / ${lim.nfpaRef}` : 'UL 268 7th edition';
+  const rafs = [];
+  if (lim.ul){
+    const sensName = lim.sensBy === 'nfpa' ? `${lim.nfpaRef} ${lim.cls} ${r2(lim.sens)} %obs/ft` : 'UL 268 7th edition 1.28 %obs/ft';
+    const ttName = lim.ttBy === 'nfpa' ? `${lim.nfpaRef} ${lim.cls} ${lim.tt} s` : 'UL 268 7th edition 120 s';
+    if (worst != null && worst > lim.sens + 1e-12){ const m = `worst hole ${r2(worst)} %obs/ft exceeds ${sensName}`; issues.push({ level: 'error', msg: m }); rafs.push([lim.sensBy, m]); }
+    if (counts.all > A.ulHoles){ const m = `${counts.all} holes incl. end cap exceeds the UL maximum of 10 (Senator 25 Handbook p11)`; issues.push({ level: 'error', msg: m }); rafs.push(['ul', m]); }
+    if (len != null && len > A.ulLengthFt){ const m = `pipe length ${r2(len)} ft exceeds the UL 160 ft test length`; issues.push({ level: 'error', msg: m }); rafs.push(['ul', m]); }
+    if (tt != null && tt > lim.tt + 1e-9){ const m = `transport ${r2(tt)} s exceeds ${ttName}`; issues.push({ level: 'error', msg: m }); rafs.push([lim.ttBy, m]); }
+    if (af.fail){ const m = `even AF 0 (${MLP.MINILASER.afFire1[0]} × ${n} holes) exceeds ${r2(lim.sens)} %obs/ft — use fewer holes or redesign`; issues.push({ level: 'error', msg: m }); rafs.push([lim.sensBy, m]); }
+    const h = MLP.asd160DescHint(pipe.description);
+    if (h.standard && h.standard !== 'UL 268') rafs.push(['ul', `the .pl Description points to ${h.standard}`]);
+    rafs.forEach(([by, m]) => issues.push({ level: 'warn', msg: `This project is set to UL 268 7th edition, but this ASD-160 does not meet ${gov(by)} (Senator 25 Handbook p.vii): ${m}. Redesign, or set the project standard to the one the design follows.` }));
+  } else {
+    if (sens != null && !MLP.asd160InRange(sens)) issues.push({ level: 'error', msg: `Detector sensitivity ${r2(sens)} %obs/ft (${r2(MLP.asd160ToM(sens))} %obs/m) is outside the ASD-160 range 0.00914–7.62 %obs/ft (Senator 25 Handbook p3)` });
+    counts.sampling.forEach(hh => { if (hh.sens != null && hh.sens > A.rangeMax + A.tol + 1e-12) issues.push({ level: 'error', msg: `Hole ${hh.i} sensitivity ${r2(hh.sens)} %obs/ft is above the ASD-160 range 7.62 %obs/ft (Senator 25 Handbook p3)` }); });
+    if (tt != null && tt > A.maxTt + 1e-9) issues.push({ level: 'error', msg: `transport ${r2(tt)} s exceeds the ASD-160 maximum 120 s (Senator 25 Handbook p11)` });
+    if (!cls.cls) issues.push({ level: 'incomplete', msg: 'Class not stated in the .pl — pick one' });
+    else if (lim.sens == null) issues.push({ level: 'incomplete', msg: `No ${cls.cls} limits entered for ${lim.standard || 'this standard'} — enter and confirm them` });
+    if (lim.sens != null && worst != null && worst > lim.sens + 1e-12) issues.push({ level: 'error', msg: `worst hole ${r2(worst)} %obs/ft exceeds ${lim.fm ? 'FM' : lim.standard} ${cls.cls} ${r2(lim.sens)} %obs/ft` });
+    if (lim.tt != null && tt != null && tt > lim.tt + 1e-9) issues.push({ level: 'error', msg: `transport ${r2(tt)} s exceeds ${lim.fm ? 'FM' : lim.standard} ${cls.cls} ${lim.tt} s` });
+    if (af.fail) issues.push({ level: 'error', msg: `even AF 0 exceeds the ${cls.cls} limit ${r2(lim.sens)} %obs/ft — use fewer holes or redesign` });
+    if (len != null && len > A.maxLengthFt) issues.push({ level: 'warn', msg: `pipe length ${r2(len)} ft exceeds the ASD-160 general maximum 165 ft (still air, Senator 25 Handbook p3)` });
+    if (counts.all > A.ulHoles){ const v = MLP.asd160PipecadValid(rec, lim);
+      if (v.ok) issues.push({ level: 'advisory', msg: `${counts.all} holes on one pipe run — Senator 25 Handbook p11 says each pipe run 'should not have more than 10 holes (including the end cap hole)'; accepted because the PipeCAD design validates` });
+      else issues.push({ level: 'error', msg: `${counts.all} holes on one pipe run and the PipeCAD design does not validate (${v.reason}) — Senator 25 Handbook p11` }); }
+  }
+  return { af, cls, ul: lim.ul, limits: lim, counts: { sampling: n, all: counts.all }, worst, worstHole: worstH ? worstH.i : '', transport, issues };
+};
+/* C1 #35 "PipeCAD proves validity" — criteria (1)–(5) */
+MLP.asd160PipecadValid = function (rec, lim){
+  const p = rec.pipe || {}, h = MLP.asd160Holes(p), tr = MLP.asd160Transport(p);
+  if (String(p.resultsValid).toLowerCase() !== 'true') return { ok: false, reason: 'resultsValid is not true' };
+  if (!p.hasResults) return { ok: false, reason: 'no PipeCAD results for this detector' };
+  if (p.balance == null || p.balanceMinLimit == null || p.balance < p.balanceMinLimit) return { ok: false, reason: 'hole balance below balanceMinLimit' };
+  if (h.sampling.some(x => x.sens != null && ((lim && lim.sens != null && x.sens > lim.sens + 1e-12) || !MLP.asd160InRange(x.sens)))) return { ok: false, reason: 'a hole sensitivity exceeds the class limit or detector range' };
+  if (tr.target != null && ((p.maxTransit != null && tr.target > p.maxTransit) || (lim && lim.tt != null && tr.target > lim.tt))) return { ok: false, reason: 'transport exceeds maxTransitTime or the class limit' };
+  return { ok: true };
+};
+/* §7d level prefill and checks (Aux/Pre-Alarm/Fire/Fire 2 — detector levels, %obs/ft) */
+MLP.asd160ConfigSeed = function (af, settings){
+  const s = Object.assign({ fire1: 10, action: 5, alert: 2 }, settings || {}), f1 = MLP.MINILASER.afFire1[af == null ? 0 : af];
+  const T = MLP.TYPICAL_DEFAULTS || {}, pick = k => (T[k] != null ? T[k] : (MLP.CONFIG_FIELDS.find(f => f.k === k || f.key === k) || {}).def);
+  return { fire1: f1, action: +((s.action / s.fire1) * f1).toFixed(5), alert: +((s.alert / s.fire1) * f1).toFixed(5), fire2: null,
+    actionDly: pick('actionDly') != null ? pick('actionDly') : 5, fire1Dly: pick('fire1Dly') != null ? pick('fire1Dly') : 5,
+    flowLow: 20, flowHigh: 20, flowDly: 120, seeded: 'worksheet default — verify (' + MLP.ASD160_WORKSHEET + ')' };
+};
+MLP.asd160ConfigIssues = function (v){
+  const out = [], num = x => (x === '' || x == null) ? null : +x;
+  const a = num(v.alert), p = num(v.action), f1 = num(v.fire1), f2 = num(v.fire2);
+  const seq = [['Aux', a], ['Pre-Alarm', p], ['Fire', f1], ['Fire 2', f2]].filter(x => x[1] != null);
+  for (let i = 1; i < seq.length; i++) if (!(seq[i][1] > seq[i - 1][1])) out.push({ level: 'error', msg: `${seq[i][0]} (${seq[i][1]}) must be above ${seq[i - 1][0]} (${seq[i - 1][1]}) — Aux < Pre-Alarm < Fire < Fire 2` });
+  if (f2 == null) out.push({ level: 'incomplete', msg: 'Fire 2 not set — enter it (detector level, %obs/ft)' });
+  else if (!MLP.asd160InRange(f2)) out.push({ level: 'error', msg: `ASD-160 Fire 2 ${f2} %obs/ft is outside the detector range 0.00914–7.62 (D4 Table 1 p3)` });
+  [['actionDly', 'Pre-Alarm delay', 0, 90], ['fire1Dly', 'Fire delay', 0, 90], ['flowLow', 'Flow low', 0, 20], ['flowHigh', 'Flow high', 0, 20], ['flowLow2', 'Flow low 2', 0, 30], ['flowHigh2', 'Flow high 2', 0, 30], ['flowDly', 'Flow fault delay', 0, 240]]
+    .forEach(([k, l, lo, hi]) => { const x = num(v[k]); if (x != null && (x < lo || x > hi)) out.push({ level: 'error', msg: `${l} ${x} is outside ${lo}–${hi}` }); });
+  return out;
+};
+
 root.MLP = MLP;
 if (typeof module !== 'undefined' && module.exports) module.exports = MLP;
 })(typeof window !== 'undefined' ? window : globalThis);

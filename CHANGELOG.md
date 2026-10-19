@@ -8,6 +8,20 @@ and reset when minor/major changes. This file is generated from the calculator's
 own in-app Amendment Log (Help → Revision Log) — that log is the source of truth;
 regenerate this file from it rather than hand-editing both.
 
+## 02.02 — 2026-10-19
+
+### 02.02.000 — 2026-10-19 (local build, not released)
+- **Brand selector (Edwards | Kidde Commercial).** First field in Project Settings; part numbers, supply labels, BOM, logos and report titles follow the brand; the last choice is remembered for new projects.
+- **Per-sheet supply variant** (120 V / 220–230 V / ULC), tamper and seismic accessories, and **FACU powers these ASDs** with a power-source prompt (in-house / third-party / unidentified — unidentified keeps the sheet Incomplete).
+- **ASD-160 (Micra25 / Senator 25).** + Add ASD-160 and PipeCAD .pl import (MICRA25): 250 mA, dedicated AUX circuit, Remote configuration, networked address 1–127; UL scopes cap SFD/OAP at 1.28 %obs/ft with R-AF7.
+- **Battery 12V6A5 (7.2 Ah)** is manual-only, with a too-small advisory.
+- **AUX/ribbon rules.** Max 4 AUX per power supply; each ribbon run holds max 4 detectors + 1 display; a detector-started run counts that detector; hybrid clusters may use any number of runs; own-AUX modules are not runs. FAQ text no longer says "2-segment/4-follower".
+- **View menu check marks** for Project Settings bar, Sheet sidebar and Results panel.
+- **Help revised** with current screenshots, captured headless from the built app with example data (dark UI). New How Do I and FAQ topics: brand, ASD-160, Print Quick Start, ribbon/AUX limits, 12V6A5, 1.28 cap.
+- **Help ▸ Print Quick Start.** 2-page letter Quick Start with numbered steps and screenshots, KGS print palette, printed from its own document (no Help chrome).
+- Shared modules: modulaser-project.js 1.6.0, MASD engine 1.2.0. Hash policy: new fields at their defaults are stripped, so unchanged 02.01.000 files keep their hash.
+- Service-worker cache bumped to `modulaser-calc-v54`.
+
 ## 02.01 — 2026-10-16
 
 ### 02.01.000 — 2026-10-16 (released 2026-10-17; QA/Auditor GO on c59a78c)

@@ -5,7 +5,7 @@
    MASD_ENGINE_VERSION and the revision of BOTH apps, with matching
    Revision-log notes that name the engine version.
    ===================================================================== */
-const MASD_ENGINE_VERSION = '1.1.0';
+const MASD_ENGINE_VERSION = '1.2.0';   // 1.2.0: explicit supply lookup (no '6A'→'10A' string swap), battery family/fit keys, 12V6A5 (manual only), brand-aware hardware via MLP 1.6.0
 const MASD_ENGINE = {
   version: MASD_ENGINE_VERSION,
   /* BS 5839-1 Annex E: D = 1 when the battery 20-hour rate (Ah / 20) meets the alarm current, else 1.75. */
@@ -89,16 +89,17 @@ const TEMPERATURE_MULTIPLIERS = { 77: 1.00, 68: 1.04, 50: 1.14, 32: 1.30, 14: 1.
 
 const BATTERY_SIZE_OPTIONS = [10, 12, 18, 26, 40, 50, 65];
 const BATTERY_MODELS = [
-  { model: "12V10A", ah: 10.5, supply: "BPS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
-  { model: "12V17A", ah: 18,   supply: "APS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
-  { model: "12V24A", ah: 26,   supply: "APS6A", enclosure: "None — fits in supply enclosure", cls: "good" },
-  { model: "12V40A", ah: 40,   supply: "BPS6A", enclosure: "BC-1", cls: "good" },
-  { model: "12V50A", ah: 50,   supply: "BPS6A", enclosure: "SSU00507", cls: "good",
+  { model: "12V6A5", ah: 7.2,  supply: "BPS6A", family: "BPS", fit: "supply", manualOnly: true, enclosure: "None — fits in supply enclosure", cls: "good" },
+  { model: "12V10A", ah: 10.5, supply: "BPS6A", family: "BPS", fit: "supply", enclosure: "None — fits in supply enclosure", cls: "good" },
+  { model: "12V17A", ah: 18,   supply: "APS6A", family: "APS", fit: "supply", enclosure: "None — fits in supply enclosure", cls: "good" },
+  { model: "12V24A", ah: 26,   supply: "APS6A", family: "APS", fit: "supply", enclosure: "None — fits in supply enclosure", cls: "good" },
+  { model: "12V40A", ah: 40,   supply: "BPS6A", family: "BPS", fit: "bc1", enclosure: "BC-1", cls: "good" },
+  { model: "12V50A", ah: 50,   supply: "BPS6A", family: "BPS", fit: "cabinet", enclosure: "SSU00507", cls: "good",
     cabinetOptions: [
       { value: "edwards", label: "Edwards 3-RCC7R", enclosure: "3-RCC7R" },
       { value: "spaceage", label: "Space Age SSU00507", enclosure: "SSU00507" }
     ] },
-  { model: "12V65A", ah: 65,   supply: "BPS6A", enclosure: "SSU00507", cls: "good",
+  { model: "12V65A", ah: 65,   supply: "BPS6A", family: "BPS", fit: "cabinet", enclosure: "SSU00507", cls: "good",
     cabinetOptions: [
       { value: "edwards", label: "Edwards 3-RCC7R with 3-BATS (battery shelf)", enclosure: "3-RCC7R + 3-BATS (battery shelf)" },
       { value: "spaceage", label: "Space Age SSU00507", enclosure: "SSU00507" }
@@ -110,19 +111,29 @@ const MAX_MODULES_PER_NETWORK = 127;
 const MAX_DISPLAYS_PER_NETWORK = 63;
 function pad2(n){ return String(n).padStart(2, "0"); }
 
+/* 1.2.0: a manual pick resolves an exact catalog Ah first (so 7.2 → 12V6A5), else the next larger Auto model. */
+function pickBatteryModelManual(ah){
+  const exact = BATTERY_MODELS.find(b => Math.abs(b.ah - ah) < 1e-9); return exact || pickBatteryModel(ah);
+}
 // Resolves a desired/required Ah value to the next-larger available battery model (never smaller)
 function pickBatteryModel(requiredAh){
-  for (const b of BATTERY_MODELS) if (b.ah >= requiredAh) return b;
+  for (const b of BATTERY_MODELS) if (!b.manualOnly && b.ah >= requiredAh) return b;   // 1.2.0: Auto never picks 12V6A5 (C1 #58)
   return null;
 }
-function hardwareFromModel(batteryModel, capacity, cabinetChoice){
+const SUPPLY_PARTS = { APS: { 6: "APS6A", 10: "APS10A" }, BPS: { 6: "BPS6A", 10: "BPS10A" } };
+/* opts (1.2.0, optional): { brand, variant } — resolved through MLP.supplyPart when the shared module is loaded; Edwards 120V otherwise. */
+function hardwareFromModel(batteryModel, capacity, cabinetChoice, opts){
   if (!batteryModel){
     return { supply: null, enclosure: null, batteryPart: null, cls: "danger", error: `Exceeds largest available battery model (12V65A, 65 Ah) — add power supplies or reduce battery size` };
   }
-  const supplyName = (capacity === 10) ? batteryModel.supply.replace('6A', '10A') : batteryModel.supply;
+  const o = opts || {}, amps = capacity === 10 ? 10 : 6, fam = batteryModel.family || (/^APS/.test(batteryModel.supply) ? 'APS' : 'BPS');
+  const M = (typeof MLP !== 'undefined' && MLP.supplyPart) ? MLP : null;
+  const sp = M ? M.supplyPart(o.brand, fam, amps, o.variant) : { pn: SUPPLY_PARTS[fam][amps], note: '' };
+  const supplyName = sp.pn;
   let enclosureLabel = batteryModel.enclosure;
   if (batteryModel.cabinetOptions){
-    const chosen = batteryModel.cabinetOptions.find(o => o.value === cabinetChoice) || batteryModel.cabinetOptions[0];
+    const def = M && M.BRANDS ? M.BRANDS[M.brandOf(o.brand)].cabinetDefault : 'edwards';
+    const chosen = batteryModel.cabinetOptions.find(x => x.value === cabinetChoice) || batteryModel.cabinetOptions.find(x => x.value === def) || batteryModel.cabinetOptions[0];
     enclosureLabel = chosen.enclosure;
   }
   return {
@@ -130,7 +141,8 @@ function hardwareFromModel(batteryModel, capacity, cabinetChoice){
     enclosure: enclosureLabel,
     batteryPart: `2 × ${batteryModel.model} per ${supplyName}${enclosureLabel.indexOf("None") !== 0 ? " (" + enclosureLabel + ")" : ""} — ${batteryModel.ah} Ah rated`,
     cls: batteryModel.cls,
-    cabinetOptions: batteryModel.cabinetOptions || null
+    cabinetOptions: batteryModel.cabinetOptions || null,
+    family: fam, amps, variant: sp.variant || '120', supplyNote: sp.note || '', manualOnly: !!batteryModel.manualOnly
   };
 }
 
@@ -198,6 +210,10 @@ function plParse(text, fileName){
       rec.fp = plFnv([rec.origName, rec.typeRaw, rec.fan, rec.x.toFixed(2), rec.y.toFixed(2)].join('|'));
       if (typeRaw === 'SOLO'){   // 1.1.0: MiniLaser — kept out of the ModuLaser PSU/cluster suggestion; placed in the sheet's Standalone ASD table
         rec.kind = 'minilaser'; rec.type = 'MiniLaser'; rec.address = ''; rec.fan = (fan >= 1 && fan <= 10) ? fan : null;
+        g.miniLasers.push(rec); return;
+      }
+      if (typeRaw === 'MICRA25' || plTxt(d, 'DetectorType') === 'MICRA25'){   // 1.2.0: ASD-160 (Micra25 / Senator 25) — sheet's ASD table, not a cluster member
+        rec.kind = 'asd160'; rec.type = 'ASD-160'; rec.fan = null;
         g.miniLasers.push(rec); return;
       }
       if (!rec.type){ out.skipped.push(`${gname}: “${name}” has unknown type “${typeRaw || 'blank'}” — skipped`); return; }

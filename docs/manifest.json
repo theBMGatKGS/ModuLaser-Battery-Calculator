@@ -1,7 +1,7 @@
 {
   "name": "ModuLaser Battery Calculator",
   "short_name": "ModuLaser Calc",
-  "description": "Current draw & standby battery sizing for ModuLaser aspirating smoke detection — BPS6A / APS6A power supplies.",
+  "description": "Current draw & standby battery sizing for ModuLaser aspirating smoke detection — Edwards and Kidde Commercial power supplies.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

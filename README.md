@@ -201,3 +201,7 @@ can produce.
 - `app/modulaser_battery_calculator.html` — the calculator itself
 - `build/icon.ico` / `icon.icns` / `icon.png` — app icons for Windows/macOS/Linux
 - `package.json` — dependencies + electron-builder configuration
+
+## What's new in 02.02.000
+
+Edwards and Kidde Commercial brands, ASD-160 (Micra25 / Senator 25) support, AUX/ribbon rules (max 4 AUX per supply; max 4 detectors + 1 display per ribbon run), and a printable Quick Start (Help → Print Quick Start). See RELEASE_NOTES.md.

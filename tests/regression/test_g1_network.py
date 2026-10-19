@@ -31,7 +31,7 @@ async def main():
     nets=[d.get('network') for d in devs]
     ok('.mlproj devices carry network (104 on 1, 26 on 2)', nets.count(1)==104 and nets.count(2)==26, (nets.count(1),nets.count(2)))
     ok('shared validator: no duplicate errors across networks', not await pg.evaluate("MLP.validateDesign(mlpBuildDesign()).length"), await pg.evaluate("MLP.validateDesign(mlpBuildDesign()).slice(0,2)"))
-    ok('MLP 1.5.1 in the app', await pg.evaluate("MLP.VERSION")=='1.5.1')
+    ok('MLP 1.6.0 in the app', await pg.evaluate("MLP.VERSION")=='1.6.0')
     fp=OUT+TAG+'two-net.mlproj.json'; open(fp,'w').write(txt)
     rp,rerr,dlg,dis=await report_import(b, fp)
     ok('Report: 130-module 2-network design is not blocked', not dis and 'Import is blocked' not in dlg, dlg[:300])
