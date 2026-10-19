@@ -4721,12 +4721,13 @@ function recalcLocationInner(loc){
   // ---- Power / ribbon-segment assignment ----
   // Every display is an entry point. Detectors can be entry points ("own circuit") or
   // follow another module in the same cluster via ribbon. A ribbon segment = one entry
-  // point + its followers. Limits: <=4 followers per segment, <=2 ribbon-connected portions per cluster.
-  // 02.01.001 (Brent 10-19): a module on its own AUX circuit with no ribbon followers is NOT a ribbon portion
-  // (up to 4 AUX per supply, any module, ribbon or not; hybrid clusters may AUX any or all modules).
-  // A ribbon portion = the cluster's display segment (always) or any entry point with >= 1 follower.
-  const isRibbonPortion = seg => seg.followerRows.length > 0 || MODULE_TYPES[seg.entryRow.querySelector('.type-select').value].kind === 'display';
-  const ribbonPortionCount = segs => (segs || []).filter(isRibbonPortion).length;
+  // point + its followers (a "ribbon run").
+  // 02.01.001 (Brent 10-19 12:53 PM CT): each ribbon run is limited to max 4 connected Detector Modules + 1 display;
+  // a hybrid cluster may have any number of runs as long as each run is within that limit and the cluster total
+  // stays within the cluster limit. Up to 4 AUX per power supply. A module on its own AUX with no ribbon is never a run.
+  const RUN_MAX_DETECTORS = 4, RUN_MAX_DISPLAYS = 1;
+  const kindOf = r => MODULE_TYPES[r.querySelector('.type-select').value].kind;
+  const runCounts = seg => { const all = [seg.entryRow, ...seg.followerRows]; return { det: all.filter(r => kindOf(r) === 'detector').length, disp: all.filter(r => kindOf(r) !== 'detector').length }; };
   const mode = locEl.querySelector('.mode-radio:checked').value;
   const ribbonAutoMode = (locEl.querySelector('.ribbon-assign-mode')?.value || 'auto') === 'auto';
   const ribbonSegmentsByCluster = {}; // clusterNum -> [ { entryRow, entryLabel, followerRows: [] }, ... ]
@@ -4853,18 +4854,11 @@ function recalcLocationInner(loc){
     pSel.innerHTML = opts;
     if (ribbonAutoMode){
       // Auto: always pick the first entry point in this cluster with room to follow (display first,
-      // then earlier-created detector entry points in order); if none has room and the cluster hasn't
-      // reached its 2-segment cap, this detector becomes a new entry point. Overrides any prior choice.
+      // then earlier-created detector entry points in order) whose run has fewer than 4 detectors; if none has
+      // room, this detector becomes a new entry point (a new run). No per-cluster run cap (Brent 10-19 12:53 PM CT).
       const segPool = ribbonSegmentsByCluster[myClusterNum];
-      const openSeg = segPool.find(seg => seg.entryRow !== row && seg.followerRows.length < 4 && (isRibbonPortion(seg) || ribbonPortionCount(segPool) < 2));
-      if (openSeg){
-        pSel.value = `follow:${openSeg.entryRow.id}`;
-      } else if (ribbonPortionCount(ribbonSegmentsByCluster[myClusterNum]) < 2){
-        pSel.value = 'own';
-      } else {
-        // Ribbon connections aren't supported here (segment cap reached) — must be its own circuit.
-        pSel.value = 'own';
-      }
+      const openSeg = segPool.find(seg => seg.entryRow !== row && runCounts(seg).det < RUN_MAX_DETECTORS);
+      pSel.value = openSeg ? `follow:${openSeg.entryRow.id}` : 'own';
     } else if (prevVal && prevVal !== 'own' && prevVal.indexOf('follow:') === 0){
       // Off: honor the user's prior manual choice; fall back to own only if it's no longer valid.
       const target = prevVal.slice(7);
@@ -5002,26 +4996,19 @@ function recalcLocationInner(loc){
   }
 
   // Ribbon segment validation
-  const oversizedSegments = [];
-  const overcountClusters = [];
+  const oversizedRuns = [];
   Object.keys(ribbonSegmentsByCluster).forEach(cnKey => {
     const cn = parseInt(cnKey);
-    const segs = ribbonSegmentsByCluster[cnKey] || [];
-    segs.forEach(seg => {
-      if (seg.followerRows.length > 4){
-        oversizedSegments.push(`Cluster ${pad2(cn)} (${seg.followerRows.length} ribbon-connected detectors on one segment)`);
+    (ribbonSegmentsByCluster[cnKey] || []).forEach(seg => {
+      if (seg.followerRows.length === 0) return; // own AUX, no ribbon: not a run
+      const c = runCounts(seg);
+      if (c.det > RUN_MAX_DETECTORS || c.disp > RUN_MAX_DISPLAYS){
+        oversizedRuns.push(`Cluster ${pad2(cn)}, run from ${labelFor(seg.entryRow)} (${c.det} Detector Module${c.det === 1 ? '' : 's'}${c.disp ? ` + ${c.disp} display` : ''})`);
       }
     });
-    const portions = ribbonPortionCount(segs);
-    if (portions > 2){
-      overcountClusters.push(`Cluster ${pad2(cn)} (${portions} ribbon-connected portions)`);
-    }
   });
-  if (oversizedSegments.length){
-    flags.push(`Ribbon segment exceeds the max of 4 detectors per display: ${oversizedSegments.join(', ')} — reassign extra detectors to a separate segment or a new cluster.`);
-  }
-  if (overcountClusters.length){
-    flags.push(`Cluster exceeds 2 ribbon-connected portions: ${overcountClusters.join(', ')} — a cluster may have at most 2 ribbon-connected portions; modules on their own AUX circuit with no ribbon connection don't count.`);
+  if (oversizedRuns.length){
+    flags.push(`Ribbon run exceeds the max of 4 Detector Modules + 1 display: ${oversizedRuns.join('; ')} — move extra detectors to another ribbon run or their own AUX circuit.`);
   }
 
   // Missing circuit-source on any entry point
@@ -6361,7 +6348,7 @@ function qsWireframe(slot){
       inp(10, 78, 180, 22, 'Circuit source', 'PS-1 AUX-2') +
       `<rect x="200" y="78" width="190" height="22" rx="3" fill="#f0f0ec" stroke="#bbb" stroke-dasharray="3,2"/><text x="295" y="93" text-anchor="middle" font-size="8" fill="#999" font-style="italic">hidden when following ribbon</text>` +
       `<text x="10" y="125" font-size="8" fill="#666">Displays are always entry points; each detector picks Own circuit or Follows another module in the same cluster.</text>` +
-      `<text x="10" y="138" font-size="8" fill="#666">Ribbon segment = 1 entry point + up to 4 followers. Up to 2 ribbon portions per cluster; own-AUX modules don't count.</text>`);
+      `<text x="10" y="138" font-size="8" fill="#666">Ribbon run = 1 entry point + its followers. Each run max 4 detectors + 1 display; own-AUX modules aren't runs.</text>`);
 
     case '6-fan-and-mode': return shell(defs +
       inp(20, 30, 140, 22, 'Fan Speed (from PipeCAD)', '8 ▾') +
