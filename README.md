@@ -6,6 +6,10 @@
 Wraps the calculator in a real desktop window for Windows and macOS, with
 its own icon, taskbar/dock entry, and Start Menu / Applications shortcut.
 
+## What's new in 02.02.000
+
+Edwards and Kidde Commercial brands, ASD-160 (Micra25 / Senator 25) support, AUX/ribbon rules (max 4 AUX per supply; max 4 detectors + 1 display per ribbon run), and a printable Quick Start (Help → Print Quick Start). See RELEASE_NOTES.md.
+
 ## What's new in 02.01.000 (released 2026-10-17)
 
 - **MiniLaser ASD (FHSD8075-ULF) support (Brent 10-16).** Each sheet has a separate **Standalone ASDs** table: a MiniLaser is never addressed, isn't on SenseNET and can be on any sheet. Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA (standby = alarm).
@@ -201,7 +205,3 @@ can produce.
 - `app/modulaser_battery_calculator.html` — the calculator itself
 - `build/icon.ico` / `icon.icns` / `icon.png` — app icons for Windows/macOS/Linux
 - `package.json` — dependencies + electron-builder configuration
-
-## What's new in 02.02.000
-
-Edwards and Kidde Commercial brands, ASD-160 (Micra25 / Senator 25) support, AUX/ribbon rules (max 4 AUX per supply; max 4 detectors + 1 display per ribbon run), and a printable Quick Start (Help → Print Quick Start). See RELEASE_NOTES.md.

@@ -14,6 +14,8 @@ async def main():
     if TB:
       qh=open(os.path.join(os.path.dirname(APP.replace('file://','')),'quickstart.html')).read()
       ok('Toolbox quickstart.html: 02.02.000 screenshots, 00.03.000, new AUX/ribbon rule', qh.count('data-shot="02.02.000"')>=2 and '00.03.000' in qh and '4 detectors + 1 display per ribbon run' in qh)
+      tbm=await pg.evaluate("[...document.querySelectorAll('img[data-qs-slot=\"view-menu\"], img[data-qs-slot=\"11-confirm-defaults\"]')].map(i=>i.dataset.shotSrc||'')")
+      ok('Toolbox Help shows the Toolbox’s own View and Edit menus (QA F10)', tbm and all(x in ('tb-view-menu','tb-edit-menu') for x in tbm), tbm)
       ok('Toolbox in-app Quick Start has the screenshots', await pg.evaluate("document.querySelectorAll('#help-tb-quickstart img.tbq-shot').length")>=2)
     if not TB:
       shots=await pg.evaluate("[...document.querySelectorAll('img[data-qs-slot]')].filter(i=>(i.getAttribute('src')||'').startsWith('data:image/jpeg')).map(i=>i.dataset.qsSlot)")
