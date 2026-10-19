@@ -1065,6 +1065,8 @@
   .menubar-menu{ position:absolute; right:0; top:calc(100% + 4px); min-width:250px; background:#000; color:#fff; border:1px solid #455160; border-radius:6px; padding:4px; z-index:5000; box-shadow:0 10px 30px rgba(0,0,0,.6); }
   .menubar-menu[hidden]{ display:none; }
   .menubar-menu [role="menuitem"], .menubar-menu [role="menuitemcheckbox"]{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:#000; color:#fff; border:0; border-radius:4px; padding:7px 10px; font:inherit; font-size:13px; cursor:pointer; box-sizing:border-box; }
+  .menubar-menu .mi-check{ display:inline-block; width:14px; flex:0 0 14px; text-align:center; color:#7fd17f; font-weight:700; }
+  .menubar-menu [aria-checked="false"] .mi-check{ visibility:hidden; }
   .menubar-menu [role="menuitem"]:hover, .menubar-menu [role="menuitem"]:focus, .menubar-menu [role="menuitemcheckbox"]:hover, .menubar-menu [role="menuitemcheckbox"]:focus{ background:#1f3550; outline:none; }
   .menubar-menu .mi-kbd{ margin-left:auto; color:var(--text-faint); font-size:11px; }
   .menubar-menu hr{ border:0; border-top:1px solid #2a323b; margin:4px 2px; }
@@ -1342,9 +1344,9 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-view-btn">
             <button role="menuitem" id="cluster-report-btn">Cluster Report</button>
             <hr>
-            <button role="menuitem" id="view-settings-btn" title="Expand or collapse the Project Settings bar">Project Settings bar</button>
-            <button role="menuitem" id="view-sidebar-btn" title="Show or hide the power supply sheet list">Sheet sidebar</button>
-            <button role="menuitem" id="view-results-btn" title="Show or hide the live results panel">Results panel</button>
+            <button role="menuitemcheckbox" aria-checked="true" id="view-settings-btn" title="Expand or collapse the Project Settings bar"><span class="mi-check" aria-hidden="true">✓</span>Project Settings bar</button>
+            <button role="menuitemcheckbox" aria-checked="true" id="view-sidebar-btn" title="Show or hide the power supply sheet list"><span class="mi-check" aria-hidden="true">✓</span>Sheet sidebar</button>
+            <button role="menuitemcheckbox" aria-checked="true" id="view-results-btn" title="Show or hide the live results panel"><span class="mi-check" aria-hidden="true">✓</span>Results panel</button>
           </div>
         </div>
         <div class="menubar-item">
@@ -8362,7 +8364,7 @@ function wireMenuBar(){
         e.preventDefault(); const cb = document.activeElement.querySelector('input'); cb.checked = !cb.checked; cb.dispatchEvent(new Event('change', { bubbles: true }));
       }
     });
-    menuOf(it).addEventListener('click', e => { if (e.target.closest('button[role="menuitem"]')) closeAll(); });
+    menuOf(it).addEventListener('click', e => { if (e.target.closest('button[role="menuitem"], button[role="menuitemcheckbox"]')) closeAll(); });
   });
   document.addEventListener('click', e => { if (!bar.contains(e.target)) closeAll(); });
   const on = (id, fn) => { const el = document.getElementById(id); if (el) el.addEventListener('click', fn); };
@@ -9042,6 +9044,15 @@ function v2UpdateCounter(inp, c){ const n = inp.value.length; c.textContent = n 
 function v2SetPanel(which, open){
   document.body.classList.toggle(which + '-closed', !open);
   try { localStorage.setItem('ml_v2_' + which, open ? '1' : '0'); } catch (e) {}
+  v2SyncViewChecks();
+}
+// 02.02.000 (Brent 10-19 12:35 PM CT): View menu shows a check on each panel that is currently on.
+function v2SyncViewChecks(){
+  const set = (id, on) => { const b = document.getElementById(id); if (b) b.setAttribute('aria-checked', String(!!on)); };
+  const bar = document.getElementById('proj-settings');
+  set('view-settings-btn', bar && !bar.classList.contains('collapsed'));
+  set('view-sidebar-btn', !document.body.classList.contains('sidebar-closed'));
+  set('view-results-btn', !document.body.classList.contains('results-closed'));
 }
 function v2ToggleSettings(force){
   const bar = document.getElementById('proj-settings');
@@ -9049,6 +9060,7 @@ function v2ToggleSettings(force){
   bar.classList.toggle('collapsed', !open);
   document.getElementById('proj-settings-toggle').setAttribute('aria-expanded', String(open));
   try { localStorage.setItem('ml_v2_settings', open ? '1' : '0'); } catch (e) {}
+  v2SyncViewChecks();
 }
 function wireV2Shell(){
   document.body.classList.add('v2');
@@ -9059,6 +9071,7 @@ function wireV2Shell(){
   if (pref('sidebar') === '0') v2SetPanel('sidebar', false);
   if (pref('results') === '0') v2SetPanel('results', false);
   if (window.matchMedia && window.matchMedia('(max-width: 820px)').matches){ v2SetPanel('sidebar', false); v2SetPanel('results', false); }
+  v2SyncViewChecks();
   document.getElementById('proj-settings-toggle').addEventListener('click', () => v2ToggleSettings());
   document.getElementById('proj-settings').addEventListener('click', e => { const b = e.target.closest('[data-goto]'); if (b){ const el = document.getElementById('location-' + b.dataset.goto); if (el){ setCurrentLocation(el); v2Refresh(); } } });
   document.getElementById('sb-list').addEventListener('click', e => {
