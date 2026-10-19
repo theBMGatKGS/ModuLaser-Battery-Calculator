@@ -9,7 +9,7 @@ async def main():
     b=await p.chromium.launch(); pg=await b.new_page(viewport={'width':1440,'height':1000}); errs=[]
     pg.on('pageerror',lambda e: errs.append(str(e)))
     await pg.goto(APP); await pg.evaluate('localStorage.clear()'); await pg.reload(); await pg.wait_for_timeout(800)
-    TB='Toolbox' in APP
+    TB=os.environ.get('TARGET','').lower()=='toolbox' or 'Toolbox' in APP
     ok('Help menu has Print Quick Start', await pg.evaluate("!!document.querySelector('[aria-labelledby=menu-help-btn] #qs-print-btn') && document.getElementById('qs-print-btn').textContent==='Print Quick Start'"))
     if TB:
       qh=open(os.path.join(os.path.dirname(APP.replace('file://','')),'quickstart.html')).read()

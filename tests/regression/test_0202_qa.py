@@ -15,7 +15,7 @@ SHEET = r'''([types, fresh])=>{ const pre=[...document.querySelectorAll('.locati
 INFO = r'''(loc)=>{ const l=document.getElementById('location-'+loc); const rows=[...l.querySelectorAll('[data-role=module]')];
   return { types: rows.map(r=>r.querySelector('.type-select').value), power: rows.map(r=>r.querySelector('.power-select').value.replace(/follow:.*/,'f')),
     opts: rows.map(r=>[...r.querySelector('.power-select').options].map(o=>o.value.replace(/follow:.*/,'f'))), aux: rows.map(r=>(r.querySelector('.aux-circuit-num')||{}).value||''),
-    flags: [...l.querySelectorAll('.flags-list li')].filter(x=>!x.closest('[hidden]')).map(x=>x.textContent), status: v2SheetModel(l).status,
+    flags: [...l.querySelectorAll('.flags-list li')].filter(x=>!x.closest('[hidden]')).map(x=>x.textContent), mflags: [...l.querySelectorAll('.icb-list li')].map(x=>x.textContent), status: v2SheetModel(l).status,
     batt: l.querySelector('.battery-size-select').value, label: v2SheetModel(l).batteryLabel || '' }; }'''
 async def main():
   async with async_playwright() as p:
@@ -58,7 +58,9 @@ async def main():
     big = await pg.evaluate(SHEET, [['Standard Display'] + ['Detector'] * 8, True])
     await pg.evaluate("(loc)=>{const l=document.getElementById('location-'+loc); const h=l.querySelector('.standby-hours'); h.value='90'; h.dispatchEvent(new Event('input',{bubbles:true})); recalcLocation(loc); recalcLocation(loc);}", big)
     ib = await pg.evaluate(INFO, big)
-    ok('F8: a built-in sheet needing more than one supply FAILS (never silently becomes 2 supplies sharing AUX 1–4)', ib['status'] == 'fail' and ib['label'] != '' , [ib['status'], ib['label']])
+    ERR='exceeds the largest available battery'
+    hit=[x for x in ib['flags']+ib['mflags'] if ERR in x]
+    ok('F8: a built-in sheet needing more than one supply FAILS with the battery-exceeds error (never silently becomes 2 supplies sharing AUX 1–4)', ib['status'] == 'fail' and hit and 'Required battery capacity' in hit[0], [ib['status'], hit[:1], ib['flags'][:2], ib['mflags'][:2]])
     ok('no page errors', not errs, errs[:3])
     await b.close()
   print(f"{sum(R)}/{len(R)} passed"); sys.exit(0 if all(R) else 1)
