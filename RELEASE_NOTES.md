@@ -2,7 +2,7 @@
 
 Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELOG.md) and Help → Revision Log.
 
-## v02.02.000 — Brands, ASD-160 and printable Quick Start (2026-10-19) · not released
+## v02.02.000 — Brands, ASD-160 and printable Quick Start (2026-10-19) · released 2026-10-19
 
 ### Recent improvements
 - **Manual battery or capacity pick turns Auto Battery Sizing off** (with a toast); the controls stay selectable in Auto.
@@ -20,6 +20,12 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 - **Help revised** with current screenshots, captured headless from the built app with example data (dark UI). New How Do I and FAQ topics: brand, ASD-160, Print Quick Start, ribbon/AUX limits, 12V6A5, 1.28 cap.
 - **Help ▸ Print Quick Start.** 2-page letter Quick Start with numbered steps and screenshots, KGS print palette, printed from its own document (no Help chrome).
 - Shared modules: modulaser-project.js 1.6.0, MASD engine 1.2.0. Hash policy: new fields at their defaults are stripped, so unchanged 02.01.000 files keep their hash.
+
+### QA audit
+- **QA/Auditor verdict: GO (final)** (2026-10-19, on Calculator 4f4c5e5 / Toolbox 7cd58c1 / Report 3303031; `qa/qa-build-review-02.02.000.md`). Brent approved the release 2026-10-19 3:59 PM CT.
+- **Findings fixed before release:** F4 UI test that Auto never picks 12V6A5; F6 plan/decisions log completed (C1 #59–#67, plan rev 4.23c); F8 ribbon scope documented; F10 Toolbox Help uses Toolbox-specific menu shots; F11 two Help images replaced to show what the text names; F12 stale Report FAQ versions; Quick Start step 9 nit; paperwork (verbatim quotes).
+- **Suites green:** 37 suites, 986 checks, 0 FAIL, 0 SKIP (Calculator, Toolbox and Report, including the Calculator 02.02.000 suites run against the Toolbox).
+- **Deferred:** per-cluster total flag → 02.02.001.
 
 ## v02.01.000 — MiniLaser ASD support (2026-10-16) · released 2026-10-17
 

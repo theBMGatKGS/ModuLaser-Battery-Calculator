@@ -10,7 +10,7 @@ regenerate this file from it rather than hand-editing both.
 
 ## 02.02 — 2026-10-19
 
-### 02.02.000 — 2026-10-19 (local build, not released)
+### 02.02.000 — 2026-10-19 (released 2026-10-19; QA/Auditor GO on 4f4c5e5)
 - **Manual battery or capacity pick turns Auto Battery Sizing off** (with a toast); the controls stay selectable in Auto.
 - **Networked ASD-160s count toward the 127-module SenseNET limit** and share the network's addresses (duplicates flagged).
 - **Unidentified power source → ⚠ Incomplete** everywhere: sheet status and amber dot, side panel, print stamp and project file; the Report adds a blank “Power source identified” item to every power supply sheet and an amber banner.
