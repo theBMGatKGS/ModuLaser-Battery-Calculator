@@ -8,7 +8,7 @@ def ok(n, c, i=''): R.append(bool(c)); print('PASS' if c else 'FAIL', n, str(i)[
 ST = """()=>{ const g=id=>document.getElementById(id).getAttribute('aria-checked'); const B=document.body.classList;
   return { s:g('view-settings-btn'), sb:g('view-sidebar-btn'), rp:g('view-results-btn'),
     sOpen:String(!document.getElementById('proj-settings').classList.contains('collapsed')), sbOpen:String(!B.contains('sidebar-closed')), rpOpen:String(!B.contains('results-closed')),
-    role:document.getElementById('view-results-btn').getAttribute('role'), vis:getComputedStyle(document.querySelector('#view-results-btn .mi-check')).visibility }; }"""
+    role:document.getElementById('view-results-btn').getAttribute('role'), vis:getComputedStyle(document.getElementById('view-results-btn'),'::before').visibility }; }"""
 def synced(x): return x['s']==x['sOpen'] and x['sb']==x['sbOpen'] and x['rp']==x['rpOpen']
 async def main():
   async with async_playwright() as p:

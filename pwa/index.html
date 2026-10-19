@@ -1065,8 +1065,8 @@
   .menubar-menu{ position:absolute; right:0; top:calc(100% + 4px); min-width:250px; background:#000; color:#fff; border:1px solid #455160; border-radius:6px; padding:4px; z-index:5000; box-shadow:0 10px 30px rgba(0,0,0,.6); }
   .menubar-menu[hidden]{ display:none; }
   .menubar-menu [role="menuitem"], .menubar-menu [role="menuitemcheckbox"]{ display:flex; align-items:center; gap:8px; width:100%; text-align:left; background:#000; color:#fff; border:0; border-radius:4px; padding:7px 10px; font:inherit; font-size:13px; cursor:pointer; box-sizing:border-box; }
-  .menubar-menu .mi-check{ display:inline-block; width:14px; flex:0 0 14px; text-align:center; color:#7fd17f; font-weight:700; }
-  .menubar-menu [aria-checked="false"] .mi-check{ visibility:hidden; }
+  .menubar-menu button[role="menuitemcheckbox"][aria-checked]::before{ content:"✓"; display:inline-block; width:14px; flex:0 0 14px; text-align:center; color:#7fd17f; font-weight:700; }
+  .menubar-menu button[role="menuitemcheckbox"][aria-checked="false"]::before{ visibility:hidden; }
   .menubar-menu [role="menuitem"]:hover, .menubar-menu [role="menuitem"]:focus, .menubar-menu [role="menuitemcheckbox"]:hover, .menubar-menu [role="menuitemcheckbox"]:focus{ background:#1f3550; outline:none; }
   .menubar-menu .mi-kbd{ margin-left:auto; color:var(--text-faint); font-size:11px; }
   .menubar-menu hr{ border:0; border-top:1px solid #2a323b; margin:4px 2px; }
@@ -1344,9 +1344,9 @@ body.v2 .model-cell{ font-size:10.5px; }
           <div class="menubar-menu" role="menu" hidden aria-labelledby="menu-view-btn">
             <button role="menuitem" id="cluster-report-btn">Cluster Report</button>
             <hr>
-            <button role="menuitemcheckbox" aria-checked="true" id="view-settings-btn" title="Expand or collapse the Project Settings bar"><span class="mi-check" aria-hidden="true">✓</span>Project Settings bar</button>
-            <button role="menuitemcheckbox" aria-checked="true" id="view-sidebar-btn" title="Show or hide the power supply sheet list"><span class="mi-check" aria-hidden="true">✓</span>Sheet sidebar</button>
-            <button role="menuitemcheckbox" aria-checked="true" id="view-results-btn" title="Show or hide the live results panel"><span class="mi-check" aria-hidden="true">✓</span>Results panel</button>
+            <button role="menuitemcheckbox" aria-checked="true" id="view-settings-btn" title="Expand or collapse the Project Settings bar">Project Settings bar</button>
+            <button role="menuitemcheckbox" aria-checked="true" id="view-sidebar-btn" title="Show or hide the power supply sheet list">Sheet sidebar</button>
+            <button role="menuitemcheckbox" aria-checked="true" id="view-results-btn" title="Show or hide the live results panel">Results panel</button>
           </div>
         </div>
         <div class="menubar-item">
