@@ -2627,7 +2627,7 @@ const AMENDMENTS = [
 { rev: "004", major: "02", minor: "00", date: "261015", desc: "Per Brent. <b>Valid defaults are no longer amber-flagged</b>: Design Basis, Standby (h), Alarm (min), Ambient Temp., Module Type, Power, Addressing, supply mode, NFPA 72 edition and margin keep their defaults without amber and no longer make a sheet <i>Needs entry</i>; only empty required fields (Power Supply Name, Location, module Address, Zone, Fan Speed…) are flagged. Edit → Confirm defaults is kept but no longer needed (harmless). <b>New sheets start with no modules</b>: an empty-state guide offers Import .pl… or + Add Display / + Add Detector; the last module can now be removed (the guide returns); an empty sheet shows Needs entry and INCOMPLETE. <b>Standby (h) / Alarm (min)</b> boxes no longer shrink and cut values off on screens ≤ 1366 px (the settings row wraps instead). <b>Addressing</b>: duplicate addresses are checked per mode — Networked sheets share an address pool per SenseNET network; a Standalone sheet is its own 1–9 pool (scoped per sheet, previously per cluster) and may reuse addresses from other sheets without a Validation Error; duplicates inside a Standalone sheet are still flagged. Projects mixing Networked and Standalone sheets show a <b>Mixed addressing</b> banner with Make all Networked… / Make all Standalone… and an optional <i>Also re-address all modules</i> (Networked 1…N across all sheets in order; Standalone 1…n per sheet; module order, ribbon/AUX/cluster assignments unchanged; confirm first). Imports (Import Calc, Import project, .pl re-import) keep addresses and list any per-mode conflicts right after import. <b>SenseNET networks</b> (per Brent): one network holds up to 127 modules; each Networked sheet has a SenseNET network number (selector on the Addressing row, SN tag in the sidebar, <i>Networked · SenseNET n</i> in print/Word/Excel settings, saved per sheet; older files default to network 1). Past 127, whole sheets (last in sheet order first) move to SenseNET 2, 3… and are addressed from 1, with a notice that a new network was added and the design must include its infrastructure; a sheet never spans networks. Duplicates are checked per network. Networked re-address numbers 1–127 on SenseNET 1 in sheet order and continues 1–127 on SenseNET 2. Imports keep networks and never move sheets on their own; an import over 127 offers Move overflow to a new SenseNET network. <b>Address change log + Undo</b> (QA F1/F2): unify / re-address, SenseNET moves and Standalone clears are logged (Edit → Address change log…, saved with the project) with before/after address and network per module, and undo in one step (Undo bar or Ctrl+Z when no field/dropdown has focus; disarmed by the next manual address/mode/network edit); auto-move only when a network's count rises past 127, otherwise a Move overflow banner; Clear file clears the log; Make all Standalone lists the addresses above 9 it will clear and reports them afterwards. <b>Confirm Settings?</b> after a .pl import (Confirm marks imported items confirmed; Revise import rolls back to the review step with choices kept). Design Basis and Ambient Temperature start on <i>- Select -</i> (amber, sheet INCOMPLETE, no de-rating until chosen); the .pl wizard requires them; saved/legacy files keep their values. Sheets with no modules show <b>Incomplete</b> for battery Ah everywhere (results card, Live Results, sidebar, print, Word, Excel; .mlproj requiredAh null + incomplete), with no battery/PSU recommendation. Calculation math and the shared engine (masd-engine.js 1.0.0) are unchanged. <b>Shared modulaser-project.js 1.4.0 (bumped from 1.3.0 for SenseNET networks: each device in .mlproj.json carries its network, the shared validator checks duplicates per network and the 127 limit per network; byte-identical in the Calculator, Toolbox and Field Report 02.00.002).</b>" },
 { rev: "005", major: "02", minor: "00", date: "261016", desc: "Per Brent (10-16, revised 5:27 PM). <b>Auto addressing.</b> <b>New build</b> (first modules in an empty project, by first .pl import or first + Add): <b>Networked or Standalone?</b> sets every sheet's mode, then <b>Auto address?</b> Yes / No (Yes: Networked 1…N in sheet order across sheets, whole sheets roll to SenseNET 2 past 127 with the infrastructure notice; Standalone 1…n per sheet). <b>Existing project</b> gaining modules (new .pl import, new sheet, modules added to a sheet, Import Calc → Merge sheets): one prompt — <b>Continue addressing per previous sheets</b> (only the new modules; Networked continues after the last address on its network, a new sheet rolls to the next network past 127; a new Standalone sheet starts at 1), <b>Manually address</b>, or <b>Re-auto address entire project</b>; new sheets take the project's mode (mixed projects keep the banner). After a .pl import the order is Confirm Settings? → (mode) → address; Revise import and linked-file re-imports don't prompt. Each automatic change is one Address change log entry with one-step Undo; quick repeated adds give one prompt (0.8 s), never stacked on another prompt. <b>Excel CAD Schedule</b>: each power supply table now has a row with that sheet's own <b>Standby time</b> (h), <b>Alarm time</b> (min) and <b>Safety margin</b> (%) (no merged cells or fills). <b>Cluster Validation Report print</b> (Brent approved): KGS palette on white, navy title bar, project summary box, Entry point / Ribbon Path / CALCULATION INVALID / VALIDATION ERROR PENDING chips, a running header (CLUSTER VALIDATION REPORT · project · Network #) and footer (app name + revision · Page n of N) on every page, repeated table headers, rows never split, no wrapping. <b>Incomplete in amber with ⚠</b> (Brent 6:07 PM): every Incomplete indication (status, empty-sheet Ah / battery / PSU recommendation, sidebar, Live Results, print stamp/tiles/tables/legend, Word cells, withheld PSU recommendation, CVR pending chip) is amber with a warning symbol — needs-entry amber on screen, #8a5a00 on #fdf3dc in print/Word; Excel exports have no fills or colour coding (plain ⚠ text); .mlproj.json keeps the plain status. Calculation math, masd-engine.js 1.0.0 and modulaser-project.js 1.4.0 unchanged." },
 { rev: "000", major: "02", minor: "01", date: "261016", desc: "Per Brent (10-16). <b>MiniLaser ASD (FHSD8075-ULF) support.</b> Each sheet has a separate <b>Standalone ASDs</b> table (never addressed, not on SenseNET, can be on any sheet). Draw by fan speed 1–10: 120/134/157/180/200/230/255/285/320/365 mA, standby = alarm. Each MiniLaser takes its own dedicated AUX circuit (max one per circuit) with the 35 mA per-circuit overhead and 3.0 A limit; more MiniLasers plus entry points than AUX outputs is a validation error recommending another power supply. I/O Expansion Modules 9-30521 (0–2, no added draw) with the 9-30520 housing added automatically; BOM by part number. <b>+ Add MiniLaser</b> opens the Pre-engineered picker (T or I shape, manual Tables 13–31) or Manual config; a hand-added MiniLaser starts with a blank fan speed, amber with ⚠ until set. <b>.pl import</b>: SOLO detectors become MiniLasers with fan speed and alarm factor from the .pl (expansions ignored with a notice; Confirm Settings? still runs). When the .pl has no alarm factor, the highest factor whose average hole sensitivity (Fire 1 × holes) is within the class limit (VEWFD 1.0, EWFD 1.5, SFD 2.0, OAP 2.18 %obs/ft) is used; if even 0 is over, 0 is set and validation fails recommending fewer holes or a redesign. DIP vs Remote configuration recommendation. MiniLasers appear on screen, in print, Word, Excel (CAD Schedule) and the Cluster Validation Report, and in .mlproj.json (miniLasers). modulaser-project.js 1.5.1, masd-engine.js 1.1.0; ModuLaser calculation math unchanged. <b>Arrangement with 2+ clusters (Brent 9:02 PM):</b> the disparate-clusters warning does not withhold the Recommended Power Supply Arrangement any more. The warning stays and the arrangement card shows alongside it. Final (Brent): it is a warning only — the sheet can pass and nothing is withheld (no “Recommendation withheld” banner; BOM and export shown). On Edwards A/BPS it never fires (AUX is unique per entry point; the unreachable shared-pathway check was removed). <b>QA delta:</b> MiniLaser manual p.66 pipe limits enforced (holes per class, pipe length, first hole when known); Current Draw Reference xlsx has an explicit black font. <b>Final:</b> the Disparate-clusters message is a warning only (the sheet can pass, nothing is withheld; never on Edwards A/BPS); modulaser-project.js 1.5.1. Side panel: validation flags are styled apart from the amber warning, and warnings are not counted; offline cache modulaser-calc-v53." },
-  { rev: "000", major: "02", minor: "02", date: "261019", desc: "<b>Brand selector (Edwards | Kidde Commercial)</b> — project-level, first in Project information; part numbers, supply labels, BOM, logos and report titles follow the brand; the remembered default seeds new projects. Per-sheet supply <b>variant</b> (120 V / 220–230 V / ULC), tamper and seismic accessories, and <b>FACU powers these ASDs</b> with a power-source prompt (in-house / third-party / unidentified; unidentified makes the sheet Incomplete). <b>ASD-160 (Micra25 / Senator 25)</b> rows in the ASD table: 250 mA, dedicated AUX circuit, networked address 1–127, PipeCAD .pl import (MICRA25), Remote configuration, UL/non-UL alarm-factor rules (1.28 cap on UL SFD/OAP, R-AF7). Battery 12V6A5 (7.2 Ah) is manual-only with a too-small advisory. AUX/ribbon rules: max 4 AUX per power supply; each ribbon run holds max 4 detectors + 1 display; a detector-started run counts that detector; hybrid clusters may have any number of runs; own-AUX modules are not runs. Help revised with current screenshots; new printable Quick Start (Help ▸ Print Quick Start). MLP 1.6.0, engine 1.2.0." }
+  { rev: "000", major: "02", minor: "02", date: "261019", desc: "<b>Brand selector (Edwards | Kidde Commercial)</b> — project-level, first in Project information; part numbers, supply labels, BOM, logos and report titles follow the brand; the remembered default seeds new projects. Per-sheet supply <b>variant</b> (120 V / 220–230 V / ULC), tamper and seismic accessories, and <b>FACU powers these ASDs</b> with a power-source prompt (in-house / third-party / unidentified; unidentified makes the sheet Incomplete). <b>ASD-160 (Micra25 / Senator 25)</b> rows in the ASD table: 250 mA, dedicated AUX circuit, networked address 1–127, PipeCAD .pl import (MICRA25), Remote configuration, UL/non-UL alarm-factor rules (1.28 cap on UL SFD/OAP, R-AF7). Battery 12V6A5 (7.2 Ah) is manual-only with a too-small advisory. AUX/ribbon rules: max 4 AUX per power supply; each ribbon run holds max 4 detectors + 1 display; a detector-started run counts that detector; hybrid clusters may have any number of runs; own-AUX modules are not runs. Help revised with current screenshots; new printable Quick Start (Help ▸ Print Quick Start). MLP 1.6.0, engine 1.2.0. Manual battery or capacity pick turns Auto Battery Sizing off (with a toast); the controls stay selectable in Auto. Networked ASD-160s count toward the 127-module SenseNET limit and share the network's addresses (duplicates flagged). Unidentified power source → ⚠ Incomplete everywhere: sheet status and amber dot, side panel, print stamp and project file; the Report adds a blank “Power source identified” item to every power supply sheet and an amber banner. A manual alarm factor on an ASD-160 row is what gets validated (\"alarm factor N … exceeds … — lower the alarm factor\"). Excel Detail sheet: Brand row under Project (no fills). Brand logo in the KGS print band (PDF / HTML / print preview). Help screenshots re-shot with fully passing example data, including Recommended Power Supply Arrangement, Edit → Confirm defaults and the Import Calc prompt (from a saved example file)." }
 ];
 
 function formatDateYYMMDD(yymmdd){
@@ -10593,7 +10593,8 @@ MLP.asd160Evaluate = function (rec, perf, area, opts){
   const sens = pipe.designSens;
   const plAf = pipe.af, activated = String(pipe.afActivatedRaw || '').toLowerCase() === 'true';
   let af;
-  if (activated && plAf != null) af = { af: plAf, src: '.pl', fire1: MLP.MINILASER.afFire1[plAf], fail: lim.sens != null && MLP.MINILASER.afFire1[plAf] * n > lim.sens + 1e-12 };
+  if (o.af != null && MLP.MINILASER.afFire1[o.af] != null) af = { af: +o.af, src: 'manual', fire1: MLP.MINILASER.afFire1[o.af], fail: lim.sens != null && MLP.MINILASER.afFire1[o.af] * n > lim.sens + 1e-12 };   // 02.02.000: a manual AF on the row is what gets validated
+  else if (activated && plAf != null) af = { af: plAf, src: '.pl', fire1: MLP.MINILASER.afFire1[plAf], fail: lim.sens != null && MLP.MINILASER.afFire1[plAf] * n > lim.sens + 1e-12 };
   else { const d = MLP.asd160DeriveAf(sens, n, lim.sens); af = Object.assign(d, { src: 'derived per Brent rule' }); }
   const len = pipe.lengthFt != null ? pipe.lengthFt : null;
   const tt = transport.target;
@@ -10606,7 +10607,7 @@ MLP.asd160Evaluate = function (rec, perf, area, opts){
     if (counts.all > A.ulHoles){ const m = `${counts.all} holes incl. end cap exceeds the UL maximum of 10 (Senator 25 Handbook p11)`; issues.push({ level: 'error', msg: m }); rafs.push(['ul', m]); }
     if (len != null && len > A.ulLengthFt){ const m = `pipe length ${r2(len)} ft exceeds the UL 160 ft test length`; issues.push({ level: 'error', msg: m }); rafs.push(['ul', m]); }
     if (tt != null && tt > lim.tt + 1e-9){ const m = `transport ${r2(tt)} s exceeds ${ttName}`; issues.push({ level: 'error', msg: m }); rafs.push([lim.ttBy, m]); }
-    if (af.fail){ const m = `even AF 0 (${MLP.MINILASER.afFire1[0]} × ${n} holes) exceeds ${r2(lim.sens)} %obs/ft — use fewer holes or redesign`; issues.push({ level: 'error', msg: m }); rafs.push([lim.sensBy, m]); }
+    if (af.fail){ const m = af.src === 'manual' ? `alarm factor ${af.af} (${af.fire1} × ${n} holes) exceeds ${r2(lim.sens)} %obs/ft — lower the alarm factor` : `even AF 0 (${MLP.MINILASER.afFire1[0]} × ${n} holes) exceeds ${r2(lim.sens)} %obs/ft — use fewer holes or redesign`; issues.push({ level: 'error', msg: m }); rafs.push([lim.sensBy, m]); }
     const h = MLP.asd160DescHint(pipe.description);
     if (h.standard && h.standard !== 'UL 268') rafs.push(['ul', `the .pl Description points to ${h.standard}`]);
     rafs.forEach(([by, m]) => issues.push({ level: 'warn', msg: `This project is set to UL 268 7th edition, but this ASD-160 does not meet ${gov(by)} (Senator 25 Handbook p.vii): ${m}. Redesign, or set the project standard to the one the design follows.` }));
@@ -10618,7 +10619,7 @@ MLP.asd160Evaluate = function (rec, perf, area, opts){
     else if (lim.sens == null) issues.push({ level: 'incomplete', msg: `No ${cls.cls} limits entered for ${lim.standard || 'this standard'} — enter and confirm them` });
     if (lim.sens != null && worst != null && worst > lim.sens + 1e-12) issues.push({ level: 'error', msg: `worst hole ${r2(worst)} %obs/ft exceeds ${lim.fm ? 'FM' : lim.standard} ${cls.cls} ${r2(lim.sens)} %obs/ft` });
     if (lim.tt != null && tt != null && tt > lim.tt + 1e-9) issues.push({ level: 'error', msg: `transport ${r2(tt)} s exceeds ${lim.fm ? 'FM' : lim.standard} ${cls.cls} ${lim.tt} s` });
-    if (af.fail) issues.push({ level: 'error', msg: `even AF 0 exceeds the ${cls.cls} limit ${r2(lim.sens)} %obs/ft — use fewer holes or redesign` });
+    if (af.fail) issues.push({ level: 'error', msg: af.src === 'manual' ? `alarm factor ${af.af} (${af.fire1} × ${n} holes) exceeds the ${cls.cls} limit ${r2(lim.sens)} %obs/ft — lower the alarm factor` : `even AF 0 exceeds the ${cls.cls} limit ${r2(lim.sens)} %obs/ft — use fewer holes or redesign` });
     if (len != null && len > A.maxLengthFt) issues.push({ level: 'warn', msg: `pipe length ${r2(len)} ft exceeds the ASD-160 general maximum 165 ft (still air, Senator 25 Handbook p3)` });
     if (counts.all > A.ulHoles){ const v = MLP.asd160PipecadValid(rec, lim);
       if (v.ok) issues.push({ level: 'advisory', msg: `${counts.all} holes on one pipe run — Senator 25 Handbook p11 says each pipe run 'should not have more than 10 holes (including the end cap hole)'; accepted because the PipeCAD design validates` });
@@ -10938,7 +10939,7 @@ function asdRowData(tr){
 function asdEval(tr, locEl){
   const d = asdRowData(tr); if (!d.pipe) return null;
   const area = (locEl.querySelector('.ps-location') || {}).value || '';
-  return MLP.asd160Evaluate({ kind: 'asd160', pipe: d.pipe }, asdPerf(), area, { cls: d.clsSrc === 'user' ? d.cls : null });
+  return MLP.asd160Evaluate({ kind: 'asd160', pipe: d.pipe }, asdPerf(), area, { cls: d.clsSrc === 'user' ? d.cls : null, af: d.afSrc === 'manual' && d.af != null ? d.af : null });
 }
 function mlWireRow(tr, loc){
   const re = () => { recalcLocation(loc); if (typeof refreshAllAmber === 'function') refreshAllAmber(); scheduleSave(); if (typeof v2Refresh === 'function') v2Refresh(); };
@@ -11393,6 +11394,66 @@ function brSetBrand(b, user){
   v2RenderSettingsSummary = function (){ const r = _s.apply(this, arguments); const s = document.getElementById('proj-settings-summary'); if (s && !s.dataset.brand) { s.insertAdjacentHTML('afterbegin', `<b class="pss-brand">${brInfo().label}</b> · `); } return r; };
 })();
 
+/* ===================== 02.02.000 completion (Brent 10-19 1:55 PM) ===================== */
+/* Toast (no fills in exports; screen only). */
+function brToast(msg){
+  let t = document.getElementById('br-toast');
+  if (!t){ t = document.createElement('div'); t.id = 'br-toast'; t.setAttribute('role', 'status'); t.style.cssText = 'position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:9999;background:#1b2127;color:#e6edf3;border:1px solid #0c77bc;border-radius:6px;padding:9px 14px;font-size:13px;box-shadow:0 4px 14px rgba(0,0,0,.45);max-width:560px'; document.body.appendChild(t); }
+  t.textContent = msg; t.hidden = false; clearTimeout(t._h); t._h = setTimeout(() => { t.hidden = true; }, 4500);
+}
+/* (d1) A manual battery or capacity pick turns Auto Battery Sizing off (with a toast). The controls stay enabled in Auto. */
+(function brManualBatteryPick(){
+  const SEL = '.battery-size-select, .battery-size-custom, .ps-capacity-select';
+  document.addEventListener('change', e => {
+    const el = e.target; if (!el.matches || !el.matches(SEL)) return;
+    const locEl = el.closest('.location'); if (!locEl) return;
+    const m = locEl.querySelector('.auto-battery-mode'); if (!m || m.value !== 'auto') return;
+    m.value = 'off';
+    const w = locEl.querySelector('.builtin-auto-battery-toggle');
+    if (w){ const a = w.querySelector('.ra-auto'), o = w.querySelector('.ra-off'); if (a) a.classList.remove('active'); if (o) o.classList.add('active'); }
+    brToast(`Auto Battery Sizing turned off on ${(locEl.querySelector('.ps-name') || {}).value || 'this sheet'} — your manual ${el.matches('.ps-capacity-select') ? 'capacity' : 'battery'} choice is kept.`);
+  }, true);
+  const _rl = recalcLocation;
+  recalcLocation = function (loc){
+    const r = _rl.apply(this, arguments);
+    const locEl = document.getElementById(`location-${loc}`);
+    if (locEl) locEl.querySelectorAll(SEL).forEach(x => { if (x.disabled){ x.disabled = false; x.title = 'Choosing a value here turns Auto Battery Sizing off'; } });
+    return r;
+  };
+})();
+/* (d2) Networked ASD-160s count toward the 127-per-SenseNET limit and share the network's address space. */
+function brAsdNetRows(l){ return Array.from(l.querySelectorAll('tr[data-kind="asd160"]')).filter(tr => { const n = tr.querySelector('.asd-net'); return n && n.value === 'networked'; }); }
+(function brAsdNetworkCount(){
+  if (typeof senseNetCounts === 'function'){ const _c = senseNetCounts;
+    senseNetCounts = function (){ const c = _c.apply(this, arguments) || {};
+      document.querySelectorAll('.location').forEach(l => { if (addrSchemeOf(l) !== 'networked') return; const k = brAsdNetRows(l).length; if (k){ const n = sheetSenseNet(l); c[n] = (c[n] || 0) + k; } });
+      return c; }; }
+  if (typeof addrConflicts === 'function'){ const _a = addrConflicts;
+    addrConflicts = function (){ const out = _a.apply(this, arguments);
+      const used = {}, counts = {};
+      document.querySelectorAll('.location').forEach(l => { if (addrSchemeOf(l) !== 'networked') return; const n = sheetSenseNet(l);
+        counts[n] = (counts[n] || 0) + l.querySelectorAll('[data-role="module"]').length + brAsdNetRows(l).length;
+        l.querySelectorAll('[data-role="module"] .module-address').forEach(s => { const a = s.value.trim(); if (a) (used[n] = used[n] || {})[a] = (used[n][a] || 0) + 1; });
+        brAsdNetRows(l).forEach(tr => { const a = (tr.querySelector('.asd-addr') || {}).value; if (a && a.trim()) (used[n] = used[n] || {})[a.trim()] = (used[n][a.trim()] || 0) + 1; }); });
+      Object.keys(used).forEach(n => Object.keys(used[n]).forEach(a => { if (used[n][a] > 1) (out.network[n] = out.network[n] || new Set()).add(a); }));
+      Object.keys(counts).forEach(n => { if (counts[n] > MAX_MODULES_PER_NETWORK) out.over[n] = counts[n]; else if (out.over[n] && counts[n] <= MAX_MODULES_PER_NETWORK) delete out.over[n]; });
+      return out; }; }
+})();
+/* (c) Excel: "Brand" row under Project (plain cells, no fills). */
+(function brExcelBrandRow(){
+  const ins = rows => { const i = rows.findIndex(r => r && r.cells && r.cells[0] === 'Project'); if (i >= 0 && !rows.some(r => r && r.cells && r.cells[0] === 'Brand')) rows.splice(i + 1, 0, { cells: ['Brand', brInfo().label] }); return rows; };
+  ['v2DetailRows'].forEach(fn => { if (typeof window[fn] !== 'function') return; const _f = window[fn]; window[fn] = function (){ return ins(_f.apply(this, arguments)); }; });
+  if (typeof buildLocationRows === 'function'){ const _b = buildLocationRows; buildLocationRows = function (){ const rows = _b.apply(this, arguments); const i = rows.findIndex(r => Array.isArray(r) && r[0] === 'Prepared By'); if (i >= 0 && !rows.some(r => Array.isArray(r) && r[0] === 'Brand')) rows.splice(i, 0, ['Brand', brInfo().label]); return rows; }; }
+})();
+/* (c) KGS print band: brand print logo in every band (PDF / HTML / print preview). */
+(function brPrintBandLogo(){
+  if (typeof v2BuildPrintHtml !== 'function') return; const _p = v2BuildPrintHtml;
+  v2BuildPrintHtml = function (){ let h = _p.apply(this, arguments); if (typeof h !== 'string') return h;
+    const logo = brLogoHtml(true).replace('class="br-logo"', 'class="band-logo"'); if (!logo) return h;
+    h = h.replace('</style>', '.band .band-logo{height:24px;width:auto;background:#fff;padding:3px 6px;border-radius:3px;margin-left:auto;align-self:center}</style>');
+    return h.replace(/(<div class="band">[\s\S]*?)(<div class="rev">|<\/div><\/section>|<\/div>(?=<\/section>))/g, (m, a, b) => b === '<div class="rev">' ? a + logo + b : m).replace(/(<div class="band"><div><h1>[^<]*<\/h1><\/div>)(<\/div>)/g, `$1${logo}$2`); };
+})();
+
 </script><!--BR-END-->
 <!--QS-BEGIN--><script id="qs-print">
 /* 02.02.000 — Help ▸ Print Quick Start: standalone 2-page printable Quick Start (KGS print palette, numbered steps, screenshots
@@ -11427,11 +11488,14 @@ function qsQuickStartHtml(){
   const rev = typeof mlpCalcRev === 'function' ? mlpCalcRev() : '';
   const brand = typeof brInfo === 'function' ? brInfo().label : 'Edwards';
   const logo = typeof brLogoHtml === 'function' ? brLogoHtml(true) : '';
-  const per = 5, pages = [];
-  for (let p = 0; p * per < QS_PRINT_STEPS.length; p++){
-    const st = QS_PRINT_STEPS.slice(p * per, p * per + per).map(([slot, t, b], k) => { const src = qsShotSrc(slot);
+  const tb = document.querySelectorAll('#help-tb-quickstart .tbq-step');   // Toolbox: print its own Quick Start (same steps as quickstart.html)
+  const STEPS = tb.length ? Array.from(tb).map(e => ['', (e.querySelector('.qs-step-title') || {}).textContent || '', (e.querySelector('p') || {}).innerHTML || '', (e.querySelector('img') || { getAttribute: () => '' }).getAttribute('src') || '']) : QS_PRINT_STEPS.map(x => x.concat([qsShotSrc(x[0])]));
+  const appName = tb.length ? 'MASD Engineering Toolbox' : `${brand} ModuLaser Battery Calculator`;
+  const per = tb.length ? 3 : 5, pages = [];
+  for (let p = 0; p * per < STEPS.length; p++){
+    const st = STEPS.slice(p * per, p * per + per).map(([slot, t, b, src], k) => { t = t.replace(/^\d+\s*·\s*/, '');
       return `<div class="step"><h2><span class="n">${p * per + k + 1}</span>${t}</h2><p>${b}</p>${src ? `<img src="${src}" alt="${t}">` : ''}</div>`; }).join('');
-    pages.push(`<div class="page"><div class="band"><div><h1>${brand} ModuLaser Battery Calculator — Quick Start</h1><div class="sub">Page ${p + 1} of ${Math.ceil(QS_PRINT_STEPS.length / per)} · screenshots show example data</div></div>${logo}<div class="rev">Rev ${rev}</div></div><div class="steps">${st}</div><div class="foot"><span>Full Help: Help ▸ Help · How Do I…</span><span>KGS</span></div></div>`);
+    pages.push(`<div class="page"><div class="band"><div><h1>${appName} — Quick Start</h1><div class="sub">Page ${p + 1} of ${Math.ceil(STEPS.length / per)} · screenshots show example data</div></div>${logo}<div class="rev">Rev ${rev}</div></div><div class="steps">${st}</div><div class="foot"><span>Full Help: Help ▸ Help · How Do I…</span><span>KGS</span></div></div>`);
   }
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Quick Start ${rev}</title><style>${QS_PRINT_CSS}</style></head><body>${pages.join('')}</body></html>`;
 }

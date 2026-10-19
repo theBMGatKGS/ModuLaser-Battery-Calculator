@@ -1004,7 +1004,8 @@ MLP.asd160Evaluate = function (rec, perf, area, opts){
   const sens = pipe.designSens;
   const plAf = pipe.af, activated = String(pipe.afActivatedRaw || '').toLowerCase() === 'true';
   let af;
-  if (activated && plAf != null) af = { af: plAf, src: '.pl', fire1: MLP.MINILASER.afFire1[plAf], fail: lim.sens != null && MLP.MINILASER.afFire1[plAf] * n > lim.sens + 1e-12 };
+  if (o.af != null && MLP.MINILASER.afFire1[o.af] != null) af = { af: +o.af, src: 'manual', fire1: MLP.MINILASER.afFire1[o.af], fail: lim.sens != null && MLP.MINILASER.afFire1[o.af] * n > lim.sens + 1e-12 };   // 02.02.000: a manual AF on the row is what gets validated
+  else if (activated && plAf != null) af = { af: plAf, src: '.pl', fire1: MLP.MINILASER.afFire1[plAf], fail: lim.sens != null && MLP.MINILASER.afFire1[plAf] * n > lim.sens + 1e-12 };
   else { const d = MLP.asd160DeriveAf(sens, n, lim.sens); af = Object.assign(d, { src: 'derived per Brent rule' }); }
   const len = pipe.lengthFt != null ? pipe.lengthFt : null;
   const tt = transport.target;
@@ -1017,7 +1018,7 @@ MLP.asd160Evaluate = function (rec, perf, area, opts){
     if (counts.all > A.ulHoles){ const m = `${counts.all} holes incl. end cap exceeds the UL maximum of 10 (Senator 25 Handbook p11)`; issues.push({ level: 'error', msg: m }); rafs.push(['ul', m]); }
     if (len != null && len > A.ulLengthFt){ const m = `pipe length ${r2(len)} ft exceeds the UL 160 ft test length`; issues.push({ level: 'error', msg: m }); rafs.push(['ul', m]); }
     if (tt != null && tt > lim.tt + 1e-9){ const m = `transport ${r2(tt)} s exceeds ${ttName}`; issues.push({ level: 'error', msg: m }); rafs.push([lim.ttBy, m]); }
-    if (af.fail){ const m = `even AF 0 (${MLP.MINILASER.afFire1[0]} × ${n} holes) exceeds ${r2(lim.sens)} %obs/ft — use fewer holes or redesign`; issues.push({ level: 'error', msg: m }); rafs.push([lim.sensBy, m]); }
+    if (af.fail){ const m = af.src === 'manual' ? `alarm factor ${af.af} (${af.fire1} × ${n} holes) exceeds ${r2(lim.sens)} %obs/ft — lower the alarm factor` : `even AF 0 (${MLP.MINILASER.afFire1[0]} × ${n} holes) exceeds ${r2(lim.sens)} %obs/ft — use fewer holes or redesign`; issues.push({ level: 'error', msg: m }); rafs.push([lim.sensBy, m]); }
     const h = MLP.asd160DescHint(pipe.description);
     if (h.standard && h.standard !== 'UL 268') rafs.push(['ul', `the .pl Description points to ${h.standard}`]);
     rafs.forEach(([by, m]) => issues.push({ level: 'warn', msg: `This project is set to UL 268 7th edition, but this ASD-160 does not meet ${gov(by)} (Senator 25 Handbook p.vii): ${m}. Redesign, or set the project standard to the one the design follows.` }));
@@ -1029,7 +1030,7 @@ MLP.asd160Evaluate = function (rec, perf, area, opts){
     else if (lim.sens == null) issues.push({ level: 'incomplete', msg: `No ${cls.cls} limits entered for ${lim.standard || 'this standard'} — enter and confirm them` });
     if (lim.sens != null && worst != null && worst > lim.sens + 1e-12) issues.push({ level: 'error', msg: `worst hole ${r2(worst)} %obs/ft exceeds ${lim.fm ? 'FM' : lim.standard} ${cls.cls} ${r2(lim.sens)} %obs/ft` });
     if (lim.tt != null && tt != null && tt > lim.tt + 1e-9) issues.push({ level: 'error', msg: `transport ${r2(tt)} s exceeds ${lim.fm ? 'FM' : lim.standard} ${cls.cls} ${lim.tt} s` });
-    if (af.fail) issues.push({ level: 'error', msg: `even AF 0 exceeds the ${cls.cls} limit ${r2(lim.sens)} %obs/ft — use fewer holes or redesign` });
+    if (af.fail) issues.push({ level: 'error', msg: af.src === 'manual' ? `alarm factor ${af.af} (${af.fire1} × ${n} holes) exceeds the ${cls.cls} limit ${r2(lim.sens)} %obs/ft — lower the alarm factor` : `even AF 0 exceeds the ${cls.cls} limit ${r2(lim.sens)} %obs/ft — use fewer holes or redesign` });
     if (len != null && len > A.maxLengthFt) issues.push({ level: 'warn', msg: `pipe length ${r2(len)} ft exceeds the ASD-160 general maximum 165 ft (still air, Senator 25 Handbook p3)` });
     if (counts.all > A.ulHoles){ const v = MLP.asd160PipecadValid(rec, lim);
       if (v.ok) issues.push({ level: 'advisory', msg: `${counts.all} holes on one pipe run — Senator 25 Handbook p11 says each pipe run 'should not have more than 10 holes (including the end cap hole)'; accepted because the PipeCAD design validates` });

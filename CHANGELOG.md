@@ -11,6 +11,12 @@ regenerate this file from it rather than hand-editing both.
 ## 02.02 — 2026-10-19
 
 ### 02.02.000 — 2026-10-19 (local build, not released)
+- **Manual battery or capacity pick turns Auto Battery Sizing off** (with a toast); the controls stay selectable in Auto.
+- **Networked ASD-160s count toward the 127-module SenseNET limit** and share the network's addresses (duplicates flagged).
+- **Unidentified power source → ⚠ Incomplete** everywhere: sheet status and amber dot, side panel, print stamp and project file; the Report adds a blank “Power source identified” item to every power supply sheet and an amber banner.
+- **A manual alarm factor on an ASD-160 row is what gets validated** ("alarm factor N … exceeds … — lower the alarm factor").
+- **Excel Detail sheet: Brand row** under Project (no fills). **Brand logo in the KGS print band** (PDF / HTML / print preview).
+- Help screenshots re-shot with fully passing example data, including Recommended Power Supply Arrangement, Edit → Confirm defaults and the Import Calc prompt (from a saved example file).
 - **Brand selector (Edwards | Kidde Commercial).** First field in Project Settings; part numbers, supply labels, BOM, logos and report titles follow the brand; the last choice is remembered for new projects.
 - **Per-sheet supply variant** (120 V / 220–230 V / ULC), tamper and seismic accessories, and **FACU powers these ASDs** with a power-source prompt (in-house / third-party / unidentified — unidentified keeps the sheet Incomplete).
 - **ASD-160 (Micra25 / Senator 25).** + Add ASD-160 and PipeCAD .pl import (MICRA25): 250 mA, dedicated AUX circuit, Remote configuration, networked address 1–127; UL scopes cap SFD/OAP at 1.28 %obs/ft with R-AF7.
