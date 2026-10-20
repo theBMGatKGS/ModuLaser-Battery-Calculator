@@ -10,7 +10,7 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.6.0';   // 1.6.0: brand catalog (Edwards | Kidde Commercial), ASD-160 kind (MICRA25), hash defaults. 1.5.1: MiniLaser pipe limits (M p.66)
+MLP.VERSION = '1.6.1';   // 1.6.1: SFD/OAP design target (Brent 2026-10-20) — project/Area target, published-limit validation, Fire 1 seed on UL scopes. 1.6.0: brand catalog (Edwards | Kidde Commercial), ASD-160 kind (MICRA25), hash defaults. 1.5.1: MiniLaser pipe limits (M p.66)
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -226,7 +226,7 @@ MLP.CITES = {
 };
 MLP.CLASSIFIRE_FACTORS = { alert: 10, prealarm: 6, alarm: 8, alarm2: 20 };   // Table 24, p.71 (factors / absolute; units not stated for Alarm 2)
 MLP.HOLE_LIMITS = { VEWFD: 1.00, EWFD: 1.50, SFD: 2.50, ref: 'ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113 (FM/UL hole limits) — pass at or below (≤) the limit (Brent 2026-10-13)' };
-MLP.configSeed = function (perfClass, kind){
+MLP.configSeed = function (perfClass, kind, perf, area){
   const values = {}, src = {};
   if (kind === 'display'){
     values.latchA = 'N'; values.latchF = 'N'; values.buzzer = 'Y'; ['latchA', 'latchF', 'buzzer'].forEach(k => { src[k] = 'typical'; });
@@ -235,6 +235,8 @@ MLP.configSeed = function (perfClass, kind){
   }
   const T = MLP.TYPICAL_DEFAULTS[perfClass];
   if (T) Object.keys(T).forEach(k => { values[k] = T[k]; src[k] = MLP.MANUAL_SOURCED[k] ? 'manual' : 'typical'; });
+  /* 02.02.001 (Brent 2026-10-20): "Yes, for projects requiring UL compliance. All others can remain at 2.5% by default." */
+  if (T && perfClass === 'SFD' && perf && MLP.sfdFamily(MLP.perfScope(perf, area)) === 'UL'){ values.fire1 = MLP.sfdTarget(perf, area).value; src.fire1 = 'design'; }
   Object.assign(values, { cascade: 'N', latchA: 'N', latchF: 'N', dayNight: 'N', ldd: 'Y' });
   ['cascade', 'latchA', 'latchF', 'dayNight', 'ldd'].forEach(k => { src[k] = 'typical'; });
   values.io = {};
@@ -426,7 +428,8 @@ MLP.diffHtml = function (diff, esc){
 
 /* ---------------- Performance Criteria (design.performance) ----------------
    perf.standard = one 'Referenced standard' preset (project), optional per-Area/Group overrides (perf.areas[a].standard).
-   NFPA presets: UL 268 7th Ed. thresholds (hole sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft;
+   NFPA presets: UL 268 7th Ed. thresholds (hole sensitivity at or below (≤) VEWFD 1.0 / EWFD 1.5 / SFD-OAP 2.18 %obs/ft pass/fail — unchanged;
+   SFD/OAP design target 2.0 %obs/ft by default, adjustable — Brent 2026-10-20, see MLP.SFD_TARGET_DEFAULTS;
    transport time no more than 60 / 43 / 43 s) plus the selected code's prescriptions; printouts state "Complies with UL 268, 7th Edition".
    FM DS presets: FM requirements only (not UL, no UL 268 statement). BS presets mirror the Battery Calculator's BS design bases.
    Only cited values are prefilled; the rest are blank ("engineer to define") and must be entered, referenced and confirmed. */
@@ -516,10 +519,11 @@ MLP.perfPresetLimits = function (id){
   MLP.PERF_CLASSES.forEach(c => { out[c] = p && p.family === 'FM' ? { sens: MLP.FM_LIMITS[c].sens, tt: MLP.FM_LIMITS[c].tt, target: MLP.SENS_TARGETS[c], ref: MLP.FM_REF, confirmed: false, src: 'prefill' } : MLP.perfLimitBlank(); });
   return out;
 };
-MLP.perfScopeInit = (o, id) => { o.standard = id; o.ulConfirmed = false; delete o.ulOptIn; o.limits = MLP.perfPresetLimits(id); o.codeReqs = MLP.perfCodeReqs(id); return o; };
-MLP.perfBlank = () => Object.assign(MLP.perfScopeInit({ standardOther: '', areas: {}, narrative: '', narrativeDraft: '', eorName: '', specRef: '', definedBy: '', definedAt: '' }, 'SFD/OAP – NFPA 72'), { statement: '', market: 'UL' });
+MLP.perfScopeInit = (o, id) => { o.standard = id; o.ulConfirmed = false; delete o.ulOptIn; delete o.sfdTarget; o.limits = MLP.perfPresetLimits(id); o.codeReqs = MLP.perfCodeReqs(id); return o; };
+MLP.perfBlank = () => Object.assign(MLP.perfScopeInit({ standardOther: '', areas: {}, narrative: '', narrativeDraft: '', eorName: '', specRef: '', definedBy: '', definedAt: '' }, 'SFD/OAP – NFPA 72'), { statement: '', market: 'UL', sfdSchema: 1 });
 /* migrate 1.2.0 drafts (market/basis) to presets */
 MLP.perfMigrate = function (perf){
+  if (perf && perf.sfdSchema == null){ perf.sfdSchema = 1; perf.sfdNotice = true; }   // 02.02.001: older projects adopt the SFD/OAP default target, one-time notice
   if (!perf || perf.standard !== undefined) return perf;
   const map = b => b === 'UL' ? 'SFD/OAP – NFPA 72' : b === 'FM' ? 'EWFD – FM DS 5-32' : b === 'NFPA 76' ? 'EWFD – NFPA 76' : 'Custom';
   const one = (o, b) => { const keep = o.limits; MLP.perfScopeInit(o, map(b)); if (!MLP.perfIsUl(o.standard) && keep) o.limits = keep; if (o.standard === 'Custom') o.standardOther = o.basisOther || b || ''; };
@@ -532,7 +536,9 @@ MLP.perfScope = (perf, area) => area && perf.areas && perf.areas[area] && perf.a
 MLP.perfLimits = function (perf, area){
   if (!perf) return null; MLP.perfMigrate(perf);
   const o = MLP.perfScope(perf, area);
-  return MLP.perfIsUl(o.standard) ? MLP.perfUlLimits(o.ulConfirmed) : (o.limits || null);
+  const L = MLP.perfIsUl(o.standard) ? MLP.perfUlLimits(o.ulConfirmed) : (o.limits ? JSON.parse(JSON.stringify(o.limits)) : null);
+  if (L){ const t = MLP.sfdTarget(perf, area); L.SFD = Object.assign({}, L.SFD || MLP.perfLimitBlank(), { target: t.value, targetSrc: t.src, targetRef: t.ref || '', targetInitials: t.initials || '' }); }
+  return L;
 };
 MLP.perfStdName = o => o.standard === 'Custom' ? (o.standardOther || 'Custom') : (o.standard || 'not selected');
 function perfScopeIssues(o, tag, out){
@@ -549,7 +555,7 @@ function perfScopeIssues(o, tag, out){
     if (!String(r.ref || '').trim()) out.push(`${n}: record the reference`);
     if (!r.confirmed) out.push(`${n}: engineer must confirm`); });
 }
-MLP.perfIssues = function (perf){
+MLP.perfIssues = function (perf, opts){
   const out = [];
   if (!perf){ out.push('Performance Criteria not defined'); return out; }
   MLP.perfMigrate(perf);
@@ -557,18 +563,98 @@ MLP.perfIssues = function (perf){
   else if (!perf.narrativeConfirmed) out.push('Engineer must confirm the performance narrative (auto-drafted from the selections)');
   perfScopeIssues(perf, '', out);
   Object.entries(perf.areas || {}).forEach(([a, o]) => { if (o && o.enabled) perfScopeIssues(o, `Area/Group "${a}" override — `, out); });
+  MLP.sfdTargetIssues(perf, opts && opts.kinds).forEach(i => out.push(i));
   return out;
 };
 MLP.perfDraft = function (perf, classesUsed){
   if (!perf) return ''; MLP.perfMigrate(perf);
   const L = MLP.perfLimits(perf) || {}; const cls = (classesUsed && classesUsed.length ? classesUsed : MLP.PERF_CLASSES);
   const std = MLP.perfStdName(perf); const ul = MLP.perfIsUl(perf.standard); const fm = (MLP.perfPreset(perf.standard) || {}).family === 'FM';
-  const lim = cls.map(c => { const l = L[c] || {}; const t = l.target ?? MLP.SENS_TARGETS[c]; return `${c === 'SFD' ? 'SFD/OAP' : c}: target ${t != null ? t.toFixed(1) : '[engineer to define]'} %obs/ft; every sampling hole at or below ${l.sens ?? '[engineer to define]'} %obs/ft${ul && l.sensMin != null ? ` and not below the UL range lower limit ${l.sensMin} %obs/ft` : ''} with transport time at or below ${l.tt ?? '[engineer to define]'} s${ul && l.ttMin != null ? ` (not below ${l.ttMin} s)` : ''}${ul && l.ulRange ? ` [${l.ulRange}]` : ''}`; }).join('; ');
+  const lim = cls.map(c => { const l = L[c] || {}; const t = l.target ?? MLP.SENS_TARGETS[c]; return `${c === 'SFD' ? 'SFD/OAP' : c}: target ${t != null ? MLP.fmtTarget(t) : '[engineer to define]'} %obs/ft; every sampling hole at or below ${l.sens ?? '[engineer to define]'} %obs/ft${ul && l.sensMin != null ? ` and not below the UL range lower limit ${l.sensMin} %obs/ft` : ''} with transport time at or below ${l.tt ?? '[engineer to define]'} s${ul && l.ttMin != null ? ` (not below ${l.ttMin} s)` : ''}${ul && l.ulRange ? ` [${l.ulRange}]` : ''}`; }).join('; ');
   const areas = Object.entries(perf.areas || {}).filter(([, o]) => o && o.enabled).map(([a, o]) => `${a} (${MLP.perfStdName(o)})`);
   return `The aspirating smoke detection system is designed to the referenced standard ${std}${perf.specRef ? ' as required by ' + perf.specRef : ''}${ul ? ', applying the UL 268, 7th Edition thresholds (Install Manual App. A, printed p.113: VEWFD Special Application Range 1, EWFD Special Application Range 2 with 1.5 %obs/ft from NFPA 76, SFD/OAP Open Area) plus the code\'s prescriptions' : fm ? ', applying FM requirements only' : ''}. Performance classes used: ${cls.join(', ')}. Design limits — ${lim}.${areas.length ? ' Area/Group overrides: ' + areas.join(', ') + '.' : ''} ${ul ? (perf.ulConfirmed ? MLP.UL_STATEMENT + '.' : 'UL 268, 7th Edition compliance to be confirmed by the engineer.') : 'Limits and references are recorded and confirmed by the engineer.'}${perf.eorName ? ' Engineer of Record: ' + perf.eorName + '.' : ''}`;
 };
 MLP.perfStatement = perf => { if (!perf) return ''; MLP.perfMigrate(perf); const std = MLP.perfStdName(perf);
   return MLP.perfIsUl(perf.standard) ? (perf.ulConfirmed ? `${MLP.UL_STATEMENT} · Referenced standard: ${std}` : `UL 268, 7th Edition compliance NOT YET CONFIRMED by the engineer · Referenced standard: ${std}`) : `Referenced standard: ${std}${(MLP.perfPreset(perf.standard) || {}).family === 'FM' ? ' (FM requirements; not a UL 268 listing statement)' : ' (engineer-defined limits)'}`; };
+/* ---------------- SFD/OAP design target (02.02.001, Brent 2026-10-20) ----------------
+   Brent (6:39 AM CT): "SFD/OAP for Engineering Toolbox must be revised from 2.5% obs/ft to 2.0% obs/ft. Make this the target for any UL-driven SFD or OAP requirement. FM and other non-UL targets can remain at 2.5% obs/ft."
+   Brent (6:47–6:49 AM CT): "UL limit is 1.71% to 2.18%. Target 2.0% for practical purposes." · "Adjustable for FM too." · "Allow per-Area/Group overrides too." ·
+   "Reject it with a message." · "Yes, require a reference and initials."
+   The target is a design value only: UL pass/fail (UL_LIMITS / UL_RANGES) and FM pass/fail (FM_LIMITS) are unchanged.
+   Storage: perf.sfdTarget (project) and perf.areas[a].sfdTarget (override) = { value, ref, initials, at, family }. Absent = default.
+   An Area override with no target of its own inherits the project's target when both are the same family (UL or FM). */
+MLP.SFD_TARGET_DEFAULTS = { UL: 2.0, FM: 2.5, other: 2.5 };
+MLP.SFD_ENVELOPES = {
+  UL: { detector: { name: 'ModuLaser', min: 1.70, max: 2.18, ref: 'UL 268, 7th Ed. Open Area — ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113' },
+        minilaser: { name: 'MiniLaser', min: 1.70, max: 2.18, ref: 'UL 268 Ed.7 OAP — MiniLaser Installation Manual 3103175-EN Rev 001, Table 35, p.72' } },
+  FM: { detector: { name: 'ModuLaser', min: null, max: 2.50, ref: 'FM Class 3230 SFD — ModuLaser Install Manual 04-4001-501-0803-05, App. A, printed p.113' },
+        minilaser: { name: 'MiniLaser', min: null, max: 2.50, ref: 'FM 3230 SFD — MiniLaser Installation Manual 3103175-EN Rev 001, Table 35, p.72' },
+        asd160: { name: 'ASD-160', min: null, max: 3.5, ref: 'ASD-160 FM SFD (ASD160_FM_LIMITS)' } }
+};
+/* ASD-160 under UL: the 1.28 %obs/ft UL cap always governs, so it is not part of the UL envelope (the target never raises it). */
+MLP.SFD_TARGET_STEP = 0.01;
+MLP.fmtTarget = t => { const v = +t; return Math.abs(v * 10 - Math.round(v * 10)) < 1e-9 ? v.toFixed(1) : v.toFixed(2); };
+MLP.sfdFamily = o => { if (!o || !o.standard) return 'UL'; if (MLP.perfIsUl(o.standard)) return 'UL'; const p = MLP.perfPreset(o.standard); return p && p.family === 'FM' ? 'FM' : 'other'; };
+MLP.sfdKinds = kinds => { const k = Array.from(new Set((kinds || []).filter(x => x && x !== 'display'))); return k.length ? k : ['detector']; };
+/* intersection of the published ranges of the detector kinds present (null = not adjustable for this family) */
+MLP.sfdEnvelope = function (family, kinds){
+  const E = MLP.SFD_ENVELOPES[family]; if (!E) return null;
+  const used = MLP.sfdKinds(kinds).filter(k => E[k]); if (!used.length) used.push('detector');
+  let min = null, max = Infinity; const parts = [];
+  used.forEach(k => { const e = E[k]; if (e.min != null) min = min == null ? e.min : Math.max(min, e.min); max = Math.min(max, e.max); parts.push(e); });
+  const excl = family === 'UL' && MLP.sfdKinds(kinds).includes('asd160') ? ['ASD-160 (UL cap 1.28 %obs/ft governs)'] : [];
+  return { family, min, max, parts, excluded: excl,
+    text: parts.map(e => `${e.name} ${e.min != null ? e.min.toFixed(2) + '–' : '≤'}${e.max.toFixed(2)} %obs/ft`).concat(excl).join(' · ') };
+};
+MLP.sfdCheck = function (value, family, kinds){
+  const env = MLP.sfdEnvelope(family, kinds);
+  if (!env) return { ok: false, msg: 'The SFD/OAP target is fixed at 2.5 %obs/ft for this referenced standard (engineer-defined limits apply); it is adjustable for UL-driven and FM scopes.' };
+  const v = typeof value === 'number' ? value : (String(value ?? '').trim() === '' ? NaN : Number(String(value).trim()));
+  if (!isFinite(v)) return { ok: false, msg: `Rejected: "${value ?? ''}" is not a number. Enter the SFD/OAP target in %obs/ft (e.g. ${MLP.SFD_TARGET_DEFAULTS[family].toFixed(1)}).` };
+  if (Math.abs(v * 100 - Math.round(v * 100)) > 1e-6) return { ok: false, msg: `Rejected: ${v} has more than two decimals; enter the target to 0.01 %obs/ft.` };
+  if (!(v > 0)) return { ok: false, msg: 'Rejected: the SFD/OAP target must be greater than 0 %obs/ft.' };
+  const bad = env.parts.find(e => (e.min != null && v < e.min - 1e-9) || v > e.max + 1e-9);
+  if (bad) return { ok: false, msg: `Rejected: ${v.toFixed(2)} %obs/ft is outside the ${bad.name} published ${family === 'UL' ? 'UL' : 'FM'} limit ${bad.min != null ? bad.min.toFixed(2) + '–' : '≤ '}${bad.max.toFixed(2)} %obs/ft (${bad.ref}). Not saved.`, env };
+  return { ok: true, value: +v.toFixed(2), env };
+};
+MLP.sfdTarget = function (perf, area){
+  const o = perf ? MLP.perfScope(perf, area) : null, fam = MLP.sfdFamily(o), def = MLP.SFD_TARGET_DEFAULTS[fam];
+  const pick = (t, src) => ({ value: +t.value, family: fam, src, ref: t.ref || '', initials: t.initials || '', at: t.at || '', def });
+  if (o && o.sfdTarget && isFinite(+o.sfdTarget.value) && fam !== 'other') return pick(o.sfdTarget, o === perf ? 'project' : 'area');
+  if (o && o !== perf && perf.sfdTarget && isFinite(+perf.sfdTarget.value) && MLP.sfdFamily(perf) === fam && fam !== 'other') return pick(perf.sfdTarget, 'project');
+  return { value: def, family: fam, src: 'default', ref: '', initials: '', at: '', def };
+};
+MLP.sfdInitialsOk = s => /^[A-Za-z][A-Za-z.\-]{0,5}$/.test(String(s || '').trim());
+/* Set or reset a scope's target. Rejects (never clamps) and leaves the stored value untouched on any failure. */
+MLP.sfdTargetSet = function (perf, area, value, o){
+  o = o || {}; if (!perf) return { ok: false, msg: 'No Performance Criteria.' }; MLP.perfMigrate(perf);
+  const S = area ? (perf.areas || {})[area] : perf;
+  if (!S || (area && !S.enabled)) return { ok: false, msg: `Rejected: enable the Area/Group "${area}" override first.` };
+  const fam = MLP.sfdFamily(S), chk = MLP.sfdCheck(value, fam, o.kinds); if (!chk.ok) return chk;
+  const def = MLP.SFD_TARGET_DEFAULTS[fam], ref = String(o.ref || '').trim(), ini = String(o.initials || '').trim();
+  const inherited = area ? MLP.sfdTarget(Object.assign({}, perf, { areas: Object.assign({}, perf.areas, { [area]: Object.assign({}, S, { sfdTarget: undefined }) }) }), area).value : def;
+  if (Math.abs(chk.value - def) > 1e-9){
+    if (!ref) return { ok: false, msg: `Rejected: a target other than the ${def.toFixed(1)} %obs/ft default needs a reference (specification section, EOR letter or listing). Not saved.` };
+    if (!MLP.sfdInitialsOk(ini)) return { ok: false, msg: 'Rejected: a target other than the default needs the engineer\'s initials (letters, up to 6). Not saved.' };
+  }
+  if (!area && Math.abs(chk.value - def) < 1e-9) delete S.sfdTarget;
+  else if (area && Math.abs(chk.value - inherited) < 1e-9 && !ref) delete S.sfdTarget;
+  else S.sfdTarget = { value: chk.value, ref, initials: ini.toUpperCase(), at: o.at || new Date().toISOString(), family: fam };
+  return { ok: true, value: chk.value, family: fam, msg: `SFD/OAP target ${MLP.fmtTarget(chk.value)} %obs/ft saved${area ? ' for Area/Group "' + area + '"' : ' (project-wide)'}.` };
+};
+MLP.sfdTargetReset = function (perf, area){ const S = area ? (perf.areas || {})[area] : perf; if (S) delete S.sfdTarget; return { ok: true }; };
+/* stored-value audit (hand-edited or imported files, or detectors added later): flagged, never clamped */
+MLP.sfdTargetIssues = function (perf, kinds){
+  const out = []; if (!perf) return out;
+  const one = (S, tag) => { const t = S && S.sfdTarget; if (!t) return; const fam = MLP.sfdFamily(S);
+    if (t.family && t.family !== fam){ out.push(`${tag}SFD/OAP target ${t.value} was set for ${t.family}; the referenced standard is now ${fam} — re-enter it`); return; }
+    const c = MLP.sfdCheck(+t.value, fam, kinds); if (!c.ok){ out.push(`${tag}SFD/OAP target ${t.value} %obs/ft: ${c.msg.replace(/^Rejected: /, '').replace(/ Not saved\.$/, '')}`); return; }
+    if (Math.abs(+t.value - MLP.SFD_TARGET_DEFAULTS[fam]) > 1e-9 && (!String(t.ref || '').trim() || !MLP.sfdInitialsOk(t.initials))) out.push(`${tag}SFD/OAP target ${MLP.fmtTarget(t.value)} %obs/ft needs a reference and the engineer's initials`); };
+  one(perf, '');
+  Object.entries(perf.areas || {}).forEach(([a, o]) => { if (o && o.enabled) one(o, `Area/Group "${a}" override — `); });
+  return out;
+};
+MLP.SFD_NOTICE = 'SFD/OAP design target: 2.0 %obs/ft for UL-driven scopes and 2.5 %obs/ft for FM and other standards (Brent 2026-10-20). UL pass/fail is unchanged (Open Area 1.70–2.18 %obs/ft, ≤43 s). The target can be changed project-wide or per Area/Group under Performance Criteria, within each detector\'s published limits.';
 /* ---------------- MiniLaser ASD FHSD8075-ULF (1.5.0) ----------------
    Sources: MiniLaser Installation Manual 3103175-EN Rev 001 ("M p.N" = printed page), I/O module datasheet
    K85001-1064 ("DS p.N"), Brent 2026-10-16 decisions (plan-02.01.000-minilaser.md §2, §2.2). Real data only. */
