@@ -12,6 +12,7 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 - **Step 1 is now a full-width row (Brent 6:28 PM).** Its text is on the left and the screenshot on the right, like the Step 3 rows. The screenshot was re-captured at 2× and cropped to Brand, Project name, Prepared by and Date, so nothing is cut off and the text is legible. Step 2 sits in a matching row.
 - Step 3B now refers to steps 6–8.
 - The Calculator no longer carries the two Toolbox-only print images (`tb-config`, `tb-calc`); the Toolbox adds them itself, outside the shared Quick Start block.
+- **Every printed step is a full-width row (Brent 7:07 PM):** text on the left, screenshot on the right, on every page; steps without a screenshot use the full width. Step numbers run continuously across pages (tested in both brands). Step 3's A/B/C sub-steps are lettered a, b, c so no list on the printout restarts at 1. Page count unchanged.
 
 ### Brent's asks (verbatim, CT, Mon 2026-10-19)
 - 1:12 PM, Brent's private chat with Builder: "Revise Help Menu with current screenshots of calculator to replace legacy visual entries. Also, allow for printing an intuitive Quick Start guide apart from the help menu"
@@ -20,6 +21,7 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 - 5:36 PM, Brent's private chat with Builder (widget pick): "Keep the full-width rows"
 - 5:56 PM, Brent's private chat with Builder (widget pick): "Looks good, bump it to 02.02.001"
 - 6:28 PM, QA's chat (QA-reported, verbatim): "Item 1 in Quick Start is truncated and illegible due to font size.  Expand to horizontal"
+- 7:07 PM, Brent's private chat with Builder: "Make all items on second page horizontally displayed. Also, why did the numbering on page 2 begin at 1?"
 
 ### QA audit
 - Pending: QA/Auditor review of 02.02.001 (Calculator) / 00.03.001 (Toolbox).

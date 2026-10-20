@@ -9,6 +9,14 @@ async def q_step1(b, html):
     r=await q.evaluate("(()=>{const s=document.querySelector('.page .step'), g=s.parentElement.getBoundingClientRect(), bb=s.getBoundingClientRect(), i=s.querySelector('img'); return {row:s.classList.contains('row'), full:bb.width>=g.width-2, w:i?i.getBoundingClientRect().width:999, fit:[...document.querySelectorAll('.page')].every(p=>{const f=p.querySelector('.foot').getBoundingClientRect(); return [...p.querySelectorAll('.step')].every(x=>x.getBoundingClientRect().bottom<=f.top+1)})}})()")
     await q.close(); return r['row'] and r['full'] and r['fit'] and r['w']>=432
 
+async def q_rows(b, html):
+    q=await b.new_page(viewport={'width':816,'height':1056}); await q.set_content(html); await q.emulate_media(media='print')
+    r=await q.evaluate("""(()=>{const pages=[...document.querySelectorAll('.page')]; const nums=pages.map(p=>[...p.querySelectorAll('.step h2 .n')].map(e=>+e.textContent));
+      const rows=pages.every(p=>{const g=p.querySelector('.steps').getBoundingClientRect(); return [...p.querySelectorAll('.step')].every(s=>s.getBoundingClientRect().width>=g.width-2 && (s.classList.contains('path') || s.classList.contains('row')) && (!s.querySelector(':scope > img') || (()=>{const i=s.querySelector(':scope > img').getBoundingClientRect(), t=s.querySelector('p').getBoundingClientRect(); return i.left>=t.right-1;})()))});
+      return {nums, rows}})()""")
+    await q.close(); flat=[n for p in r['nums'] for n in p]
+    return flat==list(range(1,len(flat)+1)) and all(len(p) for p in r['nums']), r['rows'], r['nums']
+
 async def main():
   async with async_playwright() as p:
     b=await p.chromium.launch(); pg=await b.new_page(viewport={'width':1440,'height':1000}); errs=[]
@@ -44,6 +52,10 @@ async def main():
          'Choose your path' in html and all(x in html for x in ['<b>A</b>Import PipeCAD .pl','<b>B</b>Create manually','<b>C</b>Combination']) and len(re.findall(r'<div class="opt">.*?<img src="data:image/jpeg', html))==3)
     lt=await pg.evaluate("Object.keys(QS_PRINT_LIGHT)")
     ok('02.02.001: print-light shot set present (all print slots + path; Toolbox images only in the Toolbox)', all(k in lt for k in ['1-project-header','view-menu','2-add-location','3-design-basis','4-cluster-build','ribbon-rule','6-fan-and-mode','7-aux-battery','8-validation','path-a-import','path-b-manual','path-c-combination']) and (all(k in lt for k in ['tb-config','tb-calc']) if TB else not any(k in lt for k in ['tb-config','tb-calc'])), lt)
+    cont, rows, nums = await q_rows(b, html)
+    ok('02.02.001 (Brent 7:07 PM): step numbers run continuously across all pages (no restart at 1)', cont, nums)
+    ok('02.02.001 (Brent 7:07 PM): every step on every page is a full-width row; screenshot to the right of its text', rows)
+    ok('02.02.001: Step 3 A/B/C sub-steps are lettered (a, b, c), not numbered', html.count('<ol type="a">')==(0 if TB else 3))
     ok('02.02.001 (Brent 6:28 PM): Step 1 is a full-width row (spans both columns; screenshot ≥ 4.5 in wide; every step fits)', await q_step1(b, html))
     LV=set(await pg.evaluate("Object.values(QS_PRINT_LIGHT)"))
     srcs=re.findall(r'<img src="(data:image/jpeg[^"]+)"', html)
@@ -67,6 +79,7 @@ async def main():
     if not TB:
       await pg.evaluate("document.querySelector(\"#brand-seg button[data-v='kidde-commercial']\").click()"); await pg.wait_for_timeout(300)
       kh=await pg.evaluate("qsQuickStartHtml()"); KW=await pg.evaluate("APP_BRAND_LOGOS['kidde-commercial-white']")
+      kc, kr, kn = await q_rows(b, kh); ok('02.02.001 (Brent 7:07 PM): Kidde Commercial — continuous numbering and full-width rows', kc and kr, kn)
       ok('02.02.001: Kidde Commercial selected → Kidde white logo in the header', KW and f'src="{KW}"' in kh and 'Kidde Commercial ModuLaser Battery Calculator' in kh)
       await pg.evaluate("document.querySelector(\"#brand-seg button[data-v='edwards']\").click()"); await pg.wait_for_timeout(200)
     rv=await pg.evaluate("mlpCalcRev()"); ok('02.02.001: print header shows the running revision', f'Rev {rv}' in html and ('00.03.001_261019' if TB else '02.02.001_261019') in rv, rv)
