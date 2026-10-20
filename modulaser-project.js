@@ -10,7 +10,7 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.6.2';   // 1.6.2: MiniLaser SFD/OAP alarm factor follows the scope's SFD/OAP target (Brent 2026-10-20 7:09 AM CT). 1.6.1: SFD/OAP design target (Brent 2026-10-20) — project/Area target, published-limit validation, Fire 1 seed on UL scopes. 1.6.0: brand catalog (Edwards | Kidde Commercial), ASD-160 kind (MICRA25), hash defaults. 1.5.1: MiniLaser pipe limits (M p.66)
+MLP.VERSION = '1.6.3';   // 1.6.3: QA delta — stored out-of-range target held at the published limit for the Fire 1 seed / MiniLaser AF; one-time notice banner for Calculator and Report. 1.6.2: MiniLaser SFD/OAP alarm factor follows the scope's SFD/OAP target (Brent 2026-10-20 7:09 AM CT). 1.6.1: SFD/OAP design target (Brent 2026-10-20) — project/Area target, published-limit validation, Fire 1 seed on UL scopes. 1.6.0: brand catalog (Edwards | Kidde Commercial), ASD-160 kind (MICRA25), hash defaults. 1.5.1: MiniLaser pipe limits (M p.66)
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -236,7 +236,7 @@ MLP.configSeed = function (perfClass, kind, perf, area){
   const T = MLP.TYPICAL_DEFAULTS[perfClass];
   if (T) Object.keys(T).forEach(k => { values[k] = T[k]; src[k] = MLP.MANUAL_SOURCED[k] ? 'manual' : 'typical'; });
   /* 02.02.001 (Brent 2026-10-20): "Yes, for projects requiring UL compliance. All others can remain at 2.5% by default." */
-  if (T && perfClass === 'SFD' && perf && MLP.sfdFamily(MLP.perfScope(perf, area)) === 'UL'){ values.fire1 = MLP.sfdTarget(perf, area).value; src.fire1 = 'design'; }
+  if (T && perfClass === 'SFD' && perf && MLP.sfdFamily(MLP.perfScope(perf, area)) === 'UL'){ values.fire1 = MLP.sfdTargetUse(perf, area, kind).value; src.fire1 = 'design'; }
   Object.assign(values, { cascade: 'N', latchA: 'N', latchF: 'N', dayNight: 'N', ldd: 'Y' });
   ['cascade', 'latchA', 'latchF', 'dayNight', 'ldd'].forEach(k => { src[k] = 'typical'; });
   values.io = {};
@@ -624,6 +624,13 @@ MLP.sfdTarget = function (perf, area){
   if (o && o !== perf && perf.sfdTarget && isFinite(+perf.sfdTarget.value) && MLP.sfdFamily(perf) === fam && fam !== 'other') return pick(perf.sfdTarget, 'project');
   return { value: def, family: fam, src: 'default', ref: '', initials: '', at: '', def };
 };
+/* QA A1 (1.6.3): the value USED for the Fire 1 seed and the MiniLaser alarm factor. A stored out-of-range target (hand-edited or imported)
+   stays flagged and blocks export (sfdTargetIssues) but drives these at the nearest published limit for the device kind. */
+MLP.sfdTargetUse = function (perf, area, kind){
+  const t = MLP.sfdTarget(perf, area), env = MLP.sfdEnvelope(t.family, [kind || 'detector']);
+  let v = t.value; if (env && env.parts.length){ if (env.min != null && v < env.min) v = env.min; if (v > env.max) v = env.max; }
+  return Object.assign({}, t, { value: v, stored: t.value, held: Math.abs(v - t.value) > 1e-9 });
+};
 MLP.sfdInitialsOk = s => /^[A-Za-z][A-Za-z.\-]{0,5}$/.test(String(s || '').trim());
 /* Set or reset a scope's target. Rejects (never clamps) and leaves the stored value untouched on any failure. */
 MLP.sfdTargetSet = function (perf, area, value, o){
@@ -653,6 +660,20 @@ MLP.sfdTargetIssues = function (perf, kinds){
   one(perf, '');
   Object.entries(perf.areas || {}).forEach(([a, o]) => { if (o && o.enabled) one(o, `Area/Group "${a}" override — `); });
   return out;
+};
+/* One-time notice banner (dark theme) for the Calculator and the Report; the Toolbox shows it in Performance Criteria. */
+MLP.sfdNoticeMount = function (getPerf, onDismiss){
+  if (typeof document === 'undefined' || MLP._sfdNoticeTimer) return;
+  const tick = () => { const P = getPerf && getPerf(); const el = document.getElementById('mlp-sfd-notice');
+    if (!P || !P.sfdNotice){ if (el) el.remove(); return; } if (el || !document.body) return;
+    const d = document.createElement('div'); d.id = 'mlp-sfd-notice'; d.setAttribute('role', 'status');
+    d.style.cssText = 'position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:9999;max-width:760px;padding:10px 14px;background:#2a2410;color:#f0e6c8;border:1px solid #d29922;border-left:4px solid #d29922;border-radius:6px;font:13px/1.45 system-ui,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.5)';
+    d.textContent = MLP.SFD_NOTICE + ' ';
+    const b = document.createElement('button'); b.textContent = 'OK'; b.id = 'mlp-sfd-notice-ok';
+    b.style.cssText = 'margin-left:8px;padding:3px 12px;background:#d29922;color:#111;border:0;border-radius:4px;font-weight:600;cursor:pointer';
+    b.onclick = () => { P.sfdNotice = false; d.remove(); if (onDismiss) onDismiss(P); };
+    d.appendChild(b); document.body.appendChild(d); };
+  MLP._sfdNoticeTimer = setInterval(tick, 1000); tick();
 };
 MLP.SFD_NOTICE = 'SFD/OAP design target: 2.0 %obs/ft for UL-driven scopes and 2.5 %obs/ft for FM and other standards (Brent 2026-10-20). UL pass/fail is unchanged (Open Area 1.70–2.18 %obs/ft, ≤43 s). The target can be changed project-wide or per Area/Group under Performance Criteria, within each detector\'s published limits.';
 /* ---------------- MiniLaser ASD FHSD8075-ULF (1.5.0) ----------------
@@ -881,7 +902,7 @@ MLP.preEngLookup = function (shape, fan, holes, af){
 /* Brent-approved (2026-10-16) class order for the alarm-factor rule: Area/Group class → project class → SFD.
    perf = Performance Criteria (perf.standard + optional perf.areas[a] override). Returns { cls, src }. */
 /* scope target for the SFD/OAP alarm-factor rule (1.6.2) */
-MLP.sfdAfScope = (perf, area) => { if (!perf) return {}; const t = MLP.sfdTarget(perf, area); return { target: t.value, targetSrc: t.src, family: t.family }; };
+MLP.sfdAfScope = (perf, area) => { if (!perf) return {}; const t = MLP.sfdTargetUse(perf, area, 'minilaser'); return { target: t.value, targetSrc: t.src + (t.held ? ', held at the published limit' : ''), family: t.family }; };
 MLP.miniLaserClass = function (perf, area){
   const clsOf = id => { const p = MLP.perfPreset(id); return p && p.cls && MLP.MINILASER.afThresholds[p.cls] != null ? p.cls : ''; };
   /* 1.6.2: carry the scope's SFD/OAP target (Area/Group override → project → default) for the SFD/OAP alarm-factor rule */

@@ -86,7 +86,20 @@ const rec = { fan: 4, pipe: { holes: new Array(8).fill({}), lengthFt: 100 } };
 t('.pl import (miniLaserFromPl) derives AF from the Area target', M.miniLaserFromPl(rec, M.miniLaserClass(A3, 'Lab')).alarmFactor === 7 && M.miniLaserFromPl(rec, M.miniLaserClass(A3, 'Other')).alarmFactor === 8);
 t('designFromPl path: perf passed through (UL 1.80 → AF7)', (() => { const P2 = M.perfBlank(); M.sfdTargetSet(P2, '', 1.8, ok); return M.miniLaserFromPl(rec, M.miniLaserClass(P2, '')).derivation.threshold === 1.8; })());
 t('a .pl alarm factor (AfActivated) is still taken as-is', M.miniLaserFromPl({ fan: 4, pipe: { holes: new Array(8).fill({}), afActivatedRaw: 'true', af: 8 } }, c1).alarmFactor === 8);
-t('MLP 1.6.2', M.VERSION === '1.6.2');
+t('MLP 1.6.3', M.VERSION === '1.6.3');
+
+// QA A1: a stored out-of-range target stays flagged but drives the Fire 1 seed / MiniLaser AF at the nearest published limit
+const X = M.perfBlank(); X.sfdTarget = { value: 2.3, ref: 'hand-edited', initials: 'BW', family: 'UL' };
+t('A1: stored UL 2.30 still flagged (export blocked)', M.sfdTargetIssues(X).some(i => /outside/.test(i)) && M.perfIssues(X).some(i => /SFD\/OAP target 2\.3/.test(i)));
+t('A1: Fire 1 seed held at 2.18 (not 2.30)', M.configSeed('SFD', 'detector', X, '').values.fire1 === 2.18);
+t('A1: MiniLaser AF scope held at 2.18', M.sfdAfScope(X, '').target === 2.18 && /held/.test(M.sfdAfScope(X, '').targetSrc) && M.miniLaserClass(X, '').target === 2.18);
+X.sfdTarget = { value: 1.5, ref: 'x', initials: 'BW', family: 'UL' };
+t('A1: stored UL 1.50 held at the 1.70 lower limit for seed and AF', M.configSeed('SFD', 'detector', X, '').values.fire1 === 1.7 && M.sfdAfScope(X, '').target === 1.7);
+const XF = M.perfScopeInit({ areas: {}, sfdSchema: 1 }, 'SFD – FM DS 5-48'); XF.sfdTarget = { value: 3.5, ref: 'x', initials: 'BW', family: 'FM' };
+t('A1: FM 3.5 (valid for ASD-160 only) held at 2.50 for MiniLaser AF', M.sfdAfScope(XF, '').target === 2.5 && M.sfdTargetIssues(XF, ['asd160']).length === 0 && M.sfdTargetIssues(XF, ['minilaser']).length === 1);
+t('A1: in-range target is used as set (not held)', (() => { const Y = M.perfBlank(); M.sfdTargetSet(Y, '', 1.9, ok); return M.sfdTargetUse(Y, '', 'detector').held === false && M.configSeed('SFD', 'detector', Y, '').values.fire1 === 1.9; })());
+t('F1: FM project, only ASD-160s, target 3.5 → no SFD issue with kinds; ModuLaser default flags it', M.perfIssues(XF, { kinds: ['asd160'] }).every(i => !/SFD\/OAP target/.test(i)) && M.perfIssues(XF).some(i => /SFD\/OAP target/.test(i)));
+t('sfdNoticeMount exported', typeof M.sfdNoticeMount === 'function');
 // shared copies identical (whichever repo this runs in)
 const me = fs.readFileSync(path.join(__dirname, '..', 'modulaser-project.js'), 'utf8');
 const others = ['/workspace/MASD-Engineering-Toolbox', '/workspace/ModuLaser-Battery-Calculator', '/workspace/ModuLaser-Commisioning-Report'].map(r => path.join(r, 'modulaser-project.js')).filter(f => fs.existsSync(f));

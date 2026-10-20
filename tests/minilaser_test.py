@@ -39,7 +39,7 @@ async def main():
     pg.on('pageerror', lambda e: errs.append(str(e)))
     loc = await fresh(pg)
     v = await pg.evaluate('[runningRevisionFull(), MLP.VERSION, MASD_ENGINE_VERSION, typeof mlRecalcHook]')
-    ok('revision 02.02.001 (Toolbox 00.03.001), MLP 1.6.2, engine 1.2.0, MiniLaser layer loaded', v[0] in ('02.02.001_261019', '00.03.001_261019') and v[1] == '1.6.2' and v[2] == '1.2.0' and v[3] == 'function', v)
+    ok('revision 02.02.001 (Toolbox 00.03.001), MLP 1.6.3, engine 1.2.0, MiniLaser layer loaded', v[0] in ('02.02.001_261019', '00.03.001_261019') and v[1] == '1.6.3' and v[2] == '1.2.0' and v[3] == 'function', v)
     ok('standalone ASD card on every sheet', await pg.evaluate("[...document.querySelectorAll('.location')].every(l=>l.querySelector('.ml-card .ml-add'))"))
     # ---- hand add: picker is the default, Cancel → manual; blank fan amber
     await pg.click(f'#location-{loc} .ml-add'); await pg.wait_for_timeout(200)
