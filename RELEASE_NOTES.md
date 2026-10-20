@@ -13,6 +13,7 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 - Step 3B now refers to steps 6–8.
 - The Calculator no longer carries the two Toolbox-only print images (`tb-config`, `tb-calc`); the Toolbox adds them itself, outside the shared Quick Start block.
 - **Every printed step is a full-width row (Brent 7:07 PM):** text on the left, screenshot on the right, on every page; steps without a screenshot use the full width. Step numbers run continuously across pages (tested in both brands). Step 3's A/B/C sub-steps are lettered a, b, c so no list on the printout restarts at 1. Page count unchanged.
+- **Legible screenshots on every printed page (QA bump delta 2; Brent 6:28 PM problem on pages 2–3).** The View menu, Build clusters, Power: ribbon runs, Fan speeds and Batteries screenshots were re-captured at 2× with tighter crops at full image width, so table text is readable. Every printed screenshot is now at most 1.9 source pixels per print pixel, and a test checks this for every image in both brands. The Power: ribbon runs screenshot is no longer cut off at the right, and Step 1 has padding around the date field. Page count unchanged (3).
 
 ### Brent's asks (verbatim, CT, Mon 2026-10-19)
 - 1:12 PM, Brent's private chat with Builder: "Revise Help Menu with current screenshots of calculator to replace legacy visual entries. Also, allow for printing an intuitive Quick Start guide apart from the help menu"

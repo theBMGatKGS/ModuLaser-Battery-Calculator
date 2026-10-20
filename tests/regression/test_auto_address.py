@@ -165,7 +165,7 @@ async def main():
     ok('G1 merge path wired in handleImportFile', await pg.evaluate("handleImportFile.toString().includes(\"promptAutoAddress('merge', aaPre)\")"))
     ok('P* .pl path wired', await pg.evaluate("plFinish.toString().includes(\"promptAutoAddress('import', aaPre)\")"))
 
-    rv=await pg.evaluate("typeof mlpCalcRev==='function'?mlpCalcRev():''"); ok('rev 02.02.001_261019 (Toolbox 00.03.001_261019)', ('00.03.001_261019' if TB else '02.02.001_261019') in rv, rv)
+    rv=await pg.evaluate("typeof mlpCalcRev==='function'?mlpCalcRev():''"); ok('rev 02.02.001_261019 (Toolbox 00.03.001_261019)', rv == ('Toolbox 00.03.001_261019' if TB else '02.02.001_261019'), rv)
     ok('no page errors', not errs, errs)
     await b.close()
   print(f'{sum(R)}/{len(R)} passed'); sys.exit(0 if all(R) else 1)

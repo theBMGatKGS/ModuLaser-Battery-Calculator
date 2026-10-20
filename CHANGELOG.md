@@ -17,6 +17,7 @@ regenerate this file from it rather than hand-editing both.
 - Help: Quick Start step, How Do I and a new FAQ (import vs manual vs both). No calculation change (MLP 1.6.0, engine 1.2.0). Service-worker cache `modulaser-calc-v55`.
 - Step 1 of the printout is a full-width row with a legible 2× screenshot (Brent 6:28 PM); Step 3B refers to steps 6–8; the Toolbox-only print images are removed from the Calculator.
 - Every printed Quick Start step is a full-width row with its screenshot on the right (Brent 7:07 PM); numbering continuous across pages; Step 3 sub-steps lettered a, b, c.
+- Printed screenshots legible (QA bump delta 2): View menu, Build clusters, Power: ribbon runs, Fan speeds and Batteries re-captured at 2× with tighter crops (≤ 1.9 source px per print px, tested for every image in both brands; `QS_PRINT_DPR` records the capture scale); ribbon-runs screenshot no longer cut off; Step 1 padded. Revision checks are exact matches.
 
 ### 02.02.000 — 2026-10-19 (released 2026-10-19; QA/Auditor GO on 4f4c5e5)
 - **Manual battery or capacity pick turns Auto Battery Sizing off** (with a toast); the controls stay selectable in Auto.

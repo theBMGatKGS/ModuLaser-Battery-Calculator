@@ -17,6 +17,13 @@ async def q_rows(b, html):
     await q.close(); flat=[n for p in r['nums'] for n in p]
     return flat==list(range(1,len(flat)+1)) and all(len(p) for p in r['nums']), r['rows'], r['nums']
 
+SCALE_MAX=1.9   # 02.02.001 (QA bump delta 2, D1): source px (at 1x, i.e. naturalWidth / capture DPR) per printed CSS px
+async def q_scale(b, html):
+    q=await b.new_page(viewport={'width':816,'height':1056}); await q.set_content(html); await q.emulate_media(media='print'); await q.wait_for_timeout(300)
+    r=await q.evaluate("""[...document.querySelectorAll('.page')].flatMap((p,pi)=>[...p.querySelectorAll('.step img')].map(i=>{const r=i.getBoundingClientRect(), d=+i.dataset.dpr;
+      return {page:pi+1, step:+i.closest('.step').querySelector('.n').textContent, alt:i.alt, dpr:d, ok:i.complete&&i.naturalWidth>0, scale:d>0&&r.width>0? i.naturalWidth/d/r.width : 99}}))""")
+    await q.close(); return r
+
 async def main():
   async with async_playwright() as p:
     b=await p.chromium.launch(); pg=await b.new_page(viewport={'width':1440,'height':1000}); errs=[]
@@ -82,7 +89,13 @@ async def main():
       kc, kr, kn = await q_rows(b, kh); ok('02.02.001 (Brent 7:07 PM): Kidde Commercial — continuous numbering and full-width rows', kc and kr, kn)
       ok('02.02.001: Kidde Commercial selected → Kidde white logo in the header', KW and f'src="{KW}"' in kh and 'Kidde Commercial ModuLaser Battery Calculator' in kh)
       await pg.evaluate("document.querySelector(\"#brand-seg button[data-v='edwards']\").click()"); await pg.wait_for_timeout(200)
-    rv=await pg.evaluate("mlpCalcRev()"); ok('02.02.001: print header shows the running revision', f'Rev {rv}' in html and ('00.03.001_261019' if TB else '02.02.001_261019') in rv, rv)
+    BR=await pg.evaluate("[...document.querySelectorAll('#brand-seg button[data-v]')].map(e=>e.dataset.v)")
+    for br in (BR or ['default']):
+      if BR: await pg.evaluate(f"document.querySelector(\"#brand-seg button[data-v='{br}']\").click()"); await pg.wait_for_timeout(250)
+      sc=await q_scale(b, await pg.evaluate("qsQuickStartHtml()"))
+      ok(f'02.02.001 (QA D1): every printed Quick Start screenshot is legible, ≤ {SCALE_MAX} source px per print px [{br}]', len(sc)==(2 if TB else 12) and all(x['ok'] and x['dpr'] in (1,2) and x['scale']<=SCALE_MAX for x in sc), [(x['step'],x['alt'][:18],x['dpr'],round(x['scale'],2)) for x in sc])
+    if BR: await pg.evaluate("document.querySelector(\"#brand-seg button[data-v='edwards']\").click()"); await pg.wait_for_timeout(200)
+    rv=await pg.evaluate("mlpCalcRev()"); ok('02.02.001: print header shows the running revision', f'Rev {rv}' in html and rv == ('Toolbox 00.03.001_261019' if TB else '02.02.001_261019'), rv)
     ok('02.02.001: Help Quick Start step, How Do I and FAQ describe the printout (path A/B/C, light screenshots)', await pg.evaluate("(()=>{const q=document.getElementById('qs-step-print-quickstart').parentElement.textContent, h=HOWDOI_COMMON.find(x=>x.id==='print-quickstart').blurb; return /Choose your path/.test(q) && /light theme/.test(q) && /Choose your path/.test(h) && [...document.querySelectorAll('#help-faq .q')].some(e=>/import a PipeCAD [.]pl or build the calc manually/.test(e.textContent))})()"))
     ok('Print Quick Start uses a hidden iframe document', await pg.evaluate("(()=>{const f=document.getElementById('qs-print-frame'); return !!f && f.contentDocument.querySelectorAll('.page').length==="+str(NP)+"})()"))
     ok('no page errors', not errs, errs)
