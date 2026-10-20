@@ -7,7 +7,7 @@ def _od(*p):
     d=_os.path.join(MLP_OUT,*p); _os.makedirs(d,exist_ok=True); return d.rstrip('/')+'/'
 APP='file:///workspace/ModuLaser-Battery-Calculator/modulaser_battery_calculator.html'
 T='/workspace/plbuild/t/'; SH=_od('calcshots')
-FILES={'NFPA318-Fab-Ceiling':'NFPA318-Fab-Ceiling.pl','Example Project':'Example Project.pl','Example':'Example Roadway_Re-Calc Pipes.pl','deck':'Example Deck A-D2.pl','fmp':'Example Warehouse Main Room (OAP).pl'}
+FILES={'fab':'NFPA318-Fab-Ceiling.pl','Example Project':'Example Project.pl','Example':'Example Roadway_Re-Calc Pipes.pl','deck':'Example Deck A-D2.pl','fmp':'Example Warehouse Main Room (OAP).pl'}
 res=[]
 def ok(name,cond,info=''):
     res.append((name,bool(cond),info)); print(('PASS' if cond else 'FAIL'),name,info)
@@ -73,7 +73,7 @@ async def main():
         tray=await pg.evaluate('''()=>Object.entries(plWiz.unassignedByGroup).map(([k,u])=>{const [fi,gi]=k.split(':').map(Number);return {file:plWiz.files[fi].fileName,group:plWiz.files[fi].groups[gi].origName,n:u.length}})''')
         dk=[t for t in tray if t['file'].startswith('Deck')]
         ok('Deck lone detectors land in Unassigned tray', sum(t['n'] for t in dk)>0, json.dumps(dk))
-        ok('NFPA318-Fab-Ceiling has nothing unassigned', all(t['n']==0 for t in tray if t['file']=='NFPA318-Fab-Ceiling.pl'), '')
+        ok('Fab ceiling has nothing unassigned', all(t['n']==0 for t in tray if t['file']=='NFPA318-Fab-Ceiling.pl'), '')
         nun=await pg.evaluate('plUnassignedCount()')
         dis=await pg.evaluate("document.getElementById('plw-finish').disabled"); m=await pg.text_content('#plw-msg')
         ok('Create blocked with "N detectors still unassigned"', dis and f'{nun} detectors still unassigned' in m, m)
@@ -91,15 +91,15 @@ async def main():
         info=await pg.evaluate('''()=>Object.entries(plWiz.psuByGroup).map(([k,ps])=>{const [fi,gi]=k.split(':').map(Number);const f=plWiz.files[fi];return {file:f.fileName,group:f.groups[gi].origName,psus:ps.map(p=>({det:p.devices.filter(d=>d.kind==='detector').length,disp:p.devices.filter(d=>d.kind==='display').length,ah:+plRequiredAh(p.devices).toFixed(1),fromFile:!!p.fromFile}))}})''')
         json.dump(info,open(_od('plbuild')+'psu_info.json','w'),indent=1)
         bw=[g for g in info if g['file']=='NFPA318-Fab-Ceiling.pl'][0]
-        ok('NFPA318-Fab-Ceiling 6 detectors split to <=4 per PSU', sum(p['det'] for p in bw['psus'])==6 and all(p['det']<=4 for p in bw['psus']) and len(bw['psus'])>=2, json.dumps(bw['psus']))
-        ok('NFPA318-Fab-Ceiling splits 4+display / 2', sorted((p['det'],p['disp']) for p in bw['psus'])==[(2,0),(4,1)], json.dumps(bw['psus']))
+        ok('Fab ceiling 6 detectors split to <=4 per PSU', sum(p['det'] for p in bw['psus'])==6 and all(p['det']<=4 for p in bw['psus']) and len(bw['psus'])>=2, json.dumps(bw['psus']))
+        ok('Fab ceiling splits 4+display / 2', sorted((p['det'],p['disp']) for p in bw['psus'])==[(2,0),(4,1)], json.dumps(bw['psus']))
         so=[g for g in info if g['file'].startswith('Example Project')][0]
         ok('Example Project seeded from 2 file PSUs', sum(p['fromFile'] for p in so['psus'])==2, json.dumps(so['psus']))
         by=[g['group'] for g in info if g['file'].startswith('Example')]
         ok('Example group selection (3 of 5)', len(by)==3, str(by))
         allp=[p for g in info for p in g['psus']]
         ok('all PSUs satisfy rules', all(p['det']<=4 and p['disp']<=1 and p['ah']<=65 for p in allp), f'{len(allp)} PSUs')
-        # violation test: move a detector into the full NFPA318-Fab-Ceiling PSU
+        # violation test: move a detector into the full fab-ceiling PSU
         k=[k for k in await pg.evaluate('Object.keys(plWiz.psuByGroup)') if k.startswith(str(await pg.evaluate("plWiz.files.findIndex(f=>f.fileName==='NFPA318-Fab-Ceiling.pl')"))+':')][0]
         await pg.evaluate(f'''()=>{{const ps=plWiz.psuByGroup["{k}"]; const big=ps.find(p=>p.devices.filter(d=>d.kind==='detector').length===4); const other=ps.find(p=>p!==big&&p.devices.some(d=>d.kind==='detector')); big.devices.push(other.devices.splice(other.devices.findIndex(d=>d.kind==='detector'),1)[0]); plRender();}}''')
         dis=await pg.evaluate("document.getElementById('plw-finish').disabled"); ok('violation blocks Create sheets', dis)
@@ -121,21 +121,21 @@ async def main():
         import time; t0=time.time(); await pg.click('#plw-finish'); await pg.wait_for_timeout(500); await confirm_settings(pg); print('finish secs', round(time.time()-t0,1))
         nloc=await pg.evaluate("document.querySelectorAll('.location').length"); ok('one sheet per PSU', nloc==npsu, f'{nloc} sheets / {npsu} PSUs')
         e2=[e for e in errs]; ok('no page errors after import', not e2, ';'.join(e2[:3]))
-        rows=await pg.evaluate('''()=>{const l=[...document.querySelectorAll('.location')].find(l=>l.querySelector('.ps-location').value==='Area A');return [...l.querySelectorAll('[data-role=module]')].map(r=>({t:r.querySelector('.type-select').value,z:r.querySelector('.zone-name').value,f:r.querySelector('.fanspeed-select').value,a:r.querySelector('.module-address').value,needs:r.querySelector('.module-address').classList.contains('field-needs'),k:r.dataset.plKey}))}''')
-        ok('NFPA318-Fab-Ceiling sheet prefilled (Minimum Display + fan speeds)', rows[0]['t']=='Minimum Display' and all(r['f'] for r in rows[1:]), json.dumps(rows)[:300])
+        rows=await pg.evaluate('''()=>{const l=[...document.querySelectorAll('.location')].find(l=>l.querySelector('.ps-location').value==='Fab Ceiling RA');return [...l.querySelectorAll('[data-role=module]')].map(r=>({t:r.querySelector('.type-select').value,z:r.querySelector('.zone-name').value,f:r.querySelector('.fanspeed-select').value,a:r.querySelector('.module-address').value,needs:r.querySelector('.module-address').classList.contains('field-needs'),k:r.dataset.plKey}))}''')
+        ok('Fab ceiling sheet prefilled (Minimum Display + fan speeds)', rows[0]['t']=='Minimum Display' and all(r['f'] for r in rows[1:]), json.dumps(rows)[:300])
         ok('address left blank + needs-entry highlight', all(r['a']=='' and r['needs'] for r in rows), '')
         cmp=await pg.evaluate("""()=>[...document.querySelectorAll('.location')].map(l=>{const t=(l.querySelector('.required-ah')||{}).textContent||''; return {ps:l.querySelector('.ps-name').value, sheet:parseFloat(t), aux:l.querySelector('.aux-circuits').value}})""")
         json.dump(cmp,open(_od('plbuild')+'sheet_ah.json','w'))
         over=[c for c in cmp if c['sheet']>65]
         ok('no created sheet requires >65 Ah', not over, json.dumps(over[:5]))
-        await pg.evaluate("[...document.querySelectorAll('.location')].find(l=>l.querySelector('.ps-location').value==='Area A').scrollIntoView()")
-        await pg.wait_for_timeout(200); await pg.screenshot(path=SH+'07-resulting-sheet-NFPA318-Fab-Ceiling.png')
+        await pg.evaluate("[...document.querySelectorAll('.location')].find(l=>l.querySelector('.ps-location').value==='Fab Ceiling RA').scrollIntoView()")
+        await pg.wait_for_timeout(200); await pg.screenshot(path=SH+'07-resulting-sheet-fab.png')
         links=await pg.evaluate('PL_LINKS.map(l=>({n:l.name,sha:l.sha256.length,d:Object.keys(l.devices).length}))'); ok('5 linked files with SHA-256', len(links)==5 and all(l['sha']==64 for l in links), json.dumps(links))
         # save/restore round trip of links
         st=await pg.evaluate('JSON.stringify(buildStateObject())')
         await pg.evaluate('s=>applyLoadedState(JSON.parse(s))', st); await pg.wait_for_timeout(500)
         ok('links + row mapping survive save/load', await pg.evaluate("PL_LINKS.length===5 && document.querySelectorAll('[data-pl-key]').length>0 && !!document.querySelector('.location[data-pl-sheet-id]')"))
-        # link change: modify NFPA318-Fab-Ceiling: fan 14->10 on the first detector, remove one detector? add new detector
+        # link change: modify the fab-ceiling file: fan 14->10 on the first detector
         src=open(T+'NFPA318-Fab-Ceiling.pl').read()
         mod=src.replace('<aspiratorSpeed>14</aspiratorSpeed>','<aspiratorSpeed>10</aspiratorSpeed>',1)
         T2=_od('plbuild','t2'); open(T2+'NFPA318-Fab-Ceiling.pl','w').write(mod)
@@ -153,7 +153,7 @@ async def main():
         await pg.screenshot(path=SH+'10-link-change-banner.png', clip={'x':0,'y':0,'width':1500,'height':560})
         await pg.click('[data-review]'); await pg.wait_for_timeout(200)
         await pg.click('#pld-apply'); await pg.wait_for_timeout(400)
-        fan=await pg.evaluate(f"plRowsForKey('{lid}|Area A#id0')[0].querySelector('.fanspeed-select').value"); ok('re-import updated fan 14->10', fan=='10', fan)
+        fan=await pg.evaluate(f"plRowsForKey('{lid}|Fab Ceiling RA#id0')[0].querySelector('.fanspeed-select').value"); ok('re-import updated fan 14->10', fan=='10', fan)
         ok('banner cleared after apply', await pg.evaluate("document.getElementById('pl-link-banner').hidden"))
         # Import Calc round-trip of the imported document (Replace)
         html=await pg.evaluate("()=>{updateEmbeddedStateTag(buildStateObject()); return '<!DOCTYPE html>\\n'+document.documentElement.outerHTML}")

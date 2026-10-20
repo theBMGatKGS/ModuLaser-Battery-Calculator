@@ -7,7 +7,8 @@ def _od(*p):
     d=_os.path.join(MLP_OUT,*p); _os.makedirs(d,exist_ok=True); return d.rstrip('/')+'/'
 APP=os.environ.get('APP','file:///workspace/ModuLaser-Battery-Calculator/modulaser_battery_calculator.html')
 TAG='tb-' if 'Toolbox' in APP else ''
-T='/workspace/plbuild/t/'; SH=_od('shots-0204')
+T='/workspace/plbuild/t/'
+import make_nfpa318_pl as _syn; _syn.ensure(T); SH=_od('shots-0204')
 R=[]
 def ok(n,c,i=''): R.append(bool(c)); print('PASS' if c else 'FAIL',n,str(i)[:300])
 AMBER="(()=>[...document.querySelectorAll('.location .field-needs')].map(e=>({cls:e.className.split(' ')[0],v:e.value})))()"

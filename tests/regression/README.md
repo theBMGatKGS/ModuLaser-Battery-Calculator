@@ -9,4 +9,5 @@ Run one suite: `python3 tests/regression/test_v2.py` (and so on); run every `tes
 - `inject.py`, `dev.py`, `help_edit.py` and `shot.py` are build/screenshot helpers, not tests.
 
 - Defaults use the repo under test: `regress.py` builds both the base (`BASE_REV`, default `main`) and the new build from this repo (working tree, or `NEW_REV`). `test_disparate_arrangement.py` covers the warning-only Disparate-clusters rule.
+- `make_nfpa318_pl.py` writes the synthetic `NFPA318-Fab-Ceiling.pl` (NFPA 318 fab ceiling, 6 detectors + 1 Minimum Display, fictional values) into `/workspace/plbuild/t/` on every run; it replaces the former real-project fixture.
 - Brent's Example Shaft fixtures stay off GitHub; the MiniLaser tests skip those sections with a clear message when they are absent.

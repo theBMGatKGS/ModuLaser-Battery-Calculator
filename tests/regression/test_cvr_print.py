@@ -22,7 +22,7 @@ async def main():
     await import_files(pg,['NFPA318-Fab-Ceiling.pl','Example Project.pl','Example Warehouse Main Room (OAP).pl'])
     await fill_addresses(pg)
     await pg.evaluate(r"""()=>{document.getElementById('project-name-input').value='Sample Project';document.getElementById('network-number-input').value='Network 1';document.getElementById('prepared-by-input').value='Designer';
-      const re=/Example Project|Example Project|Example Warehouse Main Room \(OAP\)/g;   // neutral names in rendered images
+      const re=/Example Project|Example Warehouse Main Room \(OAP\)|Example Warehouse Parts/g;   // neutral names in rendered images
       document.querySelectorAll('.location input').forEach(e=>{ if(typeof e.value==='string' && e.value.match(re)) e.value=e.value.replace(re,'Site'); });
       document.querySelectorAll('.location').forEach(l=>recalcLocationInner(l.dataset.loc)); if(window.syncPrintHeaders) syncPrintHeaders();}""")
     ok('cvrPageCss names this app', NAME in await pg.evaluate("cvrPageCss()"), NAME)

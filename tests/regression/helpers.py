@@ -1,6 +1,7 @@
 import asyncio, json, os, subprocess
 APP=os.environ.get('APP','file:///workspace/ModuLaser-Battery-Calculator/modulaser_battery_calculator.html')
 T='/workspace/plbuild/t/'
+import make_nfpa318_pl as _syn; _syn.ensure(T)   # synthetic NFPA 318 fab-ceiling fixture, regenerated each run
 async def pick_step1(pg, basis='NFPA 72 Voice', temp='77'):
     # 02.00.004: wizard step 1 Design Basis / Ambient Temp start on '- Select -' (required)
     await pg.evaluate("([b,t])=>{for(const [id,v] of [['plw-basis',b],['plw-temp',t]]){const s=document.getElementById(id);if(s&&!s.value){s.value=v;s.dispatchEvent(new Event('change'))}}}", [basis,temp])
@@ -42,7 +43,7 @@ async def fill_addresses(pg):
     # give every module a unique address and fill header so some sheets PASS
     await pg.evaluate('''()=>{let a=1;document.querySelectorAll('.location').forEach(l=>{l.querySelectorAll('[data-role=module]').forEach(r=>{const s=r.querySelector('.module-address');s.dataset.desiredValue=String(a);s.value=String(a);a++;});});
       updateNetworkAddressAvailability();document.querySelectorAll('.location').forEach(l=>{recalcLocationInner(l.dataset.loc)});
-      document.getElementById('project-name-input').value='Sample Tower Expansion';document.getElementById('prepared-by-input').value='B. Wilkins';document.getElementById('network-number-input').value='Network 1';document.getElementById('building-input').value='Bldg 4';refreshAllAmber();}''')
+      document.getElementById('project-name-input').value='NFPA 318 Fab Ceiling';document.getElementById('prepared-by-input').value='B. Wilkins';document.getElementById('network-number-input').value='Network 1';document.getElementById('building-input').value='Bldg 4';refreshAllAmber();}''')
     await pg.wait_for_timeout(400)
 async def render_pdf(browser, html, path):
     pg=await browser.new_page(); await pg.set_content(html); await pg.wait_for_function("document.documentElement.getAttribute('data-fit')==='done'")

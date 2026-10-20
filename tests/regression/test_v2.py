@@ -49,7 +49,7 @@ async def main():
         await pg.evaluate("(()=>{const i=document.querySelector('.location-current .zone-name');i.value='Zone A';i.dispatchEvent(new Event('input',{bubbles:true}));})()")
         # settings bar collapse
         await pg.click('#proj-settings-toggle'); await pg.wait_for_timeout(100)
-        ok('Project Settings collapses to one-line summary', await pg.evaluate("document.getElementById('proj-settings').classList.contains('collapsed') && /Sample Tower Expansion/.test(document.getElementById('proj-settings-summary').textContent)"))
+        ok('Project Settings collapses to one-line summary', await pg.evaluate("document.getElementById('proj-settings').classList.contains('collapsed') && /NFPA 318 Fab Ceiling/.test(document.getElementById('proj-settings-summary').textContent)"))
         await pg.screenshot(path=SH+'01b-settings-collapsed.png', clip={'x':0,'y':0,'width':1500,'height':260})
         await pg.click('#proj-settings-toggle'); await pg.wait_for_timeout(100)
         await pg.screenshot(path=SH+'02-settings-expanded.png', clip={'x':0,'y':0,'width':1500,'height':330})
