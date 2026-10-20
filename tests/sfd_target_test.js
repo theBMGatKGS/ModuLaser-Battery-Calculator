@@ -64,7 +64,29 @@ t('1.2.0 draft (market/basis) migrates and adopts 2.0', legacy.standard === 'SFD
 t('new project raises no notice', M.perfBlank().sfdNotice !== true);
 const fmOld = { standard: 'EWFD – FM DS 5-32', areas: {}, limits: M.perfPresetLimits('EWFD – FM DS 5-32'), codeReqs: [] };
 t('older FM project adopts 2.5', M.perfLimits(fmOld).SFD.target === 2.5);
-t('no pass/fail regression: UL_RANGES.SFD 1.70–2.18, MiniLaser table35 OAP 1.70–2.18, afThresholds unchanged', M.UL_RANGES.SFD.sensMin === 1.7 && M.UL_RANGES.SFD.sensMax === 2.18 && M.MINILASER.table35['UL 268 Ed.7 OAP'].sensMax === 2.18 && M.MINILASER.afThresholds.OAP === 2.18 && M.MINILASER.afThresholds.SFD === 2.0);
+t('no pass/fail regression: UL_RANGES.SFD 1.70–2.18, MiniLaser table35 OAP 1.70–2.18 (UL lower limit stays 1.70 — Brent 7:09 AM "Keep 1.70, per the manual")', M.UL_RANGES.SFD.sensMin === 1.7 && M.UL_RANGES.SFD.sensMax === 2.18 && M.MINILASER.table35['UL 268 Ed.7 OAP'].sensMax === 2.18 && M.MINILASER.afThresholds.SFD === 2.0);
+
+// MiniLaser alarm factor follows the SFD/OAP target (Brent 2026-10-20 7:09 AM CT: "Yes, follow the target")
+const D = (h, c, sc) => M.deriveAlarmFactor(h, c, sc);
+t('no-project fallback: OAP and SFD use the UL default target 2.0 (was OAP 2.18)', M.MINILASER.afThresholds.OAP === 2.0 && D(8, 'OAP').threshold === 2.0 && D(8, 'SFD').threshold === 2.0);
+t('9 holes OAP: AF7 at 2.0 (0.25×9=2.25 > 2.0); AF7 also at 2.18', D(9, 'OAP').af === 7 && D(9, 'OAP', { target: 2.18 }).af === 7);
+const A1 = M.perfBlank(); M.sfdTargetSet(A1, '', 1.8, ok); const c1 = M.miniLaserClass(A1, '');
+t('UL project target 1.80 carried by miniLaserClass', c1.target === 1.8 && c1.family === 'UL' && c1.targetSrc === 'project');
+t('UL project 1.80: OAP 8 holes → AF7 (2.00 > 1.80; 1.44 ≤ 1.80)', D(8, 'OAP', c1).af === 7 && D(8, 'OAP', c1).threshold === 1.8 && /target/.test(D(8, 'OAP', c1).thresholdSrc));
+t('UL project 1.80: SFD follows too', D(8, 'SFD', c1).af === 7);
+t('UL project 2.18: OAP 8 holes → AF8', (M.sfdTargetSet(A1, '', 2.18, ok), D(8, 'OAP', M.miniLaserClass(A1, '')).af === 8));
+t('VEWFD/EWFD unaffected by the target', D(4, 'VEWFD', c1).threshold === 1.0 && D(4, 'EWFD', c1).threshold === 1.5);
+const A2 = M.perfScopeInit({ areas: {}, sfdSchema: 1 }, 'SFD – FM DS 5-48'); const c2 = M.miniLaserClass(A2, '');
+t('FM project follows its own target (default 2.5): 10 holes → AF8 (2.50 ≤ 2.5)', c2.target === 2.5 && c2.family === 'FM' && D(10, 'SFD', c2).af === 8);
+M.sfdTargetSet(A2, '', 2.2, ok);
+t('FM project 2.20: 10 holes → AF7', D(10, 'SFD', M.miniLaserClass(A2, '')).af === 7 && D(10, 'SFD', M.miniLaserClass(A2, '')).threshold === 2.2);
+const A3 = M.perfBlank(); A3.areas = { Lab: { enabled: true } }; M.perfScopeInit(A3.areas.Lab, 'SFD/OAP – NFPA 72'); M.sfdTargetSet(A3, 'Lab', 1.75, { ref: 'Lab spec', initials: 'JD' });
+t('Area/Group target used for that Area (1.75), project default elsewhere (2.0)', M.miniLaserClass(A3, 'Lab').target === 1.75 && M.miniLaserClass(A3, 'Other').target === 2.0 && D(8, 'OAP', M.miniLaserClass(A3, 'Lab')).af === 7 && D(8, 'OAP', M.miniLaserClass(A3, 'Other')).af === 8);
+const rec = { fan: 4, pipe: { holes: new Array(8).fill({}), lengthFt: 100 } };
+t('.pl import (miniLaserFromPl) derives AF from the Area target', M.miniLaserFromPl(rec, M.miniLaserClass(A3, 'Lab')).alarmFactor === 7 && M.miniLaserFromPl(rec, M.miniLaserClass(A3, 'Other')).alarmFactor === 8);
+t('designFromPl path: perf passed through (UL 1.80 → AF7)', (() => { const P2 = M.perfBlank(); M.sfdTargetSet(P2, '', 1.8, ok); return M.miniLaserFromPl(rec, M.miniLaserClass(P2, '')).derivation.threshold === 1.8; })());
+t('a .pl alarm factor (AfActivated) is still taken as-is', M.miniLaserFromPl({ fan: 4, pipe: { holes: new Array(8).fill({}), afActivatedRaw: 'true', af: 8 } }, c1).alarmFactor === 8);
+t('MLP 1.6.2', M.VERSION === '1.6.2');
 // shared copies identical (whichever repo this runs in)
 const me = fs.readFileSync(path.join(__dirname, '..', 'modulaser-project.js'), 'utf8');
 const others = ['/workspace/MASD-Engineering-Toolbox', '/workspace/ModuLaser-Battery-Calculator', '/workspace/ModuLaser-Commisioning-Report'].map(r => path.join(r, 'modulaser-project.js')).filter(f => fs.existsSync(f));

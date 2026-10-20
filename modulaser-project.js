@@ -10,7 +10,7 @@
 (function (root) {
 'use strict';
 const MLP = {};
-MLP.VERSION = '1.6.1';   // 1.6.1: SFD/OAP design target (Brent 2026-10-20) — project/Area target, published-limit validation, Fire 1 seed on UL scopes. 1.6.0: brand catalog (Edwards | Kidde Commercial), ASD-160 kind (MICRA25), hash defaults. 1.5.1: MiniLaser pipe limits (M p.66)
+MLP.VERSION = '1.6.2';   // 1.6.2: MiniLaser SFD/OAP alarm factor follows the scope's SFD/OAP target (Brent 2026-10-20 7:09 AM CT). 1.6.1: SFD/OAP design target (Brent 2026-10-20) — project/Area target, published-limit validation, Fire 1 seed on UL scopes. 1.6.0: brand catalog (Edwards | Kidde Commercial), ASD-160 kind (MICRA25), hash defaults. 1.5.1: MiniLaser pipe limits (M p.66)
 MLP.FORMAT = 'modulaser-project';
 MLP.SCHEMA_VERSION = 1;
 MLP.EXT = '.mlproj.json';
@@ -678,8 +678,10 @@ MLP.MINILASER = {
     6: 'Medium · once per 10,000 years · warehouse with diesel trucks', 7: 'Low · once per 20,000 years · warehouse with diesel trucks', 8: 'Low · once per 100,000 years · warehouse with diesel trucks' },
   /* Brent's Alarm Factor Calculator (af-table.xlsx): detector Fire 1 level %obs/ft per alarm factor */
   afFire1: { 8: 0.25, 7: 0.18, 6: 0.12, 5: 0.08, 4: 0.04, 3: 0.03, 2: 0.02, 1: 0.01, 0: 0.005 },
-  /* Brent 2026-10-16: more restrictive of UL and NFPA (existing suite rule); UL Open Area 2.18 */
-  afThresholds: { VEWFD: 1.0, EWFD: 1.5, SFD: 2.0, OAP: 2.18 },
+  /* Brent 2026-10-16: more restrictive of UL and NFPA (existing suite rule). 1.6.2 (Brent 2026-10-20 7:09 AM CT, "Yes, follow the target"):
+     SFD and OAP no longer use a fixed value — they follow the scope's SFD/OAP design target (MLP.sfdTarget; UL default 2.0, FM default 2.5).
+     SFD/OAP below are the no-project fallback (UL default target). */
+  afThresholds: { VEWFD: 1.0, EWFD: 1.5, SFD: 2.0, OAP: 2.0 },
   /* M p.72 Table 35: hole sensitivity %obs/ft and transport time s per application */
   table35: {
     'UL 268 Ed.7 OAP': { sensMin: 1.70, sensMax: 2.18, ttMin: 6, ttMax: 43 },
@@ -699,15 +701,17 @@ MLP.isMiniLaser = d => !!(d && (d.kind === 'minilaser' || d.type === 'MiniLaser'
 MLP.miniLaserMa = fan => MLP.MINILASER.fanMa[fan] || 0;
 /* Brent Q20/Q21: highest AF whose average hole sensitivity (Fire 1 × holes) ≤ threshold; round toward more sensitive.
    cls: VEWFD | EWFD | SFD | OAP. Returns { af, avg, threshold, cls, fail, steps }. */
-MLP.deriveAlarmFactor = function (holes, cls){
-  const T = MLP.MINILASER.afThresholds, n = Math.max(0, parseInt(holes, 10) || 0), c = T[cls] != null ? cls : 'SFD', thr = T[c];
+MLP.deriveAlarmFactor = function (holes, cls, scope){
+  const T = MLP.MINILASER.afThresholds, n = Math.max(0, parseInt(holes, 10) || 0), c = T[cls] != null ? cls : 'SFD';
+  const sfd = c === 'SFD' || c === 'OAP', thr = sfd && scope && scope.target != null && isFinite(+scope.target) ? +scope.target : T[c];
+  const thrSrc = sfd ? (scope && scope.target != null ? `SFD/OAP target (${scope.targetSrc || 'project'}${scope.family ? ', ' + scope.family : ''})` : 'SFD/OAP default target (UL)') : 'class limit';
   const steps = [];
   for (let af = 8; af >= 0; af--){
     const avg = +(MLP.MINILASER.afFire1[af] * n).toFixed(4); steps.push({ af, avg });
-    if (avg <= thr + 1e-9) return { af, avg, threshold: thr, cls: c, holes: n, fail: false, steps };
+    if (avg <= thr + 1e-9) return { af, avg, threshold: thr, thresholdSrc: thrSrc, cls: c, holes: n, fail: false, steps };
   }
-  return { af: 0, avg: +(MLP.MINILASER.afFire1[0] * n).toFixed(4), threshold: thr, cls: c, holes: n, fail: true, steps,
-    msg: `Even alarm factor 0 gives ${(MLP.MINILASER.afFire1[0] * n).toFixed(3)} %obs/ft average hole sensitivity with ${n} holes — over the ${c} limit ${thr}. Use fewer holes or redesign the pipework.` };
+  return { af: 0, avg: +(MLP.MINILASER.afFire1[0] * n).toFixed(4), threshold: thr, thresholdSrc: thrSrc, cls: c, holes: n, fail: true, steps,
+    msg: `Even alarm factor 0 gives ${(MLP.MINILASER.afFire1[0] * n).toFixed(3)} %obs/ft average hole sensitivity with ${n} holes — over the ${c} ${sfd ? 'target' : 'limit'} ${thr}. Use fewer holes or redesign the pipework.` };
 };
 /* Brent Q22 + 2026-10-16 rule: a MiniLaser is pre-engineered only when the user says so (picker, or the "Pre-engineered" override on an
    imported unit). A .pl import is NON-pre-engineered by default — pre-engineered units need no PipeCAD design — and elbow/tee counts no longer
@@ -876,12 +880,16 @@ MLP.preEngLookup = function (shape, fan, holes, af){
 /* parsed .pl detector → MiniLaser design fields (Brent Q18/Q20/Q22). cls = intended performance class or null. */
 /* Brent-approved (2026-10-16) class order for the alarm-factor rule: Area/Group class → project class → SFD.
    perf = Performance Criteria (perf.standard + optional perf.areas[a] override). Returns { cls, src }. */
+/* scope target for the SFD/OAP alarm-factor rule (1.6.2) */
+MLP.sfdAfScope = (perf, area) => { if (!perf) return {}; const t = MLP.sfdTarget(perf, area); return { target: t.value, targetSrc: t.src, family: t.family }; };
 MLP.miniLaserClass = function (perf, area){
   const clsOf = id => { const p = MLP.perfPreset(id); return p && p.cls && MLP.MINILASER.afThresholds[p.cls] != null ? p.cls : ''; };
+  /* 1.6.2: carry the scope's SFD/OAP target (Area/Group override → project → default) for the SFD/OAP alarm-factor rule */
+  const tg = o => o.cls === 'SFD' && perf ? Object.assign(o, MLP.sfdAfScope(perf, area)) : o;   // VEWFD/EWFD keep { cls, src }
   const a = perf && area && perf.areas && perf.areas[area];
-  if (a && a.enabled && clsOf(a.standard)) return { cls: clsOf(a.standard), src: 'area' };
-  if (perf && clsOf(perf.standard)) return { cls: clsOf(perf.standard), src: 'project' };
-  return { cls: 'SFD', src: 'default SFD' };
+  if (a && a.enabled && clsOf(a.standard)) return tg({ cls: clsOf(a.standard), src: 'area' });
+  if (perf && clsOf(perf.standard)) return tg({ cls: clsOf(perf.standard), src: 'project' });
+  return tg({ cls: 'SFD', src: 'default SFD' });
 };
 MLP.miniLaserFromPl = function (rec, cls){
   const p = rec.pipe || {}, holes = (p.holes || []).length;
@@ -890,7 +898,7 @@ MLP.miniLaserFromPl = function (rec, cls){
   const clsSrc = useCls === ci.cls ? ci.src : 'default SFD';
   let af, afSrc, derivation = null;
   if (p.afActivatedRaw === 'true' && p.af != null){ af = p.af; afSrc = 'pl'; }
-  else { derivation = MLP.deriveAlarmFactor(holes, useCls); af = derivation.af; afSrc = 'derived'; }
+  else { derivation = MLP.deriveAlarmFactor(holes, useCls, ci); af = derivation.af; afSrc = 'derived'; }
   const advice = MLP.miniLaserAdvice({ fan: rec.fan, af, preEngineered: false });   // .pl import: non-pre-engineered by default (Brent)
   const pipeCheck = MLP.miniLaserPipeCheck({ key: useCls, holes, lengthFt: p.lengthFt });   // QA F1: M p.66
   return { fan: rec.fan, alarmFactor: af, alarmFactorSrc: afSrc, derivation, perfClass: useCls, perfClassSrc: clsSrc, holes, advice, pipeCheck,
