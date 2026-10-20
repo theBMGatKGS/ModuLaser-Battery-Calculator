@@ -7,8 +7,19 @@ Plain-language notes per release. The full history is in [CHANGELOG.md](CHANGELO
 ### Recent improvements
 - **Printed Quick Start (Help ▸ Print Quick Start), per Brent 10-19.** Step 3 **Choose your path** shows the three ways to build a calc — **A** import a PipeCAD .pl, **B** create the sheets manually, **C** a combination (import, then add or edit manual sheets) — each as a full-width row with a legible screenshot.
 - The header carries the larger white Edwards (or Kidde Commercial) logo, with the revision in the subtitle.
-- Print screenshots use a complementary light theme with the same layout and KGS accents; on-screen Help stays dark. The printout is 3 letter pages. All screenshots use example data.
+- Print screenshots use a complementary light theme with the same layout and KGS accents; on-screen Help stays dark. The Calculator Quick Start is now 3 letter pages (was 2). All screenshots use example data.
 - No calculation change.
+- **Step 1 is now a full-width row (Brent 6:28 PM).** Its text is on the left and the screenshot on the right, like the Step 3 rows. The screenshot was re-captured at 2× and cropped to Brand, Project name, Prepared by and Date, so nothing is cut off and the text is legible. Step 2 sits in a matching row.
+- Step 3B now refers to steps 6–8.
+- The Calculator no longer carries the two Toolbox-only print images (`tb-config`, `tb-calc`); the Toolbox adds them itself, outside the shared Quick Start block.
+
+### Brent's asks (verbatim, CT, Mon 2026-10-19)
+- 1:12 PM, Brent's private chat with Builder: "Revise Help Menu with current screenshots of calculator to replace legacy visual entries. Also, allow for printing an intuitive Quick Start guide apart from the help menu"
+- 4:59 PM: not found. Builder has no transcript of Brent's private chat; the only trace is the earlier draft commit message "Brent 10-19 4:59/5:13/5:36 PM".
+- 5:13 PM, Brent's private chat with Builder: "Increase Edwards logo size and move revision wherever it fits.  For Step 3, create A, B, C horizontally so that their screenshots are afforded the maximum real estate and are legible.  Change all dark mode screenshots to a complimentary lite mode for printing while retaining the original look and feel."
+- 5:36 PM, Brent's private chat with Builder (widget pick): "Keep the full-width rows"
+- 5:56 PM, Brent's private chat with Builder (widget pick): "Looks good, bump it to 02.02.001"
+- 6:28 PM, QA's chat (QA-reported, verbatim): "Item 1 in Quick Start is truncated and illegible due to font size.  Expand to horizontal"
 
 ### QA audit
 - Pending: QA/Auditor review of 02.02.001 (Calculator) / 00.03.001 (Toolbox).

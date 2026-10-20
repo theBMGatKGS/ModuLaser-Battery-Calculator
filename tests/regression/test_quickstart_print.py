@@ -4,6 +4,11 @@ from playwright.async_api import async_playwright
 APP=os.environ.get('APP','file:///workspace/ModuLaser-Battery-Calculator/modulaser_battery_calculator.html')
 R=[]
 def ok(n,c,i=''): R.append(bool(c)); print('PASS' if c else 'FAIL',n,str(i)[:300])
+async def q_step1(b, html):
+    q=await b.new_page(viewport={'width':816,'height':1056}); await q.set_content(html); await q.emulate_media(media='print')
+    r=await q.evaluate("(()=>{const s=document.querySelector('.page .step'), g=s.parentElement.getBoundingClientRect(), bb=s.getBoundingClientRect(), i=s.querySelector('img'); return {row:s.classList.contains('row'), full:bb.width>=g.width-2, w:i?i.getBoundingClientRect().width:999, fit:[...document.querySelectorAll('.page')].every(p=>{const f=p.querySelector('.foot').getBoundingClientRect(); return [...p.querySelectorAll('.step')].every(x=>x.getBoundingClientRect().bottom<=f.top+1)})}})()")
+    await q.close(); return r['row'] and r['full'] and r['fit'] and r['w']>=432
+
 async def main():
   async with async_playwright() as p:
     b=await p.chromium.launch(); pg=await b.new_page(viewport={'width':1440,'height':1000}); errs=[]
@@ -38,7 +43,8 @@ async def main():
       ok('02.02.001: Choose your path step with A Import .pl / B Create manually / C Combination, each with a screenshot',
          'Choose your path' in html and all(x in html for x in ['<b>A</b>Import PipeCAD .pl','<b>B</b>Create manually','<b>C</b>Combination']) and len(re.findall(r'<div class="opt">.*?<img src="data:image/jpeg', html))==3)
     lt=await pg.evaluate("Object.keys(QS_PRINT_LIGHT)")
-    ok('02.02.001: print-light shot set present (all print slots + path + Toolbox)', all(k in lt for k in ['1-project-header','view-menu','2-add-location','3-design-basis','4-cluster-build','ribbon-rule','6-fan-and-mode','7-aux-battery','8-validation','path-a-import','path-b-manual','path-c-combination','tb-config','tb-calc']), lt)
+    ok('02.02.001: print-light shot set present (all print slots + path; Toolbox images only in the Toolbox)', all(k in lt for k in ['1-project-header','view-menu','2-add-location','3-design-basis','4-cluster-build','ribbon-rule','6-fan-and-mode','7-aux-battery','8-validation','path-a-import','path-b-manual','path-c-combination']) and (all(k in lt for k in ['tb-config','tb-calc']) if TB else not any(k in lt for k in ['tb-config','tb-calc'])), lt)
+    ok('02.02.001 (Brent 6:28 PM): Step 1 is a full-width row (spans both columns; screenshot ≥ 4.5 in wide; every step fits)', await q_step1(b, html))
     LV=set(await pg.evaluate("Object.values(QS_PRINT_LIGHT)"))
     srcs=re.findall(r'<img src="(data:image/jpeg[^"]+)"', html)
     ok('02.02.001: every print screenshot comes from the print-light set', srcs and all(x in LV for x in srcs), len(srcs))
