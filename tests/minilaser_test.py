@@ -1,10 +1,13 @@
-"""Battery Calculator 02.01.000 — MiniLaser ASD (FHSD8075-ULF). Real fixture: Brent's Example Shaft .pl (qa/minilaser/minilaser.pl).
+"""Battery Calculator 02.01.000 — MiniLaser ASD (FHSD8075-ULF). Fixture: synthetic Example-Shaft-MiniLaser.pl (tests/regression/make_synthetic_pl.py, generated at test time; no real project data).
+ML_FIXTURE=<.pl> runs the import checks on another file instead; they SKIP when that file is absent.
 Run: python3 tests/minilaser_test.py   (APP=<file url> to test another copy; output → $MLP_TEST_OUT or a temp dir; SHOTS=<dir> for screenshots)"""
 import asyncio, os, sys, json, zipfile, io, re, tempfile, base64
 from playwright.async_api import async_playwright
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 APP = os.environ.get('APP', 'file://' + ROOT + '/modulaser_battery_calculator.html')
-PL = os.environ.get('ML_FIXTURE', '/workspace/qa/minilaser/minilaser.pl')
+SYN = os.environ.get('SYNTH_DIR', '/workspace/plbuild/synth')   # generated synthetic fixtures (outside the repo)
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'regression')); import make_synthetic_pl
+PL = os.environ.get('ML_FIXTURE') or make_synthetic_pl.ensure('shaft_ml', SYN)
 OUT = os.environ.get('MLP_TEST_OUT') or tempfile.mkdtemp(prefix='ml-calc-'); os.makedirs(OUT, exist_ok=True)
 SHOTS = os.environ.get('SHOTS') or os.path.join(OUT, 'shots'); os.makedirs(SHOTS, exist_ok=True)
 R = []
@@ -131,11 +134,11 @@ async def main():
     await pg.evaluate("s=>applyLoadedState(JSON.parse(s))", st); await pg.wait_for_timeout(300)
     n = await pg.evaluate("[document.querySelectorAll('[data-role=minilaser]').length, document.querySelector('[data-role=minilaser] .ml-zone').value]")
     ok('save → load keeps the MiniLaser row', n == [1, 'ML 1'], n)
-    if not os.path.exists(PL):   # Brent: the Example Shaft .pl stays off GitHub — skip the import/output checks with a clear message
-        print(f'SKIP Example Shaft .pl import and output checks: fixture not present ({PL}); set ML_FIXTURE to run them.')
+    if not os.path.exists(PL):   # real fixtures stay off GitHub — skip the import/output checks with a clear message
+        print(f'SKIP MiniLaser .pl import and output checks: fixture not present ({PL}); set ML_FIXTURE to run them.')
         req = os.environ.get('REQUIRE_FIXTURES') == '1'
-        ok('no page errors', not errs, errs[:3]); await b.close(); print(f"{sum(R)}/{len(R)} passed, SKIPPED: Example Shaft section (fixture absent)" + (' — REQUIRE_FIXTURES=1, failing' if req else '')); sys.exit(1 if (req or not all(R)) else 0)
-    # ---- Example Shaft .pl import
+        ok('no page errors', not errs, errs[:3]); await b.close(); print(f"{sum(R)}/{len(R)} passed, SKIPPED: MiniLaser .pl section (fixture absent)" + (' — REQUIRE_FIXTURES=1, failing' if req else '')); sys.exit(1 if (req or not all(R)) else 0)
+    # ---- MiniLaser .pl import
     await fresh(pg)
     await pg.click('#import-pl-btn'); await pg.wait_for_timeout(150)
     await pg.evaluate("(()=>{ const s=plWiz.settings; if(!s.designBasis) s.designBasis='NFPA 72 Standard'; if(!s.temperature) s.temperature='77'; plWiz.step=2; plRender(); })()"); await pg.wait_for_timeout(150)
@@ -160,10 +163,10 @@ async def main():
     ok('Confirm Settings? lists the MiniLaser (standalone, not addressed)', any(x.startswith('Confirm Settings') and '1 MiniLaser' in x for x in seen), seen)
     ok('no address prompt for the MiniLaser-only import', not any('ddress' in x.split('::')[0] for x in seen), [x.split('::')[0] for x in seen])
     r = await pg.evaluate("(()=>{const tr=document.querySelector('[data-role=minilaser]'); if(!tr) return null; return {fan:tr.querySelector('.ml-fan').value, af:tr.querySelector('.ml-af').value, afSrc:tr.dataset.afSrc, holes:tr.dataset.holes, method:tr.querySelector('.ml-method').value, adv:tr.querySelector('.ml-adv').textContent, setup:tr.querySelector('.ml-setup').value, amberAf:tr.querySelector('.ml-af').classList.contains('field-needs'), der:JSON.parse(tr.dataset.derivation||'null'), mods:document.querySelectorAll('[data-role=module]').length, zone:tr.querySelector('.ml-zone').value}})()")
-    ok('Example Shaft: imported as a MiniLaser in the standalone ASD table (no ModuLaser modules)', r and r['mods'] == 0 and r['setup'] == 'pl', r)
-    ok('Example Shaft: fan 6 from aspiratorSpeed', r and r['fan'] == '6')
-    ok('Example Shaft: AF derived silently = 8 (8 holes × 0.25 = 2.00 ≤ SFD 2.0), not amber', r and r['af'] == '8' and r['afSrc'] == 'derived' and r['holes'] == '8' and not r['amberAf'] and r['der']['avg'] == 2, r and r['der'])
-    ok('Example Shaft: Remote recommended (fan 6 not DIP-settable; .pl import is non-pre-engineered by default)', r and r['method'] == 'Remote' and 'Remote' in r['adv'], r and r['adv'])
+    ok('Shaft: imported as a MiniLaser in the standalone ASD table (no ModuLaser modules)', r and r['mods'] == 0 and r['setup'] == 'pl', r)
+    ok('Shaft: fan 6 from aspiratorSpeed', r and r['fan'] == '6')
+    ok('Shaft: AF derived silently = 8 (8 holes × 0.25 = 2.00 ≤ SFD 2.0), not amber', r and r['af'] == '8' and r['afSrc'] == 'derived' and r['holes'] == '8' and not r['amberAf'] and r['der']['avg'] == 2, r and r['der'])
+    ok('Shaft: Remote recommended (fan 6 not DIP-settable; .pl import is non-pre-engineered by default)', r and r['method'] == 'Remote' and 'Remote' in r['adv'], r and r['adv'])
     PP = "(()=>{const tr=document.querySelector('[data-role=minilaser]'); const c=tr.querySelector('.ml-plpre'); return c?[c.checked, tr.querySelector('.ml-method').value, tr.querySelector('.ml-adv').textContent]:null})()"
     pp0 = await pg.evaluate(PP)
     ok('imported unit: "Pre-engineered" override present, unticked by default', pp0 is not None and pp0[0] is False and pp0[1] == 'Remote', pp0)
@@ -174,9 +177,9 @@ async def main():
     await pg.click('[data-role=minilaser] .ml-plpre'); await pg.wait_for_timeout(250); pp2 = await pg.evaluate(PP)
     ok('unticking → back to Remote', pp2 and not pp2[0] and pp2[1] == 'Remote', pp2)
     ok('no page errors', not errs, errs[:3])
-    with open(OUT + '/hoistway-import.json', 'w') as fh: json.dump(r, fh, indent=1)
-    await pg.evaluate("document.getElementById('project-name-input').value='Example Shaft MiniLaser'; document.getElementById('prepared-by-input').value='B. Wilkins'; refreshAllAmber(); v2Refresh && v2Refresh()")
-    await pg.wait_for_timeout(300); await pg.screenshot(path=SHOTS + '/01-hoistway-imported.png', full_page=False)
+    with open(OUT + '/shaft-import.json', 'w') as fh: json.dump(r, fh, indent=1)
+    await pg.evaluate("document.getElementById('project-name-input').value='Example Shaft MiniLaser'; document.getElementById('prepared-by-input').value='Example Engineer'; refreshAllAmber(); v2Refresh && v2Refresh()")
+    await pg.wait_for_timeout(300); await pg.screenshot(path=SHOTS + '/01-shaft-imported.png', full_page=False)
     # ---- outputs: print html, CVR, Excel (no fills), Word, project file
     html = await pg.evaluate("v2BuildPrintHtml({level:'standard', bom:true, scope:'all'})")
     ok('print: Standalone ASDs table', 'Standalone ASDs — not on SenseNET, not addressed' in html and 'FHSD8075-ULF' in html)
@@ -199,7 +202,8 @@ async def main():
     mld = [x for x in des['devices'] if x.get('kind') == 'minilaser']
     ok('project file: MiniLaser device (FHSD8075-ULF, standalone, no address, AF 8, Remote, pipe carried)', len(mld) == 1 and mld[0]['model'] == 'FHSD8075-ULF' and mld[0]['standalone'] and mld[0]['address'] == '' and mld[0]['minilaser']['alarmFactor'] == 8 and mld[0]['minilaser']['configMethod'] == 'Remote' and mld[0]['pipe'] and len(mld[0]['pipe']['holes']) == 8, mld and {k: mld[0][k] for k in ('model', 'fan', 'address', 'minilaser')})
     await pg.evaluate("(()=>{const d=MLP.blank(); d.design=mlpBuildDesign(); d.project={name:'Example Shaft MiniLaser'}; window.__mlproj=MLP.stringify(d,'battery-calculator',runningRevisionFull());})()")
-    open(OUT + '/hoistway.mlproj.json', 'w').write(await pg.evaluate('window.__mlproj'))
+    mlproj = await pg.evaluate('window.__mlproj'); open(OUT + '/shaft.mlproj.json', 'w').write(mlproj)
+    if not os.environ.get('ML_FIXTURE'): open(os.path.join(SYN, 'Example-Shaft-MiniLaser.mlproj.json'), 'w').write(mlproj)   # for the Report's MiniLaser test
     await b.close()
   print(f"{sum(R)}/{len(R)}"); sys.exit(0 if all(R) else 1)
 asyncio.run(main())

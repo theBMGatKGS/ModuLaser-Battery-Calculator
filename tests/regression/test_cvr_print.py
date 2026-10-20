@@ -19,11 +19,9 @@ async def main():
     await fresh(pg)
     if not await pg.evaluate("typeof cvrPageCss==='function'"):   # QA F7: baseline without the CVR redesign
         ok('CVR print redesign present (cvrPageCss)', False); await b.close(); print(f'{sum(R)}/{len(R)} passed'); sys.exit(1)
-    await import_files(pg,['NFPA318-Fab-Ceiling.pl','Example Project.pl','Example Warehouse Main Room (OAP).pl'])
+    await import_files(pg,['NFPA318-Fab-Ceiling.pl','Example-Campus-PSU.pl','Example-Warehouse-OAP.pl'])
     await fill_addresses(pg)
     await pg.evaluate(r"""()=>{document.getElementById('project-name-input').value='Sample Project';document.getElementById('network-number-input').value='Network 1';document.getElementById('prepared-by-input').value='Designer';
-      const re=/Example Project|Example Warehouse Main Room \(OAP\)|Example Warehouse Parts/g;   // neutral names in rendered images
-      document.querySelectorAll('.location input').forEach(e=>{ if(typeof e.value==='string' && e.value.match(re)) e.value=e.value.replace(re,'Site'); });
       document.querySelectorAll('.location').forEach(l=>recalcLocationInner(l.dataset.loc)); if(window.syncPrintHeaders) syncPrintHeaders();}""")
     ok('cvrPageCss names this app', NAME in await pg.evaluate("cvrPageCss()"), NAME)
     await pg.evaluate("()=>{openReportModal(); document.body.classList.add('report-print'); const st=document.createElement('style');st.id='cvr-page-style';st.textContent=cvrPageCss();document.head.appendChild(st);}")
@@ -43,7 +41,13 @@ async def main():
   ok('footer Page n of N on every page', all(f'Page {i+1} of {n}' in t for i,t in enumerate(pages)))
   ok('footer app name + revision on every page', all(NAME in t for t in pages))
   ok('table header repeated on continuation pages', all(('ADDRESS' in t and 'ZONE' in t) or 'QTY' in t for t in pages))
-  ok('no real project names leaked', not any(x in ''.join(pages) for x in ['NDA']))
+  ok('no NDA text leaked', not any(x in ''.join(pages) for x in ['NDA']))
+  # Private denylist (kept OUTSIDE the repo, one sha256(term.lower())[:16] per line) for client/project names; skipped when absent
+  dl=os.environ.get('DASH_DENYLIST','/workspace/qa/kgs-dashboard/public/private-denylist.txt'); dl2=os.environ.get('PROJECT_DENYLIST','/workspace/qa/private-denylist-projects.txt')
+  deny=set(); [deny.update(open(f).read().split()) for f in (dl,dl2) if os.path.exists(f)]
+  import hashlib; toks={w for w in re.findall(r'[a-z0-9]+',''.join(pages).lower())}
+  if deny: ok('no denylisted client/project names in the printed report', not [w for w in toks if hashlib.sha256(w.encode()).hexdigest()[:16] in deny and w not in ('kgs','edwards','kidde','pipecad','brent','bmg')])
+  else: print('SKIP denylist check: no private denylist present')
   subprocess.run(['pdftoppm','-r','70','-png','-f','1','-l','2',pdf,os.path.join(OUT,TAG+'cvr-p')])
   ok('no page errors', not errs, errs)
   print(f'{sum(R)}/{len(R)} passed'); sys.exit(0 if all(R) else 1)

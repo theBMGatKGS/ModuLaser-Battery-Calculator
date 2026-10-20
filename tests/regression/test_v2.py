@@ -23,7 +23,7 @@ async def main():
         errs=[]; pg.on('pageerror',lambda e: errs.append(str(e)))
         await pg.goto(APP); await pg.evaluate('localStorage.clear()'); await pg.reload(); await pg.wait_for_timeout(500)
         ok('no CDN / external script', await pg.evaluate("[...document.scripts].every(s=>!s.src)"))
-        await import_files(pg,['NFPA318-Fab-Ceiling.pl','Example Project.pl','Example Warehouse Main Room (OAP).pl']); await fill_addresses(pg)
+        await import_files(pg,['NFPA318-Fab-Ceiling.pl','Example-Campus-PSU.pl','Example-Warehouse-OAP.pl']); await fill_addresses(pg)
         await pg.evaluate("v2Refresh()")
         n=await pg.evaluate("document.querySelectorAll('.location').length")
         ok('sidebar lists every sheet', await pg.evaluate("document.querySelectorAll('.sb-item').length")==n, n)
@@ -143,7 +143,7 @@ async def main():
         else: ok('revision log top entry 02.02.001, older entries keep 01.x', rl=='02.02.001' and await pg.evaluate("[...document.querySelectorAll('#about-amendments-body tr td:first-child')].some(t=>t.textContent==='01.05.009')") and not await pg.evaluate("[...document.querySelectorAll('#about-amendments-body tr td:first-child')].some(t=>t.textContent.startsWith('01.06'))"))
         await pg.click('#help-close-btn')
         # wizard step 4 screenshot
-        await pg.click('#import-pl-btn'); await pick_step1(pg); await pg.click('#plw-next'); await pg.set_input_files('#plw-file',[T+'Example Deck A-D2.pl',T+'NFPA318-Fab-Ceiling.pl']); await pg.wait_for_timeout(600)
+        await pg.click('#import-pl-btn'); await pick_step1(pg); await pg.click('#plw-next'); await pg.set_input_files('#plw-file',[T+'Example-Deck-14Area.pl',T+'NFPA318-Fab-Ceiling.pl']); await pg.wait_for_timeout(600)
         await pg.click('#plw-next'); await pg.click('#plw-suggest-all'); await pg.click('#plw-next'); await pg.wait_for_timeout(300)
         ok('wizard step 4 tray + Pack into fewest present', await pg.evaluate("!!document.querySelector('.plw-tray') && [...document.querySelectorAll('[data-pack]')].some(b=>/Pack into fewest/.test(b.textContent))"))
         await pg.locator('.plw-tray').first.scroll_into_view_if_needed(); await pg.screenshot(path=SH+'05-wizard-step4.png')

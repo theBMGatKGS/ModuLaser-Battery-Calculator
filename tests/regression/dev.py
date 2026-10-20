@@ -8,7 +8,7 @@ async def main():
         b=await p.chromium.launch(); ctx=await b.new_context(viewport={'width':1500,'height':1000}); pg=await ctx.new_page()
         errs=[]; pg.on('pageerror',lambda e: errs.append(str(e)))
         await pg.goto(APP); await pg.evaluate('localStorage.clear()'); await pg.reload(); await pg.wait_for_timeout(500)
-        await import_files(pg,['NFPA318-Fab-Ceiling.pl','Example Project.pl']); await fill_addresses(pg)
+        await import_files(pg,['NFPA318-Fab-Ceiling.pl','Example-Campus-PSU.pl']); await fill_addresses(pg)
         for lv in ['summary','standard','full']:
             html=await pg.evaluate(f"v2BuildPrintHtml({{level:'{lv}'}})"); open(_OUT+f'/p-{lv}.html','w').write(html)
             print(lv, await render_pdf(b, html, _OUT+f'/p-{lv}.pdf'))

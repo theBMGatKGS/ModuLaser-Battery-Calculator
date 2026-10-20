@@ -10,4 +10,5 @@ Run one suite: `python3 tests/regression/test_v2.py` (and so on); run every `tes
 
 - Defaults use the repo under test: `regress.py` builds both the base (`BASE_REV`, default `main`) and the new build from this repo (working tree, or `NEW_REV`). `test_disparate_arrangement.py` covers the warning-only Disparate-clusters rule.
 - `make_nfpa318_pl.py` writes the synthetic `NFPA318-Fab-Ceiling.pl` (NFPA 318 fab ceiling, 6 detectors + 1 Minimum Display, fictional values) into `/workspace/plbuild/t/` on every run; it replaces the former real-project fixture.
-- Brent's Example Shaft fixtures stay off GitHub; the MiniLaser tests skip those sections with a clear message when they are absent.
+- `make_synthetic_pl.py` + `synthetic_pl_specs.json` write the other synthetic fixtures (Example-Campus-PSU, Example-Tunnel-5Area, Example-Deck-14Area, Example-Warehouse-OAP into `/workspace/plbuild/t/`; Example-Shaft-MiniLaser, Example-Shaft-ASD160, Example-EN54-Metric into `/workspace/plbuild/synth/`). The specs are numbers-only layout skeletons with fictional names; they replace the former real-project files.
+- Real project files stay off GitHub. Set `ML_FIXTURE` (or `ASD_FIXTURE`) to run a suite on one; those sections SKIP with a clear message when the file is absent.

@@ -1,13 +1,13 @@
 import asyncio, json, sys, os, shutil
 from playwright.async_api import async_playwright
-from helpers import pick_step1, confirm_settings
+from helpers import pick_step1, confirm_settings   # importing helpers regenerates the synthetic fixtures in T
 import os as _os, tempfile as _tf
 MLP_OUT=_os.environ.get('MLP_TEST_OUT') or _tf.mkdtemp(prefix='mlp-test-')   # all generated output goes here (QA r3)
 def _od(*p):
     d=_os.path.join(MLP_OUT,*p); _os.makedirs(d,exist_ok=True); return d.rstrip('/')+'/'
 APP='file:///workspace/ModuLaser-Battery-Calculator/modulaser_battery_calculator.html'
 T='/workspace/plbuild/t/'; SH=_od('calcshots')
-FILES={'fab':'NFPA318-Fab-Ceiling.pl','Example Project':'Example Project.pl','Example':'Example Roadway_Re-Calc Pipes.pl','deck':'Example Deck A-D2.pl','fmp':'Example Warehouse Main Room (OAP).pl'}
+FILES={'fab':'NFPA318-Fab-Ceiling.pl','campus':'Example-Campus-PSU.pl','tunnel':'Example-Tunnel-5Area.pl','deck':'Example-Deck-14Area.pl','warehouse':'Example-Warehouse-OAP.pl'}
 res=[]
 def ok(name,cond,info=''):
     res.append((name,bool(cond),info)); print(('PASS' if cond else 'FAIL'),name,info)
@@ -54,8 +54,8 @@ async def main():
         await pg.click('#plw-next')
         await pg.set_input_files('#plw-file',[T+f for f in FILES.values()]); await pg.wait_for_function('plWiz.files.length==%d' % len(FILES), timeout=30000)
         nf=await pg.evaluate('plWiz.files.length'); ok('5 files parsed', nf==5, str(nf))
-        # Example: untick 2 of 5 groups
-        bi=await pg.evaluate("plWiz.files.findIndex(f=>f.fileName.startsWith('Example'))")
+        # Tunnel: untick 2 of 5 groups
+        bi=await pg.evaluate("plWiz.files.findIndex(f=>f.fileName.startsWith('Example-Tunnel'))")
         await pg.click(f'[data-grp="{bi}:1"]'); await pg.click(f'[data-grp="{bi}:3"]')
         await pg.screenshot(path=SH+'03-wizard-step2-files.png', full_page=False)
         await pg.click('#plw-next'); await pg.wait_for_timeout(300)
@@ -71,7 +71,7 @@ async def main():
         await pg.screenshot(path=SH+'05-wizard-step4-psu-review.png')
         ok('step 4 prompt to group detectors shown', await pg.evaluate("!!document.querySelector('.plw-prompt') && /Group detectors to a power supply/.test(document.querySelector('.plw-prompt').textContent)"))
         tray=await pg.evaluate('''()=>Object.entries(plWiz.unassignedByGroup).map(([k,u])=>{const [fi,gi]=k.split(':').map(Number);return {file:plWiz.files[fi].fileName,group:plWiz.files[fi].groups[gi].origName,n:u.length}})''')
-        dk=[t for t in tray if t['file'].startswith('Deck')]
+        dk=[t for t in tray if t['file'].startswith('Example-Deck')]
         ok('Deck lone detectors land in Unassigned tray', sum(t['n'] for t in dk)>0, json.dumps(dk))
         ok('Fab ceiling has nothing unassigned', all(t['n']==0 for t in tray if t['file']=='NFPA318-Fab-Ceiling.pl'), '')
         nun=await pg.evaluate('plUnassignedCount()')
@@ -82,7 +82,7 @@ async def main():
         await pg.locator('#plw-msg').scroll_into_view_if_needed()
         await pg.screenshot(path=SH+'05c-wizard-step4-blocked-unassigned.png')
         # Move-to from the tray onto a new supply
-        dgk=await pg.evaluate("Object.keys(plWiz.unassignedByGroup).find(k=>plWiz.unassignedByGroup[k].length && plWiz.files[+k.split(':')[0]].fileName.startsWith('Deck'))")
+        dgk=await pg.evaluate("Object.keys(plWiz.unassignedByGroup).find(k=>plWiz.unassignedByGroup[k].length && plWiz.files[+k.split(':')[0]].fileName.startsWith('Example-Deck'))")
         await pg.click(f'[data-addpsu="{dgk}"]'); await pg.wait_for_timeout(100)
         before=await pg.evaluate(f'plWiz.unassignedByGroup["{dgk}"].length'); last=await pg.evaluate(f'plWiz.psuByGroup["{dgk}"].length-1')
         await pg.locator(f'.plw-tray[data-gk="{dgk}"] .plw-move').first.select_option(str(last)); await pg.wait_for_timeout(100)
@@ -93,10 +93,10 @@ async def main():
         bw=[g for g in info if g['file']=='NFPA318-Fab-Ceiling.pl'][0]
         ok('Fab ceiling 6 detectors split to <=4 per PSU', sum(p['det'] for p in bw['psus'])==6 and all(p['det']<=4 for p in bw['psus']) and len(bw['psus'])>=2, json.dumps(bw['psus']))
         ok('Fab ceiling splits 4+display / 2', sorted((p['det'],p['disp']) for p in bw['psus'])==[(2,0),(4,1)], json.dumps(bw['psus']))
-        so=[g for g in info if g['file'].startswith('Example Project')][0]
-        ok('Example Project seeded from 2 file PSUs', sum(p['fromFile'] for p in so['psus'])==2, json.dumps(so['psus']))
-        by=[g['group'] for g in info if g['file'].startswith('Example')]
-        ok('Example group selection (3 of 5)', len(by)==3, str(by))
+        so=[g for g in info if g['file'].startswith('Example-Campus')][0]
+        ok('Campus seeded from 2 file PSUs', sum(p['fromFile'] for p in so['psus'])==2, json.dumps(so['psus']))
+        by=[g['group'] for g in info if g['file'].startswith('Example-Tunnel')]
+        ok('Tunnel group selection (3 of 5)', len(by)==3, str(by))
         allp=[p for g in info for p in g['psus']]
         ok('all PSUs satisfy rules', all(p['det']<=4 and p['disp']<=1 and p['ah']<=65 for p in allp), f'{len(allp)} PSUs')
         # violation test: move a detector into the full fab-ceiling PSU
@@ -113,7 +113,7 @@ async def main():
             await pg.click(f'[data-pack="{gk}"]'); await pg.wait_for_timeout(50)
         ok('Pack into fewest unblocks Create sheets', not await pg.evaluate("document.getElementById('plw-finish').disabled") and await pg.evaluate('plUnassignedCount()')==0, await pg.text_content('#plw-msg'))
         allp=await pg.evaluate("Object.values(plWiz.psuByGroup).flat().map(p=>p.devices.length?1:0)"); allp=[1]*sum(allp)
-        dkp=await pg.evaluate("Object.entries(plWiz.psuByGroup).filter(([k])=>plWiz.files[+k.split(':')[0]].fileName.startsWith('Deck')).reduce((n,[k,p])=>n+p.length,0)"); print('Deck PSUs after pack', dkp)
+        dkp=await pg.evaluate("Object.entries(plWiz.psuByGroup).filter(([k])=>plWiz.files[+k.split(':')[0]].fileName.startsWith('Example-Deck')).reduce((n,[k,p])=>n+p.length,0)"); print('Deck PSUs after pack', dkp)
         # re-import mode: new devices land in tray
         upd=await pg.evaluate('''()=>{const sv={m:plWiz.mode,p:plWiz.psuByGroup,u:plWiz.unassignedByGroup}; plWiz.mode='update'; plBuildSuggestions(); const r={psus:Object.values(plWiz.psuByGroup).flat().length, un:plUnassignedCount()}; plWiz.mode=sv.m; plWiz.psuByGroup=sv.p; plWiz.unassignedByGroup=sv.u; plRender(); return r;}''')
         ok('re-import: new devices start in Unassigned tray', upd['psus']==0 and upd['un']>0, json.dumps(upd))

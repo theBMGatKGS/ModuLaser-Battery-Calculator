@@ -2,6 +2,7 @@ import asyncio, json, os, subprocess
 APP=os.environ.get('APP','file:///workspace/ModuLaser-Battery-Calculator/modulaser_battery_calculator.html')
 T='/workspace/plbuild/t/'
 import make_nfpa318_pl as _syn; _syn.ensure(T)   # synthetic NFPA 318 fab-ceiling fixture, regenerated each run
+import make_synthetic_pl as _syn2; _syn2.ensure_all(T, ['campus','tunnel','deck','warehouse'])   # synthetic Example-* fixtures (no real project data)
 async def pick_step1(pg, basis='NFPA 72 Voice', temp='77'):
     # 02.00.004: wizard step 1 Design Basis / Ambient Temp start on '- Select -' (required)
     await pg.evaluate("([b,t])=>{for(const [id,v] of [['plw-basis',b],['plw-temp',t]]){const s=document.getElementById(id);if(s&&!s.value){s.value=v;s.dispatchEvent(new Event('change'))}}}", [basis,temp])
